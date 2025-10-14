@@ -3,22 +3,21 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Smart HSR - تسجيل الدخول</title>
+    <title>Smrt-HSR - تسجيل الدخول</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
     <style>
-        /* الألوان: مستوحاة من هويتك (Teal/Navy) */
         :root{
-            --primary-teal:#0ea5a1; /* Teal 500 */
-            --secondary-navy:#0b2b3a; /* Dark Navy */
+            --primary-teal:#0ea5a1;
+            --secondary-navy:#0b2b3a;
             --card-bg:#ffffff;
             --button-shadow: rgba(14, 165, 161, 0.4);
         }
         *{box-sizing:border-box}
         body{
             margin:0;
-            font-family:'Tajawal', sans-serif; /* استخدام خط عربي حديث */
+            font-family:'Tajawal', sans-serif;
             background:linear-gradient(180deg,#f7f9fb 0%,#f0f2f5 100%);
             min-height:100vh;
             display:flex;
@@ -29,10 +28,10 @@
         .card{
             width:380px;
             background:var(--card-bg);
-            border-radius:24px; /* زوايا أكثر استدارة وفخامة */
-            box-shadow:0 15px 40px rgba(10,20,50,0.15); /* ظل احترافي */
+            border-radius:24px;
+            box-shadow:0 15px 40px rgba(10,20,50,0.15);
             padding:40px 30px;
-            border: 1px solid #e9ecef; /* خط خفيف حول البطاقة */
+            border: 1px solid #e9ecef;
             position:relative;
             overflow:hidden;
             transition: all 0.3s ease;
@@ -44,7 +43,6 @@
         h1{margin:0 0 4px 0;text-align:center;font-size:32px;color:var(--secondary-navy);font-weight:900;}
         p.lead{margin:0 0 25px 0;text-align:center;color:#6c757d;font-weight:500;font-size:16px;}
         
-        /* شريط التمييز العلوي (هوية الشركات الكبرى) */
         .card-header-line{
             position: absolute;
             top: 0;
@@ -96,7 +94,7 @@
             background:linear-gradient(90deg, #0b7285, var(--primary-teal));
         }
         .message{text-align:center;margin-top:15px;font-weight:600;font-size:15px;}
-        .error{color:#dc3545;} /* أحمر قوي للأخطاء */
+        .error{color:#dc3545;}
         .success{color:#198754;}
         .muted{font-size:13px;color:#7b8a90;text-align:center;margin-top:15px;}
         
@@ -121,13 +119,13 @@
 
 <div class="card" role="main">
   <div class="card-header-line"></div>
-  <h1>Smart HSR</h1>
+  <h1>Smrt-HSR</h1>
   <p class="lead">تسجيل الدخول إلى لوحة القيادة التنفيذية</p>
 
   <form id="loginForm" onsubmit="event.preventDefault(); signInWithEmail();">
     <div class="field">
       <label for="email">البريد الإلكتروني (المعتمد):</label>
-      <input id="email" type="email" placeholder="example@smart-hsr.com" required />
+      <input id="email" type="email" placeholder="example@smrt-hsr.com" required />
     </div>
     <div class="field">
       <label for="password">كلمة المرور:</label>
@@ -147,15 +145,14 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-// هذا هو نفس إعداد مشروعك Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC5HTAq-LeJn4GObn08REwKdqIeokKmwds",
-  authDomain: "smart-hsr.firebaseapp.com",
-  projectId: "smart-hsr",
-  storageBucket: "smart-hsr.firebasestorage.app",
+  authDomain: "smrt-hsr.firebaseapp.com",
+  projectId: "smrt-hsr",
+  storageBucket: "smrt-hsr.firebasestorage.app",
   messagingSenderId: "885545362431",
   appId: "1:885545362431:web:2487096393f0fcbf29bdca",
-  measurementId: "G-NH7J83MWT9" // يمكن إزالته إذا لم تستخدم إحصائيات جوجل
+  measurementId: "G-NH7J83MWT9"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -177,15 +174,12 @@ window.signInWithEmail = async function () {
         return;
     }
     
-    // وضع زر التحميل
     loginButton.disabled = true;
     loginButton.innerHTML = `<div class="loading-spinner"></div> جاري الدخول...`;
 
     try {
         await signInWithEmailAndPassword(auth, email, password);
         msg('تم تسجيل الدخول بنجاح. جاري التوجيه...','success');
-        
-        // التوجيه إلى صفحة لوحة القيادة
         window.location.href="index.html"; 
     } catch(e) {
         let errorMessage = 'خطأ في تسجيل الدخول. تأكد من البريد وكلمة المرور.';
@@ -196,8 +190,6 @@ window.signInWithEmail = async function () {
         }
         
         msg(errorMessage, 'error');
-        
-        // إعادة تفعيل الزر
         loginButton.disabled = false;
         loginButton.innerHTML = `تسجيل الدخول`;
     }
