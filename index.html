@@ -95,6 +95,42 @@
 </head>
 
 <body class="text-gray-800">
+  <script type="module">
+// حماية الموقع - السماح فقط للمستخدمين المسجلين بالبريد الإلكتروني
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC5HTAq-LeJn4GObn08REwKdqIeokKmwds",
+  authDomain: "smart-hsr.firebaseapp.com",
+  projectId: "smart-hsr",
+  storageBucket: "smart-hsr.firebasestorage.app",
+  messagingSenderId: "885545362431",
+  appId: "1:885545362431:web:2487096393f0fcbf29bdca"
+};
+
+// تهيئة Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// تحقق من حالة المستخدم
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // لم يسجل دخول → يرجع لصفحة الدخول
+    window.location.href = "login.html";
+  } else {
+    console.log("✅ المستخدم الحالي:", user.email);
+  }
+});
+
+// تسجيل الخروج
+window.smartLogout = function() {
+  signOut(auth).then(() => {
+    window.location.href = "login.html";
+  });
+};
+</script>
+
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-start mb-6 no-print">
       <button id="logout-btn" class="ai-button-secondary rounded-full px-4 py-2 text-sm font-bold flex items-center shadow-lg transition duration-300 transform hover:scale-105" onclick="smartLogout()" title="تسجيل الخروج الآمن">
