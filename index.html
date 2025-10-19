@@ -95,6 +95,41 @@
 </head>
 
 <body class="text-gray-800">
+  <!-- حماية تسجيل الدخول بالبريد الإلكتروني -->
+  <script type="module">
+    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
+      authDomain: "gen-lang-client-0349944917.firebaseapp.com",
+      projectId: "gen-lang-client-0349944917",
+      storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
+      messagingSenderId: "883065484771",
+      appId: "1:883065484771:web:c907bb5a51f68caad75cd6"
+    };
+
+    // ✅ استخدم التطبيق الموجود إذا تم تهيئته مسبقاً
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // 🔍 تحقق من حالة المستخدم
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // 🚫 المستخدم غير مسجل → يرجع لصفحة login.html
+        window.location.href = "login.html";
+      } else {
+        console.log("✅ المستخدم الحالي:", user.email);
+      }
+    });
+
+    // 🔓 تسجيل الخروج
+    window.smartLogout = function() {
+      signOut(auth).then(() => {
+        window.location.href = "login.html";
+      });
+    };
+  </script>
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-start mb-6 no-print">
