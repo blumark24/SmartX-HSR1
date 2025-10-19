@@ -937,15 +937,6 @@ async function uploadImageBase64(file) {
         </div>`);
     };
 
-    window.generatePdfReport = function(){ window.print(); };
-
-    window.smartLogout = function(){
-      const button = document.getElementById('logout-btn');
-      button.disabled = true;
-      button.innerHTML = '<div class="loading-spinner" style="border-top:4px solid var(--color-teal);"></div> جاري تسجيل الخروج...';
-      button.classList.add('flex-row-reverse','justify-center'); button.style.backgroundColor='gray';
-      setTimeout(()=>{ alert('تم تسجيل الخروج.'); window.location.href='login.html'; }, 800);
-    };
 
     // =============================
     // 7) أدوات مساعدة UI
@@ -971,25 +962,24 @@ async function uploadImageBase64(file) {
       ].sort((a,b)=>b.createdAt-a.createdAt);
     }
 
-    // =============================
-    // 8) بدء التشغيل
-    // =============================
-  async function initApp(){
+// =============================
+// 8) بدء التشغيل
+// =============================
+async function initApp(){
   try {
     await loadFromFirestore();
 
     if (!observationsData || observationsData.length === 0) {
       console.warn("⚠️ لا توجد بيانات في Firestore - سيتم استخدام النسخ المحلية فقط (بدون حذف الصور).");
-      // لا نستدعي seedLocalDemo هنا
+      // لا نستدعي seedLocalDemo هنا حتى لا نحذف الصور القديمة
     }
 
   } catch (e) {
     console.error("❌ فشل تحميل البيانات من Firestore:", e);
     alert("تعذر الاتصال بقاعدة البيانات، سيتم عرض البيانات الأخيرة المخزنة محلياً فقط.");
-    // لا نستدعي seedLocalDemo() حتى لا نحذف الصور
   }
 
-  // عرض الواجهة فقط
+  // عرض واجهة المستخدم
   renderKPIs();
   observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
   renderObservationsList(observationsData);
@@ -997,16 +987,8 @@ async function uploadImageBase64(file) {
   lucide.createIcons();
 }
 
-      // عرض
-      renderKPIs();
-      observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
-      renderObservationsList(observationsData);
-      if (observationsData.length>0) showObservationDetail(observationsData[0].docId);
-      lucide.createIcons();
-    }
-    window.onload = initApp;
+window.onload = initApp;
 
-        window.onload = initApp;
 
 // =============================
 // أداة مساعدة لتغيير حالة الأزرار أثناء التحميل
