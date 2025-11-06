@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -11,7 +11,8 @@
 
   <!-- Fonts & Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
@@ -34,8 +35,14 @@
     .brand span{color:var(--color-teal)}
     .chip{background:#f1f5f9; padding:6px 12px; border-radius:999px; font-weight:800}
     .header-actions{margin-inline-start:auto; display:flex; gap:8px; align-items:center}
-    .btn{display:inline-flex; align-items:center; gap:6px; padding:10px 14px; border:none; border-radius:999px; cursor:pointer; font-weight:800; transition:.2s; box-shadow:0 4px 10px rgba(10,25,49,.08)}
-    .btn:hover{transform:translateY(-1px)}
+    .btn{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 14px; border:none; border-radius:999px;
+      cursor:pointer; font-weight:800; transition:.2s;
+      box-shadow:0 4px 10px rgba(10,25,49,.08);
+    }
+    .btn:hover{transform:translateY(-1px) scale(1.03)}
+    .btn:active{transform:scale(0.96)}
     .btn-primary{background:var(--color-teal); color:#fff}
     .btn-dark{background:var(--color-navy); color:#fff}
     .btn-soft{background:#fff; color:var(--color-navy); border:1px solid #e2e8f0}
@@ -75,29 +82,73 @@
     }
     .pulse.red::after{color:var(--red)}
     .pulse.amber::after{color:var(--amber)}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor} 70%{box-shadow:0 0 0 14px rgba(0,0,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 14px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
 
-    /* Modal */
-    .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:2000; padding:16px}
-    .modal.open{display:flex}
-    .modal-content{background:#fff; width:min(720px, 95vw); border-radius:18px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
-    .modal-header{display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px}
-    .modal-actions{display:flex; gap:8px; margin-top:14px; justify-content:flex-end}
-    .field{display:flex; flex-direction:column; gap:6px}
-    textarea, select, input[type="file"]{border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit}
+    /* ✅ New Modal (Smart Modal 2.0) */
+    .modal {
+      position: fixed; inset: 0; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+      z-index: 2000; padding: 16px; transition: 0.3s;
+    }
+    .modal.open { display: flex; animation: fadeIn .35s ease; }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+    .modal-content {
+      background: #fff;
+      width: min(600px, 95vw);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: slideUp 0.4s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(60px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @media (max-width:720px){
+      .modal{align-items:flex-end;}
+      .modal-content{
+        width:100%; max-height:92vh; border-radius:18px 18px 0 0;
+        animation: rise .35s ease;
+      }
+      @keyframes rise{from{transform:translateY(100%);opacity:0;}to{transform:translateY(0);opacity:1;}}
+    }
+
+    .modal-header{
+      display:flex; align-items:center; gap:8px;
+      border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px;
+    }
+    .field{display:flex; flex-direction:column; gap:6px; margin-bottom:10px;}
+    textarea, select, input[type="file"]{
+      border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit;
+    }
     .pill{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800}
     .pill.red{background:#fee2e2; color:#991b1b}
     .pill.amber{background:#fef3c7; color:#92400e}
     .pill.green{background:#dcfce7; color:#065f46}
 
-    /* Toast */
-    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
+    .btn {transition:transform .15s;}
+    .btn:active{transform:scale(0.94);}
+
+    .modal-actions{
+      display:flex; justify-content:flex-end; gap:10px; margin-top:12px;
+    }
+
+    .toast{
+      position:fixed; bottom:12px; inset-inline-start:12px;
+      background:#0a1931; color:#fff;
+      padding:10px 12px; border-radius:12px;
+      box-shadow:var(--shadow); z-index:3000; display:none;
+    }
     .toast.show{display:block}
   </style>
 </head>
-<body>
 
-  <!-- Header -->
+<body>
   <header class="app-header">
     <div class="brand">Smart HSR <span>Live&nbsp;Map</span></div>
     <div id="nearStats" class="counter" title="حول موقعي الآن">
@@ -111,10 +162,8 @@
     </div>
   </header>
 
-  <!-- Map -->
   <div id="map"></div>
 
-  <!-- Floating tools -->
   <div class="toolbar">
     <div class="tool-card card">
       <div class="tool-row" style="padding:8px 10px">
@@ -140,7 +189,7 @@
     </div>
   </div>
 
-  <!-- Modal -->
+  <!-- ✅ Smart Modal 2.0 -->
   <div id="smartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
       <div class="modal-header">
@@ -149,57 +198,34 @@
         <span id="modalChip" class="pill" style="margin-inline-start:auto"></span>
       </div>
 
-      <div id="modalBody" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-        <div class="field">
-          <label>العنوان</label>
-          <div id="mTitle" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field">
-          <label>المسافة من موقعي</label>
-          <div id="mDistance" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>الوصف</label>
-          <div id="mDetails" class="card" style="padding:12px; line-height:1.8"></div>
-        </div>
-        <div class="field">
-          <label>الحالة</label>
+      <div id="modalBody">
+        <div class="field"><label>العنوان</label><div id="mTitle" class="card" style="padding:10px; font-weight:800;"></div></div>
+        <div class="field"><label>المسافة من موقعي</label><div id="mDistance" class="card" style="padding:10px; font-weight:800;"></div></div>
+        <div class="field"><label>الوصف</label><div id="mDetails" class="card" style="padding:12px; line-height:1.8"></div></div>
+        <div class="field"><label>الحالة</label>
           <select id="mStatus" class="select">
             <option value="PENDING">جديد</option>
             <option value="IN_PROGRESS">قيد التنفيذ</option>
             <option value="COMPLETED">مغلق</option>
           </select>
         </div>
-        <div class="field">
-          <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
-          <input id="afterInput" type="file" accept="image/*">
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المذكرة الختامية</label>
-          <textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المرفق الحالي</label>
-          <div id="mMedia" class="card" style="padding:8px"></div>
-        </div>
+        <div class="field"><label>صورة بعد الإصلاح (اختياري)</label><input id="afterInput" type="file" accept="image/*"></div>
+        <div class="field"><label>المذكرة الختامية</label><textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea></div>
+        <div class="field"><label>المرفق الحالي</label><div id="mMedia" class="card" style="padding:8px"></div></div>
       </div>
 
       <div class="modal-actions">
-        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
-        <button id="closeBtn" class="btn btn-soft"><i data-lucide="x"></i>إغلاق</button>
+        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i> حفظ التحديث</button>
+        <button id="closeBtn" class="btn btn-soft"><i data-lucide="x"></i> إغلاق</button>
       </div>
     </div>
   </div>
 
   <div id="toast" class="toast">تم الحفظ بنجاح</div>
 
-  <!-- Firebase -->
   <script type="module">
-    // ============ Firebase ============
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
@@ -215,270 +241,129 @@
     try { app = initializeApp(firebaseConfig); db = getFirestore(app); FIREBASE_READY=true; }
     catch(e){ console.warn("Firebase init failed, running local-only.", e); }
 
-    // ============ Map Init ============
     const map = L.map('map', { zoomControl:false, attributionControl:true });
-    // نبدأ على الرياض كإفتراضي (يمكن التحريك مباشرة)
     map.setView([24.7136, 46.6753], 10);
     L.control.zoom({ position:'topright' }).addTo(map);
 
-    // طبقة أساسية داكنة بسيطة
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom:19, attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // أيقونات ديناميكية
     const markerIcon = (status)=> L.divIcon({
       html:`<div class="pulse ${status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green'}"></div>`,
       className:'', iconSize:[16,16], iconAnchor:[8,8]
     });
 
-    // موقعي
     let meMarker=null, meCircle=null, lastMe=[24.7136,46.6753];
-    const radiusInput=document.getElementById('radiusInput');
-    radiusInput.value=2000;
+    const radiusInput=document.getElementById('radiusInput'); radiusInput.value=2000;
 
     function drawMe(){
       const r=parseInt(radiusInput.value||2000,10);
-      if (meMarker) meMarker.remove();
-      if (meCircle) meCircle.remove();
-      meMarker = L.marker(lastMe, { icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8]})}).addTo(map);
-      meCircle = L.circle(lastMe, { radius:r, color:'#18A5A2', fillColor:'#18A5A2', fillOpacity:0.08, weight:2 }).addTo(map);
+      if(meMarker) meMarker.remove(); if(meCircle) meCircle.remove();
+      meMarker=L.marker(lastMe,{icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>',className:'',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map);
+      meCircle=L.circle(lastMe,{radius:r,color:'#18A5A2',fillColor:'#18A5A2',fillOpacity:0.08,weight:2}).addTo(map);
     }
 
-    function haversine(a,b){
-      const toRad = d=> d*Math.PI/180;
-      const [lat1,lon1]=a, [lat2,lon2]=b;
-      const R=6371000; // meters
-      const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
-      const s1=Math.sin(dLat/2), s2=Math.sin(dLon/2);
-      const c=2*Math.asin(Math.sqrt(s1*s1 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*s2*s2));
-      return R*c;
-    }
+    function haversine(a,b){const toRad=d=>d*Math.PI/180;const[lat1,lon1]=a,[lat2,lon2]=b;const R=6371000;const dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1);const s1=Math.sin(dLat/2),s2=Math.sin(dLon/2);const c=2*Math.asin(Math.sqrt(s1*s1+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*s2*s2));return R*c;}
 
-    // ============ Observations Layer ============
-    const markers = new Map(); // docId -> marker
-    let observations = [];     // raw list
+    const markers=new Map(); let observations=[];
+    const statusFilter=document.getElementById('statusFilter');
+    const nearCountEl=document.getElementById('nearCount');
+    const meDistLabel=document.getElementById('meDistLabel');
+    const radiusLabel=document.getElementById('radiusLabel');
 
-    const statusFilter = document.getElementById('statusFilter');
-    const nearCountEl  = document.getElementById('nearCount');
-    const meDistLabel  = document.getElementById('meDistLabel');
-    const radiusLabel  = document.getElementById('radiusLabel');
-
-    function fmtMeters(m){ return m<1000 ? `${Math.round(m)} م` : `${(m/1000).toFixed(1)} كم`; }
+    function fmtMeters(m){return m<1000?`${Math.round(m)} م`:`${(m/1000).toFixed(1)} كم`;}
 
     function paint(){
-      // تحديث دائرة/موقعي
       drawMe();
-
-      const filter = statusFilter.value;
-      const r = parseInt(radiusInput.value,10);
-      radiusLabel.textContent = `${r} م`;
-
-      let near=0;
-      // حدّث/أضف/أزل علامات
-      const presentIds=new Set();
-      for (const o of observations){
-        if (!o.location) continue;
-        const [lat, lon] = o.location.split(',').map(n=>parseFloat(n.trim()));
-        if (Number.isNaN(lat) || Number.isNaN(lon)) continue;
-
-        // فلترة الحالة
-        if (filter!=='ALL' && o.status!==filter) continue;
-
-        const dist = haversine(lastMe, [lat,lon]);
-        const inRadius = dist<=r;
-        if (inRadius) near++;
-
-        // إظهار جميع العلامات لكن نظهر المسافة في البطاقة
-        let m = markers.get(o.docId);
-        if (!m){
-          m = L.marker([lat,lon], { icon: markerIcon(o.status) }).addTo(map);
-          m.bindTooltip(o.title || '', { direction:'top', offset:[0,-10] });
-          m.on('click', ()=> openModalFor(o, dist));
-          markers.set(o.docId, m);
-        } else {
-          m.setIcon(markerIcon(o.status));
-          m.setLatLng([lat,lon]);
-        }
+      const filter=statusFilter.value; const r=parseInt(radiusInput.value,10);
+      radiusLabel.textContent=`${r} م`;
+      let near=0; const presentIds=new Set();
+      for(const o of observations){
+        if(!o.location) continue;
+        const[lat,lon]=o.location.split(',').map(n=>parseFloat(n.trim()));
+        if(Number.isNaN(lat)||Number.isNaN(lon)) continue;
+        if(filter!=='ALL'&&o.status!==filter) continue;
+        const dist=haversine(lastMe,[lat,lon]); const inRadius=dist<=r; if(inRadius) near++;
+        let m=markers.get(o.docId);
+        if(!m){m=L.marker([lat,lon],{icon:markerIcon(o.status)}).addTo(map); m.bindTooltip(o.title||'',{direction:'top',offset:[0,-10]}); m.on('click',()=>openModalFor(o,dist)); markers.set(o.docId,m);}
+        else{m.setIcon(markerIcon(o.status));m.setLatLng([lat,lon]);}
         presentIds.add(o.docId);
       }
-      // إزالة أي علامة لم تعد ضمن البيانات/الفلتر
-      for (const [id, m] of markers){
-        if (!presentIds.has(id)){ m.remove(); markers.delete(id); }
-      }
-      nearCountEl.textContent = near.toString();
-      meDistLabel.textContent = `نطاقي: ${fmtMeters(r)}`;
+      for(const[id,m]of markers){if(!presentIds.has(id)){m.remove();markers.delete(id);}}
+      nearCountEl.textContent=near.toString(); meDistLabel.textContent=`نطاقي: ${fmtMeters(r)}`;
     }
 
-    // ============ Firestore live ============
     async function startLive(){
-      if (!FIREBASE_READY){
-        // Demo fallback
-        observations = [
-          {docId:'local-1', id:1, title:'هبوط بسيط بالممر الجانبي', status:'PENDING', type:'MAINTENANCE', date:'2025-10-01', details:'ملاحظة تجربة.', location:'24.774265,46.738586', imagePath:'https://picsum.photos/600/400?1'},
-          {docId:'local-2', id:2, title:'تشققات عرضية', status:'IN_PROGRESS', type:'QUALITY', date:'2025-10-03', details:'جاري الإصلاح.', location:'24.633333,46.716667', imagePath:'https://picsum.photos/600/400?2'},
-          {docId:'local-3', id:3, title:'لوحة إرشادية تالفة', status:'COMPLETED', type:'QUALITY', date:'2025-10-05', details:'تم الاستبدال.', location:'24.7136,46.6753', imagePath:'https://picsum.photos/600/400?3', afterImagePath:'https://picsum.photos/600/400?4', resolutionNote:'حسب المواصفات'}
-        ];
-        paint();
-        return;
+      if(!FIREBASE_READY){
+        observations=[
+          {docId:'1',id:1,title:'هبوط بالممر',status:'PENDING',location:'24.774265,46.738586',details:'ملاحظة تجريبية.',imagePath:'https://picsum.photos/600/400?1'},
+          {docId:'2',id:2,title:'تشققات',status:'IN_PROGRESS',location:'24.633333,46.716667',details:'جاري الإصلاح.',imagePath:'https://picsum.photos/600/400?2'}
+        ]; paint(); return;
       }
-      const q = query(collection(db,'observations'), orderBy('createdAt','desc'));
-      onSnapshot(q, (snap)=>{
-        const arr=[];
-        snap.forEach(d=>{
-          const data=d.data();
-          arr.push({
-            docId:d.id,
-            id: data.displayId || 0,
-            title:data.title||'—',
-            status:data.status||'PENDING',
-            type:data.type||'MAINTENANCE',
-            date:data.date||'',
-            details:data.details||'',
-            location:data.location||'',
-            imagePath:data.imagePath||null,
-            afterImagePath:data.afterImagePath||null,
-            resolutionNote:data.resolutionNote||''
-          });
-        });
-        observations = arr;
-        paint();
-      });
+      const q=query(collection(db,'observations'),orderBy('createdAt','desc'));
+      onSnapshot(q,(snap)=>{const arr=[];snap.forEach(d=>{const data=d.data();arr.push({...data,docId:d.id});});observations=arr;paint();});
     }
 
-    // ============ Geolocation ============
     const locBtn=document.getElementById('locBtn');
     const centerBtn=document.getElementById('centerBtn');
-
     let watchId=null;
-    function startWatch(){
-      if (!navigator.geolocation){ alert('المتصفح لا يدعم تحديد الموقع.'); return; }
-      if (watchId!==null) return;
-      watchId = navigator.geolocation.watchPosition(pos=>{
-        lastMe=[pos.coords.latitude, pos.coords.longitude];
-        paint();
-      }, err=>{
-        console.warn(err);
-        alert('تعذر تحديد الموقع. يرجى السماح بالصلاحيات.');
-      }, { enableHighAccuracy:true, maximumAge:2000, timeout:10000 });
-    }
+    function startWatch(){if(!navigator.geolocation){alert('المتصفح لا يدعم تحديد الموقع');return;}
+      if(watchId!==null)return;
+      watchId=navigator.geolocation.watchPosition(pos=>{lastMe=[pos.coords.latitude,pos.coords.longitude];paint();},
+        err=>{alert('تعذر تحديد الموقع');},{enableHighAccuracy:true,maximumAge:2000,timeout:10000});}
+    locBtn.onclick=()=>{startWatch();map.setView(lastMe,14,{animate:true});}
+    centerBtn.onclick=()=>map.setView(lastMe,map.getZoom()<14?14:map.getZoom(),{animate:true});
+    statusFilter.onchange=paint; radiusInput.oninput=paint;
 
-    locBtn.addEventListener('click', ()=>{
-      startWatch();
-      map.setView(lastMe, 14, { animate:true });
-    });
-    centerBtn.addEventListener('click', ()=>{
-      map.setView(lastMe, map.getZoom()<14?14:map.getZoom(), { animate:true });
-    });
+    const modal=document.getElementById('smartModal');
+    const closeBtn=document.getElementById('closeBtn');
+    const saveBtn=document.getElementById('saveBtn');
+    const mStatus=document.getElementById('mStatus');
+    const mTitleEl=document.getElementById('mTitle');
+    const mDetails=document.getElementById('mDetails');
+    const mMedia=document.getElementById('mMedia');
+    const mNote=document.getElementById('mNote');
+    const mDistance=document.getElementById('mDistance');
+    const modalChip=document.getElementById('modalChip');
+    const afterInput=document.getElementById('afterInput');
 
-    statusFilter.addEventListener('change', paint);
-    radiusInput.addEventListener('input', paint);
-
-    // ============ Modal Logic ============
-    const modal = document.getElementById('smartModal');
-    const closeBtn = document.getElementById('closeBtn');
-    const saveBtn  = document.getElementById('saveBtn');
-    const mStatus  = document.getElementById('mStatus');
-    const mTitleEl = document.getElementById('mTitle');
-    const mDetails = document.getElementById('mDetails');
-    const mMedia   = document.getElementById('mMedia');
-    const mNote    = document.getElementById('mNote');
-    const mDistance= document.getElementById('mDistance');
-    const modalChip= document.getElementById('modalChip');
-    const afterInput = document.getElementById('afterInput');
-
-    let currentDocId=null, currentImagePath=null, currentAfterData=null;
-
-    afterInput.addEventListener('change', async (e)=>{
-      const f=e.target.files?.[0];
-      if (!f) { currentAfterData=null; return; }
-      if (!f.type.startsWith('image/')) { alert('يجب اختيار صورة.'); e.target.value=''; return; }
-      currentAfterData = await toBase64(f);
-    });
+    let currentDocId=null,currentAfterData=null;
+    afterInput.onchange=async(e)=>{const f=e.target.files?.[0];if(!f){currentAfterData=null;return;}if(!f.type.startsWith('image/')){alert('يجب اختيار صورة');e.target.value='';return;}currentAfterData=await toBase64(f);}
 
     function setChip(status){
       modalChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
-      modalChip.innerHTML = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
+      modalChip.textContent=status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
     }
 
-    function openModalFor(o, dist){
-      currentDocId=o.docId; currentImagePath=o.imagePath||null; currentAfterData=null;
-      document.getElementById('modalTitle').textContent = `ملاحظة #${o.id||'—'}`;
-      mTitleEl.textContent = o.title||'—';
-      mDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
-      mStatus.value = o.status||'PENDING';
-      setChip(o.status||'PENDING');
-      mNote.value = o.resolutionNote||'';
-      mDistance.textContent = fmtMeters(dist||0);
-
-      mMedia.innerHTML = '';
-      if (o.afterImagePath){
-        mMedia.innerHTML = `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <img src="${o.imagePath||''}" alt="قبل" style="width:100%;border-radius:12px">
-            <img src="${o.afterImagePath||''}" alt="بعد" style="width:100%;border-radius:12px">
-          </div>`;
-      } else if (o.imagePath){
-        mMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق" style="width:100%;border-radius:12px">`;
-      } else {
-        mMedia.innerHTML = `<div class="card" style="padding:10px;text-align:center">لا يوجد مرفق</div>`;
-      }
-
+    function openModalFor(o,dist){
+      currentDocId=o.docId; currentAfterData=null;
+      document.getElementById('modalTitle').textContent=`ملاحظة #${o.id||'—'}`;
+      mTitleEl.textContent=o.title||'—'; mDetails.innerHTML=(o.details||'—').replace(/\n/g,'<br>');
+      mStatus.value=o.status||'PENDING'; setChip(o.status||'PENDING');
+      mNote.value=o.resolutionNote||''; mDistance.textContent=fmtMeters(dist||0);
+      mMedia.innerHTML=o.imagePath?`<img src="${o.imagePath}" style="width:100%;border-radius:12px">`:'<div class="card" style="padding:10px;text-align:center">لا يوجد مرفق</div>';
       modal.classList.add('open');
     }
 
-    closeBtn.addEventListener('click', ()=> modal.classList.remove('open'));
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
+    closeBtn.onclick=()=>modal.classList.remove('open');
+    modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open');}
 
-    saveBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ modal.classList.remove('open'); return; }
-      const newStatus = mStatus.value;
-      if (newStatus==='COMPLETED' && !currentAfterData){
-        const ok = confirm('إغلاق يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
-        if (!ok) return;
-      }
-      const payload = {
-        status: newStatus,
-        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
+    saveBtn.onclick=async()=>{
+      if(!currentDocId){modal.classList.remove('open');return;}
+      const newStatus=mStatus.value; const payload={status:newStatus,resolutionNote:mNote.value||`تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`};
+      if(currentAfterData)payload.afterImagePath=currentAfterData;
+      try{
+        if(FIREBASE_READY){await updateDoc(doc(db,'observations',currentDocId),payload);}
+        else{const idx=observations.findIndex(x=>x.docId===currentDocId);if(idx>-1)observations[idx]={...observations[idx],...payload};}
+        showToast('تم الحفظ بنجاح'); modal.classList.remove('open');
+      }catch(e){showToast('تعذر الحفظ');}
+    };
 
-      try {
-        if (FIREBASE_READY){
-          await updateDoc(doc(db,'observations', currentDocId), payload);
-        } else {
-          // Demo update
-          const idx = observations.findIndex(x=>x.docId===currentDocId);
-          if (idx>-1){
-            observations[idx] = { ...observations[idx], ...payload };
-          }
-        }
-        showToast('تم الحفظ بنجاح');
-        modal.classList.remove('open');
-      } catch (e){
-        console.error(e);
-        showToast('تعذر الحفظ، تحقق من الاتصال');
-      }
-    });
+    function showToast(text){const t=document.getElementById('toast');t.textContent=text;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+    function toBase64(file){return new Promise((res,rej)=>{const reader=new FileReader();reader.onload=e=>res(e.target.result);reader.onerror=rej;reader.readAsDataURL(file);});}
 
-    // ============ Helpers ============
-    function showToast(text){
-      const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), 2000);
-    }
-    function toBase64(file){
-      return new Promise((res,rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=> res(e.target.result);
-        reader.onerror = rej;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // ============ Start ============
-    startLive();
-    drawMe();
-    lucide.createIcons();
+    startLive(); drawMe(); lucide.createIcons();
   </script>
 </body>
 </html>
