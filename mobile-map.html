@@ -1,207 +1,181 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
   <title>Smart HSR | الخريطة الميدانية الذكية</title>
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Fonts & Icons -->
+  <!-- Icons & Fonts -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --color-navy:#0A1931; --color-teal:#18A5A2; --color-light-teal:#ACE2E1;
-      --color-gray-bg:#F7F9FC; --shadow:0 10px 30px rgba(0,0,0,.12);
+      --navy:#0A1931; --teal:#18A5A2; --teal-600:#14918E;
+      --bg:#F7F9FC; --card:#FFFFFF; --line:#E6EEF3; --shadow:0 10px 30px rgba(0,0,0,.10);
+      --text:#0A1931; --muted:#64748B;
       --red:#EF4444; --amber:#F59E0B; --green:#10B981;
-      --frame:#E5EEF0; --frame-dark:#C9D7DB;
+      --map-ring:#CFEAE8;
     }
+    [data-theme="dark"]{
+      --bg:#0e1726; --card:#102036; --line:#25334A; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --text:#E6EEF7; --muted:#9FB0C8; --map-ring:#173F46;
+    }
+
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0; font-family:'Tajawal',sans-serif; background:var(--color-gray-bg); color:var(--color-navy); overflow:hidden}
+    body{margin:0; font-family:'Tajawal',sans-serif; background:var(--bg); color:var(--text)}
 
-/* Header */
-.app-header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: #fff;
-  border-bottom: 3px solid #e6f5f4;
-  padding: 6px 10px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 3px 10px rgba(10, 25, 49, 0.06);
-  background-image: linear-gradient(180deg, rgba(24,165,162,.06), transparent);
-}
-.brand {
-  font-weight: 900;
-  letter-spacing: .3px;
-  font-size: 15px;
-}
-.brand span {
-  color: var(--color-teal);
-}
-.header-actions {
-  margin-inline-start: auto;
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 800;
-  font-size: 13px;
-  transition: .2s;
-  box-shadow: 0 2px 6px rgba(10,25,49,.08);
-}
-.btn:hover { transform: translateY(-1px); }
-.btn-primary { background: var(--color-teal); color: #fff; }
-.btn-dark { background: var(--color-navy); color: #fff; }
-.btn-soft { background: #fff; color: var(--color-navy); border: 1px solid #e2e8f0; }
+    /* Header (mobile-first, compact) */
+    .app-header{
+      position:sticky; top:0; z-index:1000; background:var(--card);
+      border-bottom:4px solid rgba(24,165,162,.12);
+      box-shadow:0 2px 10px rgba(0,0,0,.06);
+      padding:10px 12px; display:flex; align-items:center; gap:8px;
+    }
+    .brand{font-weight:900; letter-spacing:.3px; font-size:16px}
+    .brand span{color:var(--teal)}
+    .header-actions{margin-inline-start:auto; display:flex; gap:6px; align-items:center}
+    .btn{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:8px 10px; border:none; border-radius:999px; cursor:pointer;
+      font-weight:800; transition:.18s; box-shadow:0 4px 10px rgba(10,25,49,.08); font-size:12px
+    }
+    .btn i{width:16px;height:16px}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--teal); color:#fff}
+    .btn-dark{background:var(--navy); color:#fff}
+    .btn-soft{background:transparent; color:var(--text); border:1px solid var(--line)}
+    .btn-ghost{background:transparent; color:var(--text)}
+    .chip{display:none}
 
-.counter {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.counter .stat {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 4px 8px;
-  font-weight: 800;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
+    /* Make header even more compact on very small devices */
+    @media (max-width:420px){
+      .app-header{padding:8px 10px}
+      .btn{padding:6px 8px; font-size:11px}
+      .brand{font-size:14px}
+    }
 
-/* Map frame adjustment */
-.map-frame {
-  margin: 6px;
-  border-radius: 16px;
-  border: 6px solid #e0f2f1;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
-}
-.map-inner { inset: 8px; }
-#map {
-  width: 100%;
-  height: calc(100vh - 110px); /* زيدنا المساحة */
-}
+    /* Map frame like Balady */
+    .map-wrap{
+      position:relative; height:calc(100vh - 64px); /* compact header height */
+      margin:10px; border-radius:18px;
+      background:linear-gradient(#fff,#fff) padding-box,
+                 linear-gradient(135deg, #ACE2E1 0%, #18A5A2 50%, #0A1931 100%) border-box;
+      border:3px solid transparent; box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    [data-theme="dark"] .map-wrap{ background:linear-gradient(var(--card),var(--card)) padding-box,
+                                   linear-gradient(135deg, #173F46 0%, #18A5A2 50%, #0A1931 100%) border-box;}
+    #map{width:100%; height:100%}
 
-/* Toolbar smaller on mobile */
-.toolbar {
-  position: absolute;
-  top: 10px;
-  inset-inline-start: 10px;
-  z-index: 900;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transform: scale(0.9);
-  transform-origin: top left;
-}
-
-@media (max-width: 640px) {
-  .brand { font-size: 13px; }
-  .btn { font-size: 12px; padding: 5px 8px; }
-  .counter .stat { font-size: 11px; }
-  #map { height: calc(100vh - 96px); }
-}
-
-
-    /* Floating tools */
+    /* Toolbar floating (compact) */
     .toolbar{
-      position:absolute; top:22px; inset-inline-start:22px; z-index:900;
-      display:flex; flex-direction:column; gap:8px;
+      position:absolute; top:12px; inset-inline-start:12px; z-index:900;
+      display:flex; flex-direction:column; gap:8px; pointer-events:none;
     }
-    .card{background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:var(--shadow)}
-    .tool-card{padding:10px}
-    .tool-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow)}
+    .tool-card{padding:8px; pointer-events:auto}
+    .tool-row{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
     .select, .range{
-      border:1px solid #e2e8f0; border-radius:12px; padding:8px 10px; font-weight:600; background:#fff; color:#0a1931
+      border:1px solid var(--line); border-radius:10px; padding:6px 8px; font-weight:700;
+      background:var(--card); color:var(--text); font-size:12px
     }
-    .legend{padding:10px 12px; font-size:13px}
-    .legend .item{display:flex; align-items:center; gap:8px; margin:6px 0}
-    .dot{width:12px; height:12px; border-radius:50%}
+    .legend{padding:8px 10px; font-size:12px; pointer-events:auto}
+    .legend .item{display:flex; align-items:center; gap:8px; margin:4px 0}
+    .dot{width:10px; height:10px; border-radius:50%}
     .dot.red{background:var(--red)}
     .dot.amber{background:var(--amber)}
     .dot.green{background:var(--green)}
+    .legend-title{font-weight:900; margin-bottom:4px}
 
-    /* Marker styles (Uber-like) */
-    .pulse{
-      width:14px; height:14px; border-radius:50%; position:relative; box-shadow:0 0 0 2px #fff, 0 4px 10px rgba(0,0,0,.25)
-    }
+    /* Uber-like pulsing marker */
+    .pulse{ width:14px; height:14px; border-radius:50%; position:relative; box-shadow:0 0 0 2px #fff, 0 4px 10px rgba(0,0,0,.25)}
     .pulse.red{background:var(--red)}
     .pulse.amber{background:var(--amber)}
     .pulse.green{background:var(--green)}
-    .pulse.red::after, .pulse.amber::after{
+    .pulse.red::after,.pulse.amber::after{
       content:""; position:absolute; inset:0; border-radius:50%; box-shadow:0 0 0 0 currentColor; animation:pulse 1.8s infinite; opacity:.55
     }
     .pulse.red::after{color:var(--red)}
     .pulse.amber::after{color:var(--amber)}
     @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor} 70%{box-shadow:0 0 0 14px rgba(0,0,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
 
+    /* My location ring */
+    .me-ring{
+      box-shadow: 0 0 0 3px #fff;
+      border:2px solid var(--teal);
+      background:radial-gradient(circle at center, var(--teal) 0 40%, transparent 41% 100%);
+      width:16px;height:16px;border-radius:50%;
+    }
+
     /* Toast */
-    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
+    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:var(--navy); color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:4000; display:none; font-weight:800}
     .toast.show{display:block}
 
-    /* ======= Smart Bottom Sheet (بديل النافذة) ======= */
+    /* Bottom Sheet (Smart Modal) */
     .sheet{
-      position:fixed; inset-inline:0; bottom:-100%;
-      background:#fff; border-radius:22px 22px 0 0;
-      box-shadow:0 -12px 40px rgba(0,0,0,.18);
-      z-index:4000;
-      max-height:80vh; overflow:auto;
-      transition:transform .28s ease, bottom .28s ease;
-      transform:translateY(0);
-      will-change:transform;
+      position:fixed; inset-inline:0; bottom:0; z-index:3500;
+      border-top-left-radius:18px; border-top-right-radius:18px;
+      background:var(--card); color:var(--text);
+      box-shadow:0 -10px 40px rgba(0,0,0,.25);
+      transform:translateY(100%); transition:transform .28s ease;
+      border-top:1px solid var(--line);
+      max-height:80vh; display:flex; flex-direction:column;
     }
-    .sheet.open{ bottom:0 }
+    .sheet.open{transform:translateY(0)}
+    .sheet-handle{
+      width:46px; height:5px; border-radius:999px; background:var(--line);
+      margin:8px auto 6px;
+    }
     .sheet-header{
-      position:sticky; top:0; background:#fff; padding:12px 16px;
-      display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0;
+      padding:6px 14px 10px; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--line)
     }
-    .sheet-grip{
-      position:absolute; top:6px; inset-inline:0; margin:auto; width:48px; height:5px; border-radius:999px; background:#e2e8f0;
-    }
-    .sheet-title{font-weight:900; margin:0; padding-top:10px}
-    .pill{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800}
+    .sheet-header h3{margin:0; font-weight:900; font-size:15px}
+    .pill{display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px}
     .pill.red{background:#fee2e2; color:#991b1b}
     .pill.amber{background:#fef3c7; color:#92400e}
     .pill.green{background:#dcfce7; color:#065f46}
 
-    .sheet-body{padding:14px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .sheet-body{
+      padding:10px 14px; overflow:auto; display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    }
     .field{display:flex; flex-direction:column; gap:6px}
-    .card-soft{background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:10px}
+    .field label{font-size:12px; color:var(--muted); font-weight:800}
+    .card-mini{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px; font-weight:800}
     textarea, select, input[type="file"]{
-      border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit
+      border:1px solid var(--line); border-radius:10px; padding:8px; font-family:inherit; background:var(--card); color:var(--text)
     }
-    .sheet-actions{position:sticky; bottom:0; background:#fff; padding:10px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #e2e8f0}
+    .media-box{padding:8px; border-radius:12px; border:1px dashed var(--line); min-height:56px}
+    .sheet-actions{display:flex; gap:8px; padding:10px 14px 12px; border-top:1px solid var(--line); justify-content:flex-end}
+    .btn-lg{padding:10px 14px; font-size:13px}
 
-    /* Responsive tweaks */
-    @media (max-width: 1024px){
+    /* Mobile-first sizing for sheet */
+    @media (max-width:768px){
       .sheet-body{grid-template-columns:1fr}
+      .btn-lg{padding:10px 12px; font-size:12px}
+      .sheet-header h3{font-size:14px}
     }
-    @media (max-width: 640px){
-      .brand{font-size:16px}
-      .counter .stat{padding:6px 10px}
-      .toolbar{top:18px; inset-inline-start:18px}
-      .sheet{max-height:82vh}
+
+    /* Compact toolbar and counters shown in header for larger screens only */
+    .counter{display:none}
+    @media (min-width:768px){
+      .counter{display:flex; gap:8px; flex-wrap:wrap}
+      .counter .stat{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:6px 10px; font-weight:800; display:flex; align-items:center; gap:6px; font-size:12px}
+      .chip{display:inline-flex; background:rgba(241,245,249,.6); padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px}
+    }
+
+    /* Accessibility helpers */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    /* Leaflet controls (smaller) */
+    .leaflet-control-zoom a{
+      width:28px;height:28px; line-height:28px; font-size:16px;
     }
   </style>
 </head>
@@ -213,78 +187,76 @@
     <div id="nearStats" class="counter" title="حول موقعي الآن">
       <div class="stat"><i data-lucide="map-pin" class="w-4 h-4"></i><span id="meDistLabel">—</span></div>
       <div class="stat"><i data-lucide="alert-triangle" class="w-4 h-4"></i>قريب: <b id="nearCount">0</b></div>
+      <div class="chip" id="themeChip">وضع نهاري</div>
     </div>
     <div class="header-actions">
-      <button id="locBtn" class="btn btn-primary"><i data-lucide="crosshair"></i>تحديد موقعي</button>
-      <button id="centerBtn" class="btn btn-dark"><i data-lucide="navigation"></i>إعادة التمركز</button>
-      <a href="index.html" class="btn btn-soft"><i data-lucide="layout-dashboard"></i>اللوحة التنفيذية</a>
+      <button id="themeBtn" class="btn btn-soft" title="الوضع الليلي/النهاري"><i data-lucide="moon"></i><span class="sr-only">الوضع</span></button>
+      <button id="locBtn" class="btn btn-primary" title="تحديد موقعي"><i data-lucide="crosshair"></i><span>موقعي</span></button>
+      <button id="centerBtn" class="btn btn-dark" title="إعادة التمركز"><i data-lucide="navigation"></i><span>تمركز</span></button>
+      <a href="index.html" class="btn btn-soft" title="اللوحة التنفيذية"><i data-lucide="layout-dashboard"></i><span class="sr-only">اللوحة التنفيذية</span></a>
     </div>
   </header>
 
-  <!-- Content -->
-  <div class="page">
-    <div class="map-frame">
-      <div class="map-topbar"></div>
-      <div class="map-inner">
-        <div id="map"></div>
+  <!-- Map frame -->
+  <div class="map-wrap">
+    <div id="map" aria-label="الخريطة التفاعلية"></div>
+
+    <!-- Compact Floating tools -->
+    <div class="toolbar">
+      <div class="tool-card card" aria-label="أدوات التصفية">
+        <div class="tool-row">
+          <select id="statusFilter" class="select" title="تصفية حسب الحالة">
+            <option value="ALL">كل الحالات</option>
+            <option value="PENDING">جديد</option>
+            <option value="IN_PROGRESS">قيد التنفيذ</option>
+            <option value="COMPLETED">مغلق</option>
+          </select>
+          <label class="select" style="display:flex;align-items:center;gap:6px;" title="نصف القطر">
+            <i data-lucide="radar" class="w-4 h-4"></i>
+            نصف القطر:
+            <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:140px">
+            <span id="radiusLabel" style="font-weight:900">2000 م</span>
+          </label>
+        </div>
       </div>
 
-      <!-- Floating tools -->
-      <div class="toolbar">
-        <div class="tool-card card">
-          <div class="tool-row" style="padding:8px 10px">
-            <select id="statusFilter" class="select">
-              <option value="ALL">كل الحالات</option>
-              <option value="PENDING">جديد</option>
-              <option value="IN_PROGRESS">قيد التنفيذ</option>
-              <option value="COMPLETED">مغلق</option>
-            </select>
-            <label class="select" style="display:flex;align-items:center;gap:8px;">
-              <i data-lucide="radar" class="w-4 h-4"></i>
-              نصف القطر: <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:160px">
-              <span id="radiusLabel" style="font-weight:800">2000 م</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="legend card">
-          <div style="font-weight:900; margin-bottom:6px">أسطورة الحالات</div>
-          <div class="item"><span class="dot red"></span> جديد</div>
-          <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
-          <div class="item"><span class="dot green"></span> مغلق</div>
-        </div>
+      <div class="legend card" aria-label="أسطورة الحالات">
+        <div class="legend-title">أسطورة الحالات</div>
+        <div class="item"><span class="dot red"></span> جديد</div>
+        <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
+        <div class="item"><span class="dot green"></span> مغلق</div>
       </div>
     </div>
   </div>
 
-  <!-- Smart Bottom Sheet (بديل النافذة) -->
-  <div id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
-    <div class="sheet-grip" aria-hidden="true"></div>
+  <!-- Bottom Sheet (نافذة ذكية) -->
+  <section id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-handle" id="sheetHandle" aria-hidden="true"></div>
     <div class="sheet-header">
       <i data-lucide="file-search" class="w-5 h-5"></i>
-      <h3 id="sheetTitle" class="sheet-title">تفاصيل الملاحظة</h3>
+      <h3 id="sheetTitle">تفاصيل الملاحظة</h3>
       <span id="sheetChip" class="pill" style="margin-inline-start:auto"></span>
-      <button id="sheetClose" class="btn btn-soft" style="margin-inline-start:8px"><i data-lucide="x"></i>إغلاق</button>
+      <button id="sheetClose" class="btn btn-ghost" title="إغلاق"><i data-lucide="x"></i></button>
     </div>
 
     <div id="sheetBody" class="sheet-body">
       <div class="field">
         <label>العنوان</label>
-        <div id="mTitle" class="card-soft" style="font-weight:800"></div>
+        <div id="sTitle" class="card-mini"></div>
       </div>
       <div class="field">
         <label>المسافة من موقعي</label>
-        <div id="mDistance" class="card-soft" style="font-weight:800"></div>
+        <div id="sDistance" class="card-mini"></div>
       </div>
 
       <div class="field" style="grid-column:1/-1">
         <label>الوصف</label>
-        <div id="mDetails" class="card-soft" style="line-height:1.8"></div>
+        <div id="sDetails" class="card-mini" style="line-height:1.8"></div>
       </div>
 
       <div class="field">
         <label>الحالة</label>
-        <select id="mStatus">
+        <select id="sStatus">
           <option value="PENDING">جديد</option>
           <option value="IN_PROGRESS">قيد التنفيذ</option>
           <option value="COMPLETED">مغلق</option>
@@ -292,32 +264,32 @@
       </div>
 
       <div class="field">
-        <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
-        <input id="afterInput" type="file" accept="image/*">
+        <label>صورة بعد الإصلاح (إلزامية عند الإغلاق)</label>
+        <input id="sAfter" type="file" accept="image/*">
       </div>
 
       <div class="field" style="grid-column:1/-1">
         <label>المذكرة الختامية</label>
-        <textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
+        <textarea id="sNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
       </div>
 
       <div class="field" style="grid-column:1/-1">
         <label>المرفق الحالي</label>
-        <div id="mMedia" class="card-soft"></div>
+        <div id="sMedia" class="media-box"></div>
       </div>
     </div>
 
     <div class="sheet-actions">
-      <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
-      <button id="closeBtn" class="btn btn-dark"><i data-lucide="lock"></i>إغلاق البلاغ</button>
+      <button id="sSave" class="btn btn-primary btn-lg"><i data-lucide="save"></i>حفظ التحديث</button>
     </div>
-  </div>
+  </section>
 
-  <div id="toast" class="toast">تم الحفظ بنجاح</div>
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">تم الحفظ بنجاح</div>
 
-  <!-- Firebase -->
+  <!-- Firebase + App -->
   <script type="module">
-    // ============ Firebase ============
+    /* ================== Firebase ================== */
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import {
       getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy
@@ -337,34 +309,57 @@
     try { app = initializeApp(firebaseConfig); db = getFirestore(app); FIREBASE_READY=true; }
     catch(e){ console.warn("Firebase init failed, running local-only.", e); }
 
-    // ============ Map Init ============
+    /* ================== Theme ================== */
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeBtn');
+    const themeChip = document.getElementById('themeChip');
+    function applyTheme(mode){
+      root.setAttribute('data-theme', mode);
+      themeBtn.innerHTML = mode==='dark'
+        ? '<i data-lucide="sun"></i><span class="sr-only">نهاري</span>'
+        : '<i data-lucide="moon"></i><span class="sr-only">ليلي</span>';
+      if (themeChip){ themeChip.textContent = (mode==='dark'?'وضع ليلي':'وضع نهاري'); }
+      lucide.createIcons();
+      localStorage.setItem('smartTheme', mode);
+    }
+    // init theme
+    const saved = localStorage.getItem('smartTheme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(saved);
+    themeBtn.addEventListener('click', ()=>{
+      const now = root.getAttribute('data-theme')==='dark' ? 'light' : 'dark';
+      applyTheme(now);
+    });
+
+    /* ================== Map ================== */
     const map = L.map('map', { zoomControl:false, attributionControl:true });
-    // نبدأ على الرياض كإفتراضي
-    map.setView([24.7136, 46.6753], 10);
+    map.setView([24.7136, 46.6753], 11);
     L.control.zoom({ position:'topright' }).addTo(map);
 
-    // طبقة أساسية
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom:19, attribution: '&copy; OpenStreetMap'
+    // Base tiles
+    const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom:19,
+      attribution: '&copy; OpenStreetMap'
     }).addTo(map);
 
-    // أيقونات ديناميكية
-    const markerIcon = (status)=> L.divIcon({
+    // Keep map inside frame with subtle ring
+    const frameRing = L.layerGroup().addTo(map);
+
+    // Dynamic Icons
+    const statusIcon = (status)=> L.divIcon({
       html:`<div class="pulse ${status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green'}"></div>`,
       className:'', iconSize:[16,16], iconAnchor:[8,8]
     });
 
-    // موقعي + نطاق
+    // My location
     let meMarker=null, meCircle=null, lastMe=[24.7136,46.6753];
-    const radiusInput=document.getElementById('radiusInput');
-    radiusInput.value=2000;
+    const radiusInput=document.getElementById('radiusInput'); radiusInput.value=2000;
 
     function drawMe(){
       const r=parseInt(radiusInput.value||2000,10);
       if (meMarker) meMarker.remove();
       if (meCircle) meCircle.remove();
-      meMarker = L.marker(lastMe, { icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8]})}).addTo(map);
-      meCircle = L.circle(lastMe, { radius:r, color:'#18A5A2', fillColor:'#18A5A2', fillOpacity:0.08, weight:2 }).addTo(map);
+      meMarker = L.marker(lastMe, { icon:L.divIcon({html:'<div class="me-ring"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8]})}).addTo(map);
+      meCircle = L.circle(lastMe, { radius:r, color:'#18A5A2', fillColor:'var(--map-ring)', fillOpacity:0.12, weight:2 }).addTo(map);
     }
 
     function haversine(a,b){
@@ -377,9 +372,9 @@
       return R*c;
     }
 
-    // ============ Observations Layer ============
-    const markers = new Map(); // docId -> marker
-    let observations = [];     // raw list
+    /* ================== Observations ================== */
+    const markers = new Map();
+    let observations = [];
 
     const statusFilter = document.getElementById('statusFilter');
     const nearCountEl  = document.getElementById('nearCount');
@@ -390,7 +385,6 @@
 
     function paint(){
       drawMe();
-
       const filter = statusFilter.value;
       const r = parseInt(radiusInput.value,10);
       radiusLabel.textContent = `${r} م`;
@@ -405,17 +399,16 @@
         if (filter!=='ALL' && o.status!==filter) continue;
 
         const dist = haversine(lastMe, [lat,lon]);
-        const inRadius = dist<=r;
-        if (inRadius) near++;
+        if (dist<=r) near++;
 
         let m = markers.get(o.docId);
         if (!m){
-          m = L.marker([lat,lon], { icon: markerIcon(o.status) }).addTo(map);
+          m = L.marker([lat,lon], { icon: statusIcon(o.status) }).addTo(map);
           m.bindTooltip(o.title || '', { direction:'top', offset:[0,-10] });
-          m.on('click', ()=> openSheetFor(o, dist));
+          m.on('click', ()=> openSheet(o, dist));
           markers.set(o.docId, m);
         } else {
-          m.setIcon(markerIcon(o.status));
+          m.setIcon(statusIcon(o.status));
           m.setLatLng([lat,lon]);
         }
         presentIds.add(o.docId);
@@ -423,11 +416,10 @@
       for (const [id, m] of markers){
         if (!presentIds.has(id)){ m.remove(); markers.delete(id); }
       }
-      nearCountEl.textContent = near.toString();
-      meDistLabel.textContent = `نطاقي: ${fmtMeters(r)}`;
+      if (nearCountEl) nearCountEl.textContent = near.toString();
+      if (meDistLabel) meDistLabel.textContent = `نطاقي: ${fmtMeters(r)}`;
     }
 
-    // ============ Firestore live ============
     async function startLive(){
       if (!FIREBASE_READY){
         // Demo fallback
@@ -463,11 +455,11 @@
       });
     }
 
-    // ============ Geolocation ============
+    /* ================== Geolocation ================== */
     const locBtn=document.getElementById('locBtn');
     const centerBtn=document.getElementById('centerBtn');
-
     let watchId=null;
+
     function startWatch(){
       if (!navigator.geolocation){ alert('المتصفح لا يدعم تحديد الموقع.'); return; }
       if (watchId!==null) return;
@@ -491,29 +483,120 @@
     statusFilter.addEventListener('change', paint);
     radiusInput.addEventListener('input', paint);
 
-    // ============ Smart Sheet Logic ============
-    const sheet   = document.getElementById('smartSheet');
-    const sheetCloseBtn = document.getElementById('sheetClose');
-    const saveBtn = document.getElementById('saveBtn');
-    const closeBtn= document.getElementById('closeBtn');
-
-    const mStatus  = document.getElementById('mStatus');
-    const mTitleEl = document.getElementById('mTitle');
-    const mDetails = document.getElementById('mDetails');
-    const mMedia   = document.getElementById('mMedia');
-    const mNote    = document.getElementById('mNote');
-    const mDistance= document.getElementById('mDistance');
-    const sheetChip= document.getElementById('sheetChip');
-    const afterInput = document.getElementById('afterInput');
+    /* ================== Bottom Sheet Logic ================== */
+    const sheet = document.getElementById('smartSheet');
+    const sheetHandle = document.getElementById('sheetHandle');
+    const sheetClose = document.getElementById('sheetClose');
+    const sStatus  = document.getElementById('sStatus');
+    const sTitleEl = document.getElementById('sTitle');
+    const sDetails = document.getElementById('sDetails');
+    const sMedia   = document.getElementById('sMedia');
+    const sNote    = document.getElementById('sNote');
+    const sDistance= document.getElementById('sDistance');
+    const sChip    = document.getElementById('sheetChip');
+    const sSave    = document.getElementById('sSave');
+    const sAfter   = document.getElementById('sAfter');
+    const sheetTitle= document.getElementById('sheetTitle');
 
     let currentDocId=null, currentAfterData=null;
 
     function setChip(status){
-      sheetChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
-      sheetChip.textContent = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
+      sChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
+      sChip.textContent = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
     }
 
-    function toBase64(file){
+    sAfter.addEventListener('change', async (e)=>{
+      const f=e.target.files?.[0];
+      if (!f) { currentAfterData=null; return; }
+      if (!f.type.startsWith('image/')) { alert('يجب اختيار صورة.'); e.target.value=''; return; }
+      currentAfterData = await fileToBase64(f);
+    });
+
+    function openSheet(o, dist){
+      currentDocId=o.docId; currentAfterData=null;
+      sheetTitle.textContent = `ملاحظة #${o.id||'—'}`;
+      sTitleEl.textContent = o.title||'—';
+      sDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
+      sStatus.value = o.status||'PENDING';
+      setChip(o.status||'PENDING');
+      sNote.value = o.resolutionNote||'';
+      sDistance.textContent = fmtMeters(dist||0);
+
+      sMedia.innerHTML = '';
+      if (o.afterImagePath){
+        sMedia.innerHTML = `
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <img src="${o.imagePath||''}" alt="قبل" style="width:100%;border-radius:10px">
+            <img src="${o.afterImagePath||''}" alt="بعد" style="width:100%;border-radius:10px">
+          </div>`;
+      } else if (o.imagePath){
+        sMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق" style="width:100%;border-radius:10px">`;
+      } else {
+        sMedia.innerHTML = `<div class="card-mini" style="text-align:center">لا يوجد مرفق</div>`;
+      }
+
+      sheet.classList.add('open');
+    }
+
+    sheetClose.addEventListener('click', ()=> sheet.classList.remove('open'));
+    // Drag-to-close (basic)
+    let startY=0, currentY=0, dragging=false;
+    function onStart(e){ dragging=true; startY = (e.touches?e.touches[0].clientY:e.clientY); sheet.style.transition='none'; }
+    function onMove(e){
+      if(!dragging) return;
+      currentY = (e.touches?e.touches[0].clientY:e.clientY);
+      const dy = Math.max(0, currentY - startY);
+      sheet.style.transform = `translateY(${dy}px)`;
+    }
+    function onEnd(){
+      if(!dragging) return;
+      dragging=false; sheet.style.transition='';
+      const dy = Math.max(0, currentY - startY);
+      if (dy > 120){ sheet.classList.remove('open'); sheet.style.transform=''; }
+      else { sheet.style.transform=''; }
+    }
+    sheetHandle.addEventListener('mousedown', onStart);
+    sheetHandle.addEventListener('touchstart', onStart);
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove);
+    window.addEventListener('mouseup', onEnd);
+    window.addEventListener('touchend', onEnd);
+
+    sSave.addEventListener('click', async ()=>{
+      if (!currentDocId){ sheet.classList.remove('open'); return; }
+      const newStatus = sStatus.value;
+      if (newStatus==='COMPLETED' && !currentAfterData){
+        const ok = confirm('إغلاق يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
+        if (!ok) return;
+      }
+      const payload = {
+        status: newStatus,
+        resolutionNote: sNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
+      };
+      if (currentAfterData) payload.afterImagePath = currentAfterData;
+
+      try {
+        if (FIREBASE_READY){
+          await updateDoc(doc(db,'observations', currentDocId), payload);
+        } else {
+          const idx = observations.findIndex(x=>x.docId===currentDocId);
+          if (idx>-1){ observations[idx] = { ...observations[idx], ...payload }; }
+        }
+        toast('تم الحفظ بنجاح');
+        sheet.classList.remove('open');
+        paint(); // تعكس اللون/الأيقونات فوراً
+      } catch (e){
+        console.error(e);
+        toast('تعذر الحفظ، تحقق من الاتصال');
+      }
+    });
+
+    /* ================== Helpers ================== */
+    function toast(text){
+      const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), 1800);
+    }
+    function fileToBase64(file){
       return new Promise((res,rej)=>{
         const reader = new FileReader();
         reader.onload = e=> res(e.target.result);
@@ -522,113 +605,18 @@
       });
     }
 
-    afterInput.addEventListener('change', async (e)=>{
-      const f=e.target.files?.[0];
-      if (!f) { currentAfterData=null; return; }
-      if (!f.type.startsWith('image/')) { alert('يجب اختيار صورة.'); e.target.value=''; return; }
-      currentAfterData = await toBase64(f);
-    });
-
-    function openSheetFor(o, dist=0){
-      currentDocId=o.docId; currentAfterData=null;
-      document.getElementById('sheetTitle').textContent = `ملاحظة #${o.id||'—'}`;
-      mTitleEl.textContent = o.title||'—';
-      mDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
-      mStatus.value = o.status||'PENDING';
-      setChip(o.status||'PENDING');
-      mNote.value = o.resolutionNote||'';
-      mDistance.textContent = fmtMeters(dist||0);
-
-      mMedia.innerHTML = '';
-      if (o.afterImagePath){
-        mMedia.innerHTML = `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <img src="${o.imagePath||''}" alt="قبل" style="width:100%;border-radius:12px">
-            <img src="${o.afterImagePath||''}" alt="بعد" style="width:100%;border-radius:12px">
-          </div>`;
-      } else if (o.imagePath){
-        mMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق" style="width:100%;border-radius:12px">`;
-      } else {
-        mMedia.innerHTML = `<div class="card-soft" style="text-align:center">لا يوجد مرفق</div>`;
-      }
-
-      sheet.classList.add('open');
+    /* ================== Start ================== */
+    function drawFrame(){
+      frameRing.clearLayers();
+      // optional: add a subtle boundary ring around current view center
+      const center = map.getCenter();
+      L.circle([center.lat, center.lng], { radius: 80, color:'#18A5A2', fillColor:'var(--map-ring)', fillOpacity:0.06, weight:1 }).addTo(frameRing);
     }
-
-    function closeSheet(){ sheet.classList.remove('open'); }
-
-    sheetCloseBtn.addEventListener('click', closeSheet);
-    // اغلاق عند السحب للأسفل على الجوال (تحسين UX بسيط)
-    let touchStartY=null;
-    sheet.addEventListener('touchstart', (e)=>{ touchStartY = e.touches[0].clientY; }, {passive:true});
-    sheet.addEventListener('touchmove', (e)=>{
-      if (touchStartY===null) return;
-      const delta = e.touches[0].clientY - touchStartY;
-      if (delta>80) closeSheet();
-    }, {passive:true});
-    sheet.addEventListener('click', (e)=>{
-      // لا شيء — السماح للنقر على الأزرار
-    });
-
-    // حفظ
-    async function persist(payload, successMsg){
-      try {
-        if (FIREBASE_READY && currentDocId){
-          await updateDoc(doc(db,'observations', currentDocId), payload);
-        } else {
-          // Demo update
-          const idx = observations.findIndex(x=>x.docId===currentDocId);
-          if (idx>-1){ observations[idx] = { ...observations[idx], ...payload }; }
-        }
-        showToast(successMsg||'تم الحفظ بنجاح');
-        closeSheet();
-      } catch (e){
-        console.error(e);
-        showToast('تعذر الحفظ، تحقق من الاتصال');
-      }
-    }
-
-    saveBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ closeSheet(); return; }
-      const payload = {
-        status: mStatus.value,
-        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
-      await persist(payload, 'تم حفظ التحديث');
-    });
-
-    // إغلاق البلاغ (يضبط الحالة لمغلق ويتأكد من الصورة)
-    closeBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ closeSheet(); return; }
-      if (!currentAfterData){
-        const ok = confirm('إغلاق البلاغ يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
-        if (!ok) return;
-      }
-      const payload = {
-        status: 'COMPLETED',
-        resolutionNote: mNote.value || `تم الإغلاق بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
-      await persist(payload, 'تم إغلاق البلاغ');
-    });
-
-    // ============ Helpers ============
-    function showToast(text){
-      const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), 2000);
-    }
-
-    // ============ Start ============
-    function paintAndFitOnce(){
-      paint();
-      // ضمان إعادة تحجيم الخريطة بعد تحميل الإطارات
-      setTimeout(()=> { map.invalidateSize(); }, 150);
-    }
+    map.on('moveend', drawFrame);
+    drawFrame();
 
     startLive();
     drawMe();
-    paintAndFitOnce();
     lucide.createIcons();
   </script>
 </body>
