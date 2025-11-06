@@ -19,23 +19,24 @@
       --color-navy:#0A1931; --color-teal:#18A5A2; --color-light-teal:#ACE2E1;
       --color-gray-bg:#F7F9FC; --shadow:0 10px 30px rgba(0,0,0,.12);
       --red:#EF4444; --amber:#F59E0B; --green:#10B981;
-      --frame:#dbe9e7; --frame-dark:#b7cfcb;
+      --frame:#E5EEF0; --frame-dark:#C9D7DB;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0; font-family:'Tajawal',sans-serif; background:var(--color-gray-bg); color:var(--color-navy)}
-    a{color:inherit; text-decoration:none}
+    body{margin:0; font-family:'Tajawal',sans-serif; background:var(--color-gray-bg); color:var(--color-navy); overflow:hidden}
 
     /* Header */
     .app-header{
       position:sticky; top:0; z-index:1000;
       background:#fff; border-bottom:4px solid #e6f5f4;
       padding:12px 16px; display:flex; align-items:center; gap:10px;
+      box-shadow:0 6px 18px rgba(10,25,49,.06);
+      background-image:linear-gradient(180deg, rgba(24,165,162,.08), transparent);
     }
-    .brand{font-weight:900; letter-spacing:.5px}
+    .brand{font-weight:900; letter-spacing:.3px; font-size:18px}
     .brand span{color:var(--color-teal)}
     .chip{background:#f1f5f9; padding:6px 12px; border-radius:999px; font-weight:800}
-    .header-actions{margin-inline-start:auto; display:flex; gap:8px; align-items:center}
+    .header-actions{margin-inline-start:auto; display:flex; gap:8px; align-items:center; flex-wrap:wrap}
     .btn{display:inline-flex; align-items:center; gap:6px; padding:10px 14px; border:none; border-radius:999px; cursor:pointer; font-weight:800; transition:.2s; box-shadow:0 4px 10px rgba(10,25,49,.08)}
     .btn:hover{transform:translateY(-1px)}
     .btn-primary{background:var(--color-teal); color:#fff}
@@ -44,39 +45,46 @@
     .counter{display:flex; gap:8px; flex-wrap:wrap}
     .counter .stat{background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:8px 12px; font-weight:800; display:flex; align-items:center; gap:6px}
 
-    /* Map frame (Balady-like) */
-    .map-shell{
-      padding:14px; max-width:1600px; margin:14px auto;
+    /* Page layout */
+    .page{
+      height:calc(100% - 72px);
+      display:grid;
+      grid-template-rows: 1fr;
     }
-    .map-frame{
-      background:#fff;
-      border:1px solid var(--frame);
-      border-radius:18px;
-      box-shadow:0 12px 30px rgba(0,0,0,.08);
-      overflow:hidden;
-      position:relative;
-    }
-    .frame-topbar{
-      height:42px; background:linear-gradient(90deg, var(--light-teal,#e7f7f6) 0%, #eaf6f3 40%, #ffffff 100%);
-      border-bottom:1px solid var(--frame);
-      display:flex; align-items:center; gap:10px; padding:0 12px;
-    }
-    .frame-topbar .title{
-      font-weight:900; color:#0a1931; display:flex; align-items:center; gap:8px;
-    }
-    .frame-topbar .title i{opacity:.8}
-    .frame-border{
-      position:absolute; inset:42px 0 0 0;
-      pointer-events:none;
-      border-top:1px solid var(--frame);
-    }
-    /* Map container inside frame */
-    #map{width:100%; height:calc(100vh - 84px);}
 
-    /* Toolbar floating */
+    /* Framed Map like Balady */
+    .map-frame{
+      position:relative;
+      margin:12px;
+      border-radius:24px;
+      background:
+        linear-gradient(180deg, rgba(10,25,49,.06), rgba(10,25,49,0)) padding-box,
+        radial-gradient(120% 120% at 100% 0%, #ffffff, #f6fbfc) border-box;
+      border: 8px solid transparent;
+      box-shadow:
+        0 6px 14px rgba(0,0,0,.06),
+        inset 0 0 0 1px var(--frame),
+        0 16px 36px rgba(24,165,162,.08);
+      overflow:hidden;
+    }
+    .map-topbar{
+      position:absolute; top:0; left:0; right:0; height:14px;
+      background:linear-gradient(90deg, var(--frame), var(--frame-dark), var(--frame));
+      opacity:.6;
+    }
+    .map-inner{
+      position:absolute; inset:14px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid var(--frame);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.6);
+    }
+    #map{width:100%; height:100%}
+
+    /* Floating tools */
     .toolbar{
-      position:absolute; top:70px; inset-inline-start:20px; z-index:900;
-      display:flex; flex-direction:column; gap:10px;
+      position:absolute; top:22px; inset-inline-start:22px; z-index:900;
+      display:flex; flex-direction:column; gap:8px;
     }
     .card{background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:var(--shadow)}
     .tool-card{padding:10px}
@@ -105,38 +113,53 @@
     .pulse.amber::after{color:var(--amber)}
     @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor} 70%{box-shadow:0 0 0 14px rgba(0,0,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
 
-    /* Modal (UPDATED smaller + responsive) */
-    .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:2000; padding:16px}
-    .modal.open{display:flex}
-    .modal-content{
-      background:#fff; width:min(640px, 94vw);
-      border-radius:16px; padding:14px; box-shadow:0 20px 60px rgba(0,0,0,.25)
+    /* Toast */
+    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
+    .toast.show{display:block}
+
+    /* ======= Smart Bottom Sheet (بديل النافذة) ======= */
+    .sheet{
+      position:fixed; inset-inline:0; bottom:-100%;
+      background:#fff; border-radius:22px 22px 0 0;
+      box-shadow:0 -12px 40px rgba(0,0,0,.18);
+      z-index:4000;
+      max-height:80vh; overflow:auto;
+      transition:transform .28s ease, bottom .28s ease;
+      transform:translateY(0);
+      will-change:transform;
     }
-    .modal-header{
+    .sheet.open{ bottom:0 }
+    .sheet-header{
+      position:sticky; top:0; background:#fff; padding:12px 16px;
       display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0;
-      padding-bottom:8px; margin-bottom:10px
     }
-    .modal-header .h-title{margin:0; font-weight:900; font-size:16px}
-    .modal-actions{display:flex; gap:8px; margin-top:12px; justify-content:flex-end}
-    .field{display:flex; flex-direction:column; gap:6px}
-    textarea, select, input[type="file"]{border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit}
+    .sheet-grip{
+      position:absolute; top:6px; inset-inline:0; margin:auto; width:48px; height:5px; border-radius:999px; background:#e2e8f0;
+    }
+    .sheet-title{font-weight:900; margin:0; padding-top:10px}
     .pill{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800}
     .pill.red{background:#fee2e2; color:#991b1b}
     .pill.amber{background:#fef3c7; color:#92400e}
     .pill.green{background:#dcfce7; color:#065f46}
 
-    /* Smart grid sizes for all devices */
-    #modalBody{
-      display:grid; grid-template-columns: 1fr 1fr; gap:10px;
+    .sheet-body{padding:14px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .field{display:flex; flex-direction:column; gap:6px}
+    .card-soft{background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:10px}
+    textarea, select, input[type="file"]{
+      border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit
+    }
+    .sheet-actions{position:sticky; bottom:0; background:#fff; padding:10px 16px; display:flex; gap:8px; justify-content:flex-end; border-top:1px solid #e2e8f0}
+
+    /* Responsive tweaks */
+    @media (max-width: 1024px){
+      .sheet-body{grid-template-columns:1fr}
     }
     @media (max-width: 640px){
-      #modalBody{grid-template-columns:1fr}
-      .modal-content{padding:12px; width:95vw}
+      .brand{font-size:16px}
+      .counter .stat{padding:6px 10px}
+      .toolbar{top:18px; inset-inline-start:18px}
+      .sheet{max-height:82vh}
     }
-
-    /* Toast */
-    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
-    .toast.show{display:block}
   </style>
 </head>
 <body>
@@ -155,21 +178,19 @@
     </div>
   </header>
 
-  <!-- Map frame -->
-  <div class="map-shell">
+  <!-- Content -->
+  <div class="page">
     <div class="map-frame">
-      <div class="frame-topbar">
-        <div class="title"><i data-lucide="map" class="w-4 h-4"></i> الخريطة الميدانية الذكية</div>
+      <div class="map-topbar"></div>
+      <div class="map-inner">
+        <div id="map"></div>
       </div>
-      <!-- the map -->
-      <div id="map"></div>
-      <div class="frame-border"></div>
 
       <!-- Floating tools -->
       <div class="toolbar">
         <div class="tool-card card">
           <div class="tool-row" style="padding:8px 10px">
-            <select id="statusFilter" class="select" title="فلترة حسب الحالة">
+            <select id="statusFilter" class="select">
               <option value="ALL">كل الحالات</option>
               <option value="PENDING">جديد</option>
               <option value="IN_PROGRESS">قيد التنفيذ</option>
@@ -177,8 +198,7 @@
             </select>
             <label class="select" style="display:flex;align-items:center;gap:8px;">
               <i data-lucide="radar" class="w-4 h-4"></i>
-              نصف القطر:
-              <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:160px">
+              نصف القطر: <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:160px">
               <span id="radiusLabel" style="font-weight:800">2000 م</span>
             </label>
           </div>
@@ -194,60 +214,65 @@
     </div>
   </div>
 
-  <!-- Modal (REPLACED, smaller & responsive) -->
-  <div id="smartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-content">
-      <div class="modal-header">
-        <i data-lucide="file-search" class="w-5 h-5"></i>
-        <h3 id="modalTitle" class="h-title">تفاصيل الملاحظة</h3>
-        <span id="modalChip" class="pill" style="margin-inline-start:auto"></span>
-        <button id="closeBtn" class="btn btn-soft" style="padding:6px 10px;"><i data-lucide="x"></i>إغلاق</button>
+  <!-- Smart Bottom Sheet (بديل النافذة) -->
+  <div id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <div class="sheet-header">
+      <i data-lucide="file-search" class="w-5 h-5"></i>
+      <h3 id="sheetTitle" class="sheet-title">تفاصيل الملاحظة</h3>
+      <span id="sheetChip" class="pill" style="margin-inline-start:auto"></span>
+      <button id="sheetClose" class="btn btn-soft" style="margin-inline-start:8px"><i data-lucide="x"></i>إغلاق</button>
+    </div>
+
+    <div id="sheetBody" class="sheet-body">
+      <div class="field">
+        <label>العنوان</label>
+        <div id="mTitle" class="card-soft" style="font-weight:800"></div>
+      </div>
+      <div class="field">
+        <label>المسافة من موقعي</label>
+        <div id="mDistance" class="card-soft" style="font-weight:800"></div>
       </div>
 
-      <div id="modalBody">
-        <div class="field">
-          <label>العنوان</label>
-          <div id="mTitle" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field">
-          <label>المسافة من موقعي</label>
-          <div id="mDistance" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>الوصف</label>
-          <div id="mDetails" class="card" style="padding:12px; line-height:1.8"></div>
-        </div>
-        <div class="field">
-          <label>الحالة</label>
-          <select id="mStatus" class="select">
-            <option value="PENDING">جديد</option>
-            <option value="IN_PROGRESS">قيد التنفيذ</option>
-            <option value="COMPLETED">مغلق</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
-          <input id="afterInput" type="file" accept="image/*">
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المذكرة الختامية</label>
-          <textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المرفق الحالي</label>
-          <div id="mMedia" class="card" style="padding:8px"></div>
-        </div>
+      <div class="field" style="grid-column:1/-1">
+        <label>الوصف</label>
+        <div id="mDetails" class="card-soft" style="line-height:1.8"></div>
       </div>
 
-      <div class="modal-actions">
-        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
+      <div class="field">
+        <label>الحالة</label>
+        <select id="mStatus">
+          <option value="PENDING">جديد</option>
+          <option value="IN_PROGRESS">قيد التنفيذ</option>
+          <option value="COMPLETED">مغلق</option>
+        </select>
       </div>
+
+      <div class="field">
+        <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
+        <input id="afterInput" type="file" accept="image/*">
+      </div>
+
+      <div class="field" style="grid-column:1/-1">
+        <label>المذكرة الختامية</label>
+        <textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
+      </div>
+
+      <div class="field" style="grid-column:1/-1">
+        <label>المرفق الحالي</label>
+        <div id="mMedia" class="card-soft"></div>
+      </div>
+    </div>
+
+    <div class="sheet-actions">
+      <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
+      <button id="closeBtn" class="btn btn-dark"><i data-lucide="lock"></i>إغلاق البلاغ</button>
     </div>
   </div>
 
   <div id="toast" class="toast">تم الحفظ بنجاح</div>
 
-  <!-- Firebase + App -->
+  <!-- Firebase -->
   <script type="module">
     // ============ Firebase ============
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -271,7 +296,7 @@
 
     // ============ Map Init ============
     const map = L.map('map', { zoomControl:false, attributionControl:true });
-    // نبدأ على الرياض افتراضيًا
+    // نبدأ على الرياض كإفتراضي
     map.setView([24.7136, 46.6753], 10);
     L.control.zoom({ position:'topright' }).addTo(map);
 
@@ -286,7 +311,7 @@
       className:'', iconSize:[16,16], iconAnchor:[8,8]
     });
 
-    // حالتي على الخريطة + الإطار
+    // موقعي + نطاق
     let meMarker=null, meCircle=null, lastMe=[24.7136,46.6753];
     const radiusInput=document.getElementById('radiusInput');
     radiusInput.value=2000;
@@ -322,6 +347,7 @@
 
     function paint(){
       drawMe();
+
       const filter = statusFilter.value;
       const r = parseInt(radiusInput.value,10);
       radiusLabel.textContent = `${r} م`;
@@ -332,6 +358,7 @@
         if (!o.location) continue;
         const [lat, lon] = o.location.split(',').map(n=>parseFloat(n.trim()));
         if (Number.isNaN(lat) || Number.isNaN(lon)) continue;
+
         if (filter!=='ALL' && o.status!==filter) continue;
 
         const dist = haversine(lastMe, [lat,lon]);
@@ -342,7 +369,7 @@
         if (!m){
           m = L.marker([lat,lon], { icon: markerIcon(o.status) }).addTo(map);
           m.bindTooltip(o.title || '', { direction:'top', offset:[0,-10] });
-          m.on('click', ()=> openModalFor(o, dist));
+          m.on('click', ()=> openSheetFor(o, dist));
           markers.set(o.docId, m);
         } else {
           m.setIcon(markerIcon(o.status));
@@ -421,20 +448,36 @@
     statusFilter.addEventListener('change', paint);
     radiusInput.addEventListener('input', paint);
 
-    // ============ Modal Logic ============
-    const modal     = document.getElementById('smartModal');
-    const closeBtn  = document.getElementById('closeBtn');
-    const saveBtn   = document.getElementById('saveBtn');
-    const mStatus   = document.getElementById('mStatus');
-    const mTitleEl  = document.getElementById('mTitle');
-    const mDetails  = document.getElementById('mDetails');
-    const mMedia    = document.getElementById('mMedia');
-    const mNote     = document.getElementById('mNote');
-    const mDistance = document.getElementById('mDistance');
-    const modalChip = document.getElementById('modalChip');
-    const afterInput= document.getElementById('afterInput');
+    // ============ Smart Sheet Logic ============
+    const sheet   = document.getElementById('smartSheet');
+    const sheetCloseBtn = document.getElementById('sheetClose');
+    const saveBtn = document.getElementById('saveBtn');
+    const closeBtn= document.getElementById('closeBtn');
 
-    let currentDocId=null, currentAfterData=null, currentObj=null;
+    const mStatus  = document.getElementById('mStatus');
+    const mTitleEl = document.getElementById('mTitle');
+    const mDetails = document.getElementById('mDetails');
+    const mMedia   = document.getElementById('mMedia');
+    const mNote    = document.getElementById('mNote');
+    const mDistance= document.getElementById('mDistance');
+    const sheetChip= document.getElementById('sheetChip');
+    const afterInput = document.getElementById('afterInput');
+
+    let currentDocId=null, currentAfterData=null;
+
+    function setChip(status){
+      sheetChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
+      sheetChip.textContent = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
+    }
+
+    function toBase64(file){
+      return new Promise((res,rej)=>{
+        const reader = new FileReader();
+        reader.onload = e=> res(e.target.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(file);
+      });
+    }
 
     afterInput.addEventListener('change', async (e)=>{
       const f=e.target.files?.[0];
@@ -443,14 +486,9 @@
       currentAfterData = await toBase64(f);
     });
 
-    function setChip(status){
-      modalChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
-      modalChip.innerHTML = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
-    }
-
-    function openModalFor(o, dist){
-      currentObj = o; currentDocId=o.docId; currentAfterData=null;
-      document.getElementById('modalTitle').textContent = `ملاحظة #${o.id||'—'}`;
+    function openSheetFor(o, dist=0){
+      currentDocId=o.docId; currentAfterData=null;
+      document.getElementById('sheetTitle').textContent = `ملاحظة #${o.id||'—'}`;
       mTitleEl.textContent = o.title||'—';
       mDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
       mStatus.value = o.status||'PENDING';
@@ -468,57 +506,68 @@
       } else if (o.imagePath){
         mMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق" style="width:100%;border-radius:12px">`;
       } else {
-        mMedia.innerHTML = `<div class="card" style="padding:10px;text-align:center">لا يوجد مرفق</div>`;
+        mMedia.innerHTML = `<div class="card-soft" style="text-align:center">لا يوجد مرفق</div>`;
       }
 
-      modal.classList.add('open');
+      sheet.classList.add('open');
     }
 
-    closeBtn.addEventListener('click', ()=> modal.classList.remove('open'));
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
+    function closeSheet(){ sheet.classList.remove('open'); }
 
-    saveBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ modal.classList.remove('open'); return; }
-      const newStatus = mStatus.value;
-      if (newStatus==='COMPLETED' && !currentAfterData && !currentObj?.afterImagePath){
-        const ok = confirm('إغلاق يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
-        if (!ok) return;
-      }
-      const payload = {
-        status: newStatus,
-        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
+    sheetCloseBtn.addEventListener('click', closeSheet);
+    // اغلاق عند السحب للأسفل على الجوال (تحسين UX بسيط)
+    let touchStartY=null;
+    sheet.addEventListener('touchstart', (e)=>{ touchStartY = e.touches[0].clientY; }, {passive:true});
+    sheet.addEventListener('touchmove', (e)=>{
+      if (touchStartY===null) return;
+      const delta = e.touches[0].clientY - touchStartY;
+      if (delta>80) closeSheet();
+    }, {passive:true});
+    sheet.addEventListener('click', (e)=>{
+      // لا شيء — السماح للنقر على الأزرار
+    });
 
+    // حفظ
+    async function persist(payload, successMsg){
       try {
-        if (FIREBASE_READY){
+        if (FIREBASE_READY && currentDocId){
           await updateDoc(doc(db,'observations', currentDocId), payload);
         } else {
-          // Demo update (محلي)
+          // Demo update
           const idx = observations.findIndex(x=>x.docId===currentDocId);
-          if (idx>-1){
-            observations[idx] = { ...observations[idx], ...payload };
-          }
+          if (idx>-1){ observations[idx] = { ...observations[idx], ...payload }; }
         }
-        // حدث العناصر على الخريطة مباشرة لضمان الاستجابة الفورية
-        if (markers.has(currentDocId)){
-          const mk = markers.get(currentDocId);
-          mk.setIcon(markerIcon(newStatus));
-        }
-        // حدث الكائن الحالي
-        if (currentObj){
-          currentObj.status = newStatus;
-          if (payload.afterImagePath) currentObj.afterImagePath = payload.afterImagePath;
-          currentObj.resolutionNote = payload.resolutionNote;
-        }
-        setChip(newStatus);
-        showToast('تم الحفظ بنجاح');
-        modal.classList.remove('open');
-        paint();
+        showToast(successMsg||'تم الحفظ بنجاح');
+        closeSheet();
       } catch (e){
         console.error(e);
         showToast('تعذر الحفظ، تحقق من الاتصال');
       }
+    }
+
+    saveBtn.addEventListener('click', async ()=>{
+      if (!currentDocId){ closeSheet(); return; }
+      const payload = {
+        status: mStatus.value,
+        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
+      };
+      if (currentAfterData) payload.afterImagePath = currentAfterData;
+      await persist(payload, 'تم حفظ التحديث');
+    });
+
+    // إغلاق البلاغ (يضبط الحالة لمغلق ويتأكد من الصورة)
+    closeBtn.addEventListener('click', async ()=>{
+      if (!currentDocId){ closeSheet(); return; }
+      if (!currentAfterData){
+        const ok = confirm('إغلاق البلاغ يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
+        if (!ok) return;
+      }
+      const payload = {
+        status: 'COMPLETED',
+        resolutionNote: mNote.value || `تم الإغلاق بتاريخ ${new Date().toLocaleString('ar-SA')}`
+      };
+      if (currentAfterData) payload.afterImagePath = currentAfterData;
+      await persist(payload, 'تم إغلاق البلاغ');
     });
 
     // ============ Helpers ============
@@ -526,22 +575,18 @@
       const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
       setTimeout(()=> t.classList.remove('show'), 2000);
     }
-    function toBase64(file){
-      return new Promise((res,rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=> res(e.target.result);
-        reader.onerror = rej;
-        reader.readAsDataURL(file);
-      });
-    }
 
     // ============ Start ============
+    function paintAndFitOnce(){
+      paint();
+      // ضمان إعادة تحجيم الخريطة بعد تحميل الإطارات
+      setTimeout(()=> { map.invalidateSize(); }, 150);
+    }
+
     startLive();
     drawMe();
+    paintAndFitOnce();
     lucide.createIcons();
-
-    // تحفظ موضع الخريطة داخل الإطار عند تغيير الحجم
-    window.addEventListener('resize', ()=> { map.invalidateSize(); });
   </script>
 </body>
 </html>
