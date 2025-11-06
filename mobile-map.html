@@ -1,433 +1,311 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Smart HSR — الخريطة الميدانية الذكية</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart HSR | الخريطة الميدانية الذكية</title>
 
-  <!-- Leaflet + MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-
-  <!-- Lucide for icons (used in header/buttons) -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root{
-      --bg:#F7F9FC; --navy:#0A1931; --teal:#18A5A2; --muted:#6B7280;
-      --card:#fff;
-    }
-    *{box-sizing:border-box}
-    html,body,#map{height:100%}
-    body{
-      margin:0; font-family:"Tajawal",sans-serif; background:var(--bg); color:var(--navy); direction:rtl;
-      -webkit-font-smoothing:antialiased;
-    }
-
-    /* Layout */
-    .app {
-      display:flex; flex-direction:column; height:100vh;
-    }
-    header{
-      display:flex; align-items:center; gap:12px; padding:10px 14px;
-      background:linear-gradient(90deg,var(--card),#f0fbfa); box-shadow:0 6px 18px rgba(10,25,49,.06);
-      z-index:2000;
-    }
-    .brand { font-weight:700; font-size:18px; color:var(--navy); }
-    .controls { margin-inline-start:auto; display:flex; gap:8px; align-items:center; }
-
-    .btn {
-      background:var(--teal); color:#fff; border:none; padding:8px 12px; border-radius:999px;
-      font-weight:600; cursor:pointer; display:inline-flex; gap:8px; align-items:center;
-    }
-    .btn.ghost { background:transparent; color:var(--navy); border:1px solid rgba(10,25,49,.06); }
-    .btn.small{ padding:6px 10px; font-size:14px }
-
-    /* Map container */
-    #map { flex:1; min-height:300px; }
-
-    /* floating dashboard (responsive) */
-    .panel {
-      position: absolute; top:84px; left:16px; right:16px; margin:auto; max-width:1024px;
-      display:flex; gap:12px; align-items:center; padding:12px; border-radius:12px;
-      background:rgba(255,255,255,0.95); box-shadow:0 10px 30px rgba(10,25,49,.08); z-index:1500;
-      backdrop-filter: blur(6px);
-    }
-    .legend { display:flex; gap:10px; align-items:center; font-size:13px; color:var(--muted) }
-    .dot { width:12px; height:12px; border-radius:50%; display:inline-block; margin-inline-start:6px; }
-
-    /* smart modal (responsive) */
-    .smart-modal {
-      position:fixed; z-index:3000; left:0; top:0; width:100%; height:100%; display:none;
-      align-items:flex-end; justify-content:center; padding:12px; pointer-events:none;
-    }
-    .smart-modal.open{ display:flex; pointer-events:auto; }
-    .smart-card {
-      width:100%; max-width:720px; border-radius:14px; background:var(--card); padding:16px;
-      box-shadow:0 20px 50px rgba(10,25,49,.12); transform:translateY(20px);
-    }
-    @media(min-width:900px){
-      .smart-modal{ align-items:center; }
-      .smart-card{ transform:none; width:420px; }
-      .panel{ top:96px; left:32px; right:auto; }
-    }
-
-    .smart-header{ display:flex; align-items:center; justify-content:space-between; gap:8px }
-    .smart-title{ font-weight:700; color:var(--navy) }
-    .sm-actions{ display:flex; gap:8px; margin-top:10px }
-
-    /* small helpers */
-    .muted{ color:var(--muted); font-size:13px }
-    .distance { font-weight:700; color:var(--navy) }
-
-    /* dark mode auto toggle for tiles & UI tweaks */
-    @media (prefers-color-scheme: dark){
-      body{ background:#071226; color:#E6EEF3 }
-      .panel{ background: rgba(5,10,18,0.6) }
-      .smart-card{ background:#061226; color:#E6EEF3 }
-      .btn.ghost{ color:#E6EEF3; border-color:rgba(255,255,255,.06) }
-    }
-  </style>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css">
+<style>
+  :root{--navy:#0A1931;--teal:#18A5A2;--light:#F7F9FC;--shadow:rgba(10,25,49,.1)}
+  *{box-sizing:border-box}
+  body{font-family:'Tajawal',sans-serif;background:var(--light);color:#1f2937;margin:0}
+  .app{display:flex;flex-direction:column;height:100vh}
+  .header{background:#fff;border-bottom:6px solid #e6fffb;box-shadow:0 6px 20px var(--shadow);padding:.6rem 1rem;display:flex;align-items:center;gap:.6rem;position:sticky;top:0;z-index:1000}
+  .brand{display:flex;align-items:center;gap:.6rem}
+  .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--teal),#10B981);box-shadow:0 4px 12px rgba(24,165,162,.4)}
+  .title{font-weight:800;font-size:1.05rem;color:var(--navy)}
+  .controls{display:flex;flex-wrap:wrap;gap:.5rem;margin-inline-start:auto}
+  .btn,.select{border:0;border-radius:999px;padding:.55rem .9rem;font-weight:700;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.08);background:#fff;color:#0f172a}
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:var(--teal);color:#fff}
+  .toggle{display:flex;align-items:center;gap:.45rem;padding:.45rem .75rem;border-radius:999px;background:#0A1931;color:#fff;font-weight:800}
+  .toggle input{accent-color:#22c55e;transform:scale(1.1)}
+  .metrics{display:flex;gap:.6rem;padding:.6rem 1rem;background:#fff;border-bottom:1px solid #eef2f7}
+  .pill{flex:1;min-width:140px;background:linear-gradient(135deg,#f8fafc,#eef7f6);border:1px solid #e8f3f2;border-radius:18px;padding:.55rem .8rem;display:flex;align-items:center;justify-content:space-between}
+  .pill .v{font-size:1.25rem;font-weight:900;color:var(--navy)}
+  #map{flex:1}
+  .legend{position:absolute;inset-inline-end:10px;bottom:10px;background:#fff;border-radius:12px;box-shadow:0 8px 20px var(--shadow);padding:.6rem .8rem;z-index:500;font-size:.85rem}
+  .legend .row{display:flex;align-items:center;gap:.4rem;margin:.2rem 0}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .card{position:absolute;inset-inline-start:10px;bottom:10px;background:#fff;border-radius:16px;box-shadow:0 10px 30px var(--shadow);padding:.8rem;min-width:240px;max-width:320px;z-index:500}
+  .card h4{margin:.2rem 0 .4rem 0;font-size:1rem;color:var(--navy)}
+  .card p{margin:.15rem 0;font-size:.9rem;color:#334155}
+  .chip{display:inline-block;padding:.2rem .55rem;border-radius:999px;font-size:.75rem;font-weight:800;color:#fff}
+  .status-PENDING{background:#ef4444}
+  .status-IN_PROGRESS{background:#f59e0b}
+  .status-COMPLETED{background:#10b981}
+  .map-topbar{position:absolute;top:12px;inset-inline-start:12px;z-index:500;display:flex;gap:.4rem;flex-wrap:wrap}
+  .panel{background:#fff;border-radius:14px;box-shadow:0 8px 20px var(--shadow);padding:.5rem .6rem;display:flex;gap:.4rem;align-items:center}
+  .select{padding:.45rem .8rem}
+  @media (max-width:640px){.controls{display:none}}
+</style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div class="brand">Smart HSR — الخريطة الميدانية</div>
-      <div class="controls">
-        <button id="centerMeBtn" class="btn small" title="تحديد موقعي"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"><path stroke="#fff" stroke-width="1.6" d="M8 3v2M8 11v2M3 8h2M11 8h2M4.5 4.5l1.4 1.4M10.1 10.1l1.4 1.4M10.1 5.9l1.4-1.4M4.5 11.5l1.4-1.4"/></svg> موقعي</button>
-        <button id="filterBtn" class="btn ghost small" title="تصفية">تصفية</button>
-      </div>
-    </header>
-
-    <div id="map"></div>
-
-    <div class="panel" id="topPanel" role="region" aria-label="لوحة عرض الخريطة">
-      <div style="display:flex; align-items:center; gap:12px">
-        <div style="font-weight:700; color:var(--navy)">حالة الحقل</div>
-        <div class="legend">
-          <span class="dot" style="background:#1f78ff"></span> مراقب
-          <span class="dot" style="background:#ff8a00"></span> مقاول
-          <span class="dot" style="background:#10B981"></span> متحرك
-          <span class="dot" style="background:#9CA3AF"></span> غير متصل
-        </div>
-      </div>
-      <div style="margin-inline-start:auto; display:flex; gap:8px; align-items:center">
-        <div class="muted">نقاط: <span id="countUsers">0</span></div>
-        <button id="refreshBtn" class="btn small">تحديث</button>
-      </div>
+<div class="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="brand">
+      <div class="logo"></div>
+      <div class="title">الخريطة الميدانية الذكية</div>
     </div>
-
-    <!-- ذكي: نافذة مفصلة -->
-    <div id="smartModal" class="smart-modal" aria-hidden="true">
-      <div class="smart-card" role="dialog" aria-modal="true" aria-labelledby="smartTitle">
-        <div class="smart-header">
-          <div>
-            <div id="smartTitle" class="smart-title">تفاصيل المستخدم</div>
-            <div class="muted" id="smartSubtitle">—</div>
-          </div>
-          <div>
-            <button id="closeSmart" class="btn ghost small">إغلاق</button>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div class="muted">آخر مشاهدة: <span id="lastSeen">—</span></div>
-          <div class="muted">المسافة منك: <span id="distance">—</span></div>
-          <div style="margin-top:10px" id="lastObsContainer"></div>
-
-          <div class="sm-actions">
-            <button id="openNav" class="btn small">انتقل</button>
-            <button id="openDetail" class="btn ghost small">تفاصيل الملاحظة</button>
-            <button id="assignBtn" class="btn ghost small">تعيين/تحديث</button>
-          </div>
-        </div>
-      </div>
+    <div class="controls">
+      <button class="btn" onclick="goDashboard()">لوحة القيادة</button>
+      <button class="btn" onclick="refreshNow()">تحديث يدوي</button>
+      <div class="toggle"><label>تحديث تلقائي</label><input id="autoRefresh" type="checkbox" checked></div>
     </div>
   </div>
 
-  <!-- Firebase (الشيفرة نفسها كما في اللوحة، استبدل إذا لزم) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, doc, onSnapshot, query, where, orderBy, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- METRICS -->
+  <div class="metrics" id="metrics">
+    <div class="pill"><span>جديد</span><span class="v" id="mNew">0</span></div>
+    <div class="pill"><span>قيد التنفيذ</span><span class="v" id="mProg">0</span></div>
+    <div class="pill"><span>مغلق</span><span class="v" id="mDone">0</span></div>
+    <div class="pill"><span>موثّق بالصور</span><span class="v" id="mPic">0</span></div>
+  </div>
 
-    // ============ ضع هنا إعدادات Firebase (نفس المشروع) ============
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
-      authDomain: "gen-lang-client-0349944917.firebaseapp.com",
-      projectId: "gen-lang-client-0349944917",
-      storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
-      messagingSenderId: "883065484771",
-      appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
-      measurementId: "G-V8WG5M8V5B"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- MAP -->
+  <div id="map"></div>
 
-    // ============ خريطة Leaflet + طبقات تلقائية الوضع ============
-    const map = L.map('map', { zoomControl:true, preferCanvas:true });
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="row"><span class="dot" style="background:#ef4444"></span> جديد</div>
+    <div class="row"><span class="dot" style="background:#f59e0b"></span> قيد التنفيذ</div>
+    <div class="row"><span class="dot" style="background:#10b981"></span> مغلق</div>
+  </div>
 
-    // light/dark tile layers (no API key)
-    const lightTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; OSM'
+  <!-- DETAILS CARD -->
+  <div class="card" id="detailCard" style="display:none">
+    <h4 id="dTitle">—</h4>
+    <p><b>التصنيف:</b> <span id="dType">—</span></p>
+    <p><b>الموقع:</b> <span id="dLoc">—</span></p>
+    <p><b>التاريخ:</b> <span id="dDate">—</span></p>
+    <p><span id="dStatus" class="chip status-PENDING">—</span> <span id="dId" style="font-weight:800;color:#475569;margin-inline-start:.35rem"></span></p>
+    <div style="margin-top:.45rem;display:flex;gap:.4rem;flex-wrap:wrap">
+      <button class="btn-primary btn" onclick="openInDashboard()">فتح التفاصيل</button>
+      <button class="btn" onclick="closeCard()">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- MAP TOP FILTERS -->
+  <div class="map-topbar">
+    <div class="panel">
+      <select id="filterStatus" class="select" onchange="applyFilters()">
+        <option value="ALL">كل الحالات</option>
+        <option value="PENDING">جديد</option>
+        <option value="IN_PROGRESS">قيد التنفيذ</option>
+        <option value="COMPLETED">مغلق</option>
+      </select>
+      <select id="filterType" class="select" onchange="applyFilters()">
+        <option value="ALL">كل التصنيفات</option>
+        <option value="QUALITY">جودة</option>
+        <option value="MAINTENANCE">صيانة</option>
+        <option value="SAFETY">سلامة</option>
+        <option value="ENVIRONMENT">بيئة</option>
+      </select>
+      <button class="btn" id="locBtn">موقعي</button>
+    </div>
+    <div class="panel">
+      <button class="btn" onclick="setBase('street')">خريطة شارع</button>
+      <button class="btn" onclick="setBase('sat')">صور أقمار</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIBS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+<script type="module">
+/* ========= Firebase (نفس إعداداتك) ========= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
+  authDomain: "gen-lang-client-0349944917.firebaseapp.com",
+  projectId: "gen-lang-client-0349944917",
+  storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
+  messagingSenderId: "883065484771",
+  appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
+  measurementId: "G-V8WG5M8V5B"
+};
+
+let app, db;
+try{ app = initializeApp(firebaseConfig); db = getFirestore(app); }
+catch(e){ console.warn('Firebase init failed, using local seed.', e); }
+
+/* ========= خريطة شبيهة ببلدي ========= */
+const map = L.map('map', {
+  center: [24.7136, 46.6753], // الرياض كنقطة بداية حقيقية
+  zoom: 10,
+  zoomControl: false
+});
+L.control.zoom({ position: 'topleft' }).addTo(map);
+
+// طبقات أساس (Street/Satellite) بسيطة بلا مفاتيح
+const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution: '&copy; OpenStreetMap'
+});
+const sat = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+  attribution:'&copy; Esri'
+});
+let base = street.addTo(map);
+function setBase(kind){
+  if(kind==='street'){ map.removeLayer(base); base = street.addTo(map); }
+  else { map.removeLayer(base); base = sat.addTo(map); }
+}
+window.setBase = setBase;
+
+/* ========= أدوات واجهة ========= */
+document.getElementById('locBtn').onclick = ()=> {
+  map.locate({ setView:true, maxZoom:16 });
+};
+map.on('locationerror', ()=> alert('تعذر تحديد الموقع'));
+function goDashboard(){ window.location.href = 'dashboard.html'; }
+window.goDashboard = goDashboard;
+
+const autoRefreshEl = document.getElementById('autoRefresh');
+autoRefreshEl.addEventListener('change', ()=> scheduleAuto());
+function refreshNow(){ loadData(true); }
+window.refreshNow = refreshNow;
+
+/* ========= ألوان الحاله ========= */
+const COLORS = {
+  PENDING:   '#ef4444',
+  IN_PROGRESS:'#f59e0b',
+  COMPLETED: '#10b981'
+};
+
+/* ========= قراءة البيانات ورسمها ========= */
+let markers = [];
+let currentSelected = null;
+async function fetchObservations(){
+  if(!db){ // seed محلي إذا لا يوجد اتصال
+    return [
+      { docId:'local-4', id:4,  type:'QUALITY',     date:'2025-09-20', title:'تآكل لوحة إرشادية', status:'PENDING',      location:'24.7743, 46.7386' },
+      { docId:'local-3', id:3,  type:'MAINTENANCE', date:'2025-09-25', title:'عطل تبريد رئيسي',   status:'IN_PROGRESS', location:'24.6869, 46.7223' },
+      { docId:'local-2', id:2,  type:'QUALITY',     date:'2025-09-28', title:'تصدع أسفلت',        status:'COMPLETED',   location:'24.6282, 46.7436' },
+      { docId:'local-1', id:1,  type:'SAFETY',      date:'2025-10-01', title:'PPE غير مكتمل',     status:'PENDING',      location:'24.8001, 46.6009' }
+    ];
+  }
+  const q = query(collection(db,'observations'), orderBy('createdAt','desc'));
+  const snap = await getDocs(q);
+  const rows = [];
+  snap.forEach(d=>{
+    const o = d.data();
+    rows.push({
+      docId: d.id,
+      id: o.displayId || o.id || '—',
+      type: o.type || 'MAINTENANCE',
+      date: o.date || '—',
+      title: o.title || '—',
+      status: o.status || 'PENDING',
+      location: o.location || '', // "lat, lon"
     });
-    const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '&copy; CARTO'
-    });
+  });
+  return rows;
+}
 
-    // auto-switch based on user preference
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    (prefersDark ? darkTiles : lightTiles).addTo(map);
+function clearMarkers(){
+  markers.forEach(m=> map.removeLayer(m));
+  markers = [];
+}
 
-    // Listen to changes in OS theme and swap tiles
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (e.matches) {
-          map.removeLayer(lightTiles); darkTiles.addTo(map);
-        } else {
-          map.removeLayer(darkTiles); lightTiles.addTo(map);
-        }
-      });
-    }
+function makeDot(color){
+  const svg = encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='28' height='28'>
+      <circle cx='14' cy='14' r='9' fill='${color}'/>
+      <circle cx='14' cy='14' r='12' fill='white' fill-opacity='.7'/>
+    </svg>`
+  );
+  return L.icon({ iconUrl:`data:image/svg+xml,${svg}`, iconSize:[28,28], iconAnchor:[14,14] });
+}
 
-    // default view (center on country, change to your country coordinates)
-    // >>> ضع إحداثيات بلدك هنا (مركز الخريطة)
-    const countryCenter = [24.7, 46.7]; // مثال: السعودية - عدل للبلد الخاص بك
-    map.setView(countryCenter, 8);
+let allData = [];
+async function loadData(fit=false){
+  const data = await fetchObservations();
+  allData = data;
+  renderMetrics(data);
+  applyFilters(fit);
+}
 
-    // marker cluster group
-    const markers = L.markerClusterGroup({ chunkedLoading:true, showCoverageOnHover:false });
-    map.addLayer(markers);
+function renderMetrics(data){
+  const nNew  = data.filter(d=>d.status==='PENDING').length;
+  const nProg = data.filter(d=>d.status==='IN_PROGRESS').length;
+  const nDone = data.filter(d=>d.status==='COMPLETED').length;
+  const nPic  = 0; // يمكن لاحقاً احتسابه إن احتجت imagePath
+  mNew.textContent  = nNew;
+  mProg.textContent = nProg;
+  mDone.textContent = nDone;
+  mPic.textContent  = nPic;
+}
 
-    // store markers by uid for updates
-    const markerIndex = new Map();
+function parseLatLng(str){
+  if(!str) return null;
+  const [lat,lon] = String(str).split(',').map(s=>parseFloat(s.trim()));
+  if(Number.isFinite(lat)&&Number.isFinite(lon)) return {lat,lon};
+  return null;
+}
 
-    // helper: create colored icon
-    function coloredIcon(colorHex) {
-      const svg = encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><circle cx="20" cy="14" r="9" fill="${colorHex}" stroke="#fff" stroke-width="2"/><rect x="12" y="22" width="16" height="12" rx="3" fill="${colorHex}" opacity="0.95"/></svg>`);
-      return L.icon({ iconUrl: `data:image/svg+xml;utf8,${svg}`, iconSize:[36,46], iconAnchor:[18,46], popupAnchor:[0,-40] });
-    }
+function applyFilters(fit=false){
+  clearMarkers();
+  const fs = document.getElementById('filterStatus').value;
+  const ft = document.getElementById('filterType').value;
+  const filtered = allData.filter(r=>{
+    const okS = (fs==='ALL' || r.status===fs);
+    const okT = (ft==='ALL' || r.type===ft);
+    return okS && okT;
+  });
+  const group = [];
+  filtered.forEach(r=>{
+    const ll = parseLatLng(r.location);
+    if(!ll) return;
+    const icon = makeDot(COLORS[r.status] || '#64748b');
+    const m = L.marker([ll.lat,ll.lon], { icon }).addTo(map);
+    m.on('click', ()=> showCard(r));
+    markers.push(m); group.push([ll.lat,ll.lon]);
+  });
+  if(fit && group.length){ map.fitBounds(group, { padding:[40,40] }); }
+}
+window.applyFilters = applyFilters;
 
-    // colors: inspector / contractor / moving / offline
-    const ICONS = {
-      inspector: coloredIcon('#1f78ff'),
-      contractor: coloredIcon('#ff8a00'),
-      moving: coloredIcon('#10B981'),
-      offline: coloredIcon('#9CA3AF')
-    };
+/* ========= بطاقة التفاصيل ========= */
+function showCard(r){
+  currentSelected = r;
+  dTitle.textContent = r.title || '—';
+  dType.textContent  = r.type  || '—';
+  dLoc.textContent   = r.location || '—';
+  dDate.textContent  = r.date  || '—';
+  dId.textContent    = `#${r.id}`;
+  dStatus.textContent = (r.status==='PENDING'?'جديد':r.status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق');
+  dStatus.className = `chip status-${r.status}`;
+  detailCard.style.display = 'block';
+}
+function closeCard(){ detailCard.style.display = 'none'; }
+window.closeCard = closeCard;
 
-    // calculate distance in meters
-    function haversine([lat1,lon1],[lat2,lon2]){
-      const toRad = v => v*Math.PI/180;
-      const R = 6371000;
-      const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
-      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-      return R * (2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-    }
+function openInDashboard(){
+  if(!currentSelected) return;
+  // نمرر displayId كمعامل للاستفادة منه في dashboard (يمكنك قراءة query param هناك)
+  const id = encodeURIComponent(currentSelected.id);
+  window.location.href = `dashboard.html?id=${id}`;
+}
+window.openInDashboard = openInDashboard;
 
-    // Smart modal elements
-    const smartModal = document.getElementById('smartModal');
-    const smartTitle = document.getElementById('smartTitle');
-    const smartSubtitle = document.getElementById('smartSubtitle');
-    const lastSeenEl = document.getElementById('lastSeen');
-    const distanceEl = document.getElementById('distance');
-    const lastObsContainer = document.getElementById('lastObsContainer');
-    const closeSmart = document.getElementById('closeSmart');
-    const openNav = document.getElementById('openNav');
-    const openDetail = document.getElementById('openDetail');
-    const assignBtn = document.getElementById('assignBtn');
+/* ========= جدولة التحديث ========= */
+let timer=null;
+function scheduleAuto(){
+  if(timer){ clearInterval(timer); timer=null; }
+  if(autoRefreshEl.checked){
+    timer = setInterval(()=> loadData(false), 60000); // كل دقيقة
+  }
+}
+scheduleAuto();
 
-    let activeUserDoc = null;
-    closeSmart.addEventListener('click', ()=> { smartModal.classList.remove('open'); smartModal.setAttribute('aria-hidden','true'); });
-
-    // center-me button
-    document.getElementById('centerMeBtn').addEventListener('click', ()=> {
-      if (!navigator.geolocation) { alert('الموقع غير متاح'); return; }
-      navigator.geolocation.getCurrentPosition(p=>{
-        const lat = p.coords.latitude, lon = p.coords.longitude;
-        map.setView([lat,lon], 14, { animate:true });
-      }, ()=> alert('تعذر الحصول على الموقع'));
-    });
-
-    // refresh button reloads data snapshot (can be useful)
-    document.getElementById('refreshBtn').addEventListener('click', ()=> {
-      // naive: clear then refetch by re-attaching listener (we have real-time listener anyway)
-      alert('تحديث الرسوم... (الخريطة متصلة بالفعل بالزمن الحقيقي)');
-    });
-
-    // When user clicks nav — open external maps directions
-    openNav.addEventListener('click', ()=>{
-      if (!activeUserDoc) return;
-      const { lat, lng } = activeUserDoc;
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
-      window.open(url, '_blank');
-    });
-
-    // open detail (you can wire to main app page)
-    openDetail.addEventListener('click', ()=>{
-      if (!activeUserDoc) return;
-      // if your main dashboard exposes a route to observation details, open it:
-      // e.g. window.open(`observation.html?id=${activeUserDoc.currentObservationId}`, '_blank');
-      alert('افتح تفاصيل الملاحظة في اللوحة الأساسية (ركن التطوير: ربط الروابط الداخلية).');
-    });
-
-    assignBtn.addEventListener('click', ()=>{
-      if (!activeUserDoc) return;
-      const newAssignee = prompt('أدخل اسم أو معرف التعيين (تجريبي):');
-      if (!newAssignee) return;
-      alert(`تعيين (تجريبي) لـ ${activeUserDoc.name} إلى ${newAssignee}`);
-      // هنا يمكنك عمل update في Firestore إذا كانت الصلاحية متاحة
-    });
-
-    // ============ Real-time listener (field users collection) ============
-    // المقترح: collection name = "field_users"
-    // وثيقة كل مستخدم: { uid, name, role: "inspector"|"contractor", lat, lng, status: "moving|idle|offline", lastSeen: timestamp, currentObservationId: string }
-    const usersCol = collection(db, 'field_users');
-
-    // attach snapshot listener
-    onSnapshot(usersCol, snapshot => {
-      snapshot.docChanges().forEach(change => {
-        const id = change.doc.id;
-        const d = change.doc.data();
-        const payload = {
-          uid: id,
-          name: d.name || 'غير معروف',
-          role: d.role || 'inspector',
-          lat: d.lat || null,
-          lng: d.lng || null,
-          status: d.status || 'offline',
-          lastSeen: d.lastSeen ? d.lastSeen.toDate() : (d.lastSeen || null),
-          currentObservationId: d.currentObservationId || null,
-          extra: d
-        };
-
-        // REMOVE
-        if (change.type === 'removed') {
-          const m = markerIndex.get(id);
-          if (m) { markers.removeLayer(m); markerIndex.delete(id); }
-          return;
-        }
-
-        // CREATE or UPDATE
-        if (payload.lat==null || payload.lng==null) {
-          // offline: represent at last known position or skip
-          // We'll still show offline marker if previously known
-        }
-
-        // determine icon by role/status
-        let icon = ICONS.inspector;
-        if (payload.status === 'moving') icon = ICONS.moving;
-        else if (payload.role === 'contractor') icon = ICONS.contractor;
-        else if (payload.status === 'offline') icon = ICONS.offline;
-
-        // existing marker?
-        if (markerIndex.has(id)) {
-          const existing = markerIndex.get(id);
-          // smooth move
-          const newLatLng = L.latLng(payload.lat, payload.lng);
-          existing.setLatLng(newLatLng);
-          existing.setIcon(icon);
-          existing.options.payload = payload;
-        } else {
-          // create marker
-          const m = L.marker([payload.lat||countryCenter[0], payload.lng||countryCenter[1]], { icon, title: payload.name, payload });
-          m.on('click', onMarkerClick);
-          markers.addLayer(m);
-          markerIndex.set(id, m);
-        }
-      });
-
-      // update counters
-      document.getElementById('countUsers').textContent = markerIndex.size;
-    }, err => {
-      console.error('Firestore listener error', err);
-      alert('تعذر الاتصال بالخدمة (تحقق من الإعدادات).');
-    });
-
-    // when marker clicked -> open smart modal with distance and last obs
-    async function onMarkerClick(e){
-      const mk = e.target;
-      const p = mk.options.payload || {};
-      activeUserDoc = p;
-      smartTitle.textContent = `${p.name || 'مستخدم'} — ${p.role || ''}`;
-      const ls = p.lastSeen ? new Date(p.lastSeen).toLocaleString('ar-SA') : 'غير متوفر';
-      lastSeenEl.textContent = ls;
-
-      // compute distance to current viewer location if available
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos=>{
-          const my = [pos.coords.latitude, pos.coords.longitude];
-          const dist = haversine(my, [p.lat,p.lng]);
-          distanceEl.textContent = `${Math.round(dist)} متر`;
-        }, ()=> { distanceEl.textContent = 'غير مسموح بالموقع'; });
-      } else distanceEl.textContent = 'غير مدعوم';
-
-      // last observation summary (if field stores lastObservation in user doc)
-      lastObsContainer.innerHTML = '';
-      if (p.extra && p.extra.lastObservationSummary) {
-        lastObsContainer.innerHTML = `<div style="margin-top:8px; padding:8px; border-radius:8px; background:rgba(0,0,0,0.03)">${escapeHtml(p.extra.lastObservationSummary)}</div>`;
-      } else if (p.currentObservationId) {
-        // fetch from observations collection (best-effort)
-        try {
-          const obsSnap = await getDocs(query(collection(db,'observations'), where('__name__','==', p.currentObservationId)));
-          if (!obsSnap.empty) {
-            const od = obsSnap.docs[0].data();
-            lastObsContainer.innerHTML = `<div style="margin-top:8px; padding:8px; border-radius:8px; background:rgba(0,0,0,0.03)"><b>${escapeHtml(od.title||'—')}</b><div class="muted" style="margin-top:6px">${escapeHtml((od.details||'').substring(0,200))}</div></div>`;
-          } else lastObsContainer.innerHTML = `<div class="muted">لا توجد ملاحظات حالية</div>`;
-        } catch (e) {
-          console.warn('fetch obs failed', e);
-          lastObsContainer.innerHTML = `<div class="muted">تعذر جلب الملاحظة</div>`;
-        }
-      } else {
-        lastObsContainer.innerHTML = `<div class="muted">لا توجد ملاحظة مرتبطة</div>`;
-      }
-
-      // show modal
-      smartModal.classList.add('open');
-      smartModal.setAttribute('aria-hidden','false');
-    }
-
-    // utility: escape
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]); }
-
-    // set initial map center to user's location if allowed
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const lat = pos.coords.latitude, lon = pos.coords.longitude;
-        map.setView([lat, lon], 13);
-        // add a pulsing circle for current user (optional)
-        const userMarker = L.circleMarker([lat,lon], { radius:8, color:'#0ea5a4', fillColor:'#0ea5a4', fillOpacity:0.2, weight:2 });
-        userMarker.addTo(map);
-      }, ()=>{ /* ignore */ }, { maximumAge:60000 });
-    }
-
-    // responsive: reduce panel on small devices
-    function adaptPanel() {
-      const panel = document.getElementById('topPanel');
-      if (window.innerWidth < 640) {
-        panel.style.top = '72px';
-        panel.style.left = '8px';
-        panel.style.right = '8px';
-      } else {
-        panel.style.top = '96px';
-        panel.style.left = '24px';
-        panel.style.right = 'auto';
-      }
-    }
-    window.addEventListener('resize', adaptPanel);
-    adaptPanel();
-
-    // close modal when clicking outside on large screens
-    smartModal.addEventListener('click', e=>{
-      if (e.target === smartModal) { smartModal.classList.remove('open'); smartModal.setAttribute('aria-hidden','true'); }
-    });
-
-  </script>
+/* ========= بدء التشغيل ========= */
+loadData(true);
+</script>
 </body>
 </html>
