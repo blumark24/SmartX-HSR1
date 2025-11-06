@@ -16,184 +16,135 @@
 
   <style>
     :root{
-      --color-navy:#0A1931; --color-teal:#18A5A2; --color-light-teal:#ACE2E1;
-      --color-gray-bg:#F7F9FC; --shadow:0 10px 30px rgba(0,0,0,.12);
-      --red:#EF4444; --amber:#F59E0B; --green:#10B981;
-
-      --surface:#ffffff; --text:#0A1931; --muted:#475569; --soft-border:#e2e8f0;
-      --glass:rgba(255,255,255,.85); --glass-border:rgba(10,25,49,.10);
-    }
-    /* dark theme variables */
-    [data-theme="dark"]{
-      --color-gray-bg:#0b1220;
-      --surface:#0e1729;
-      --text:#e6eefc;
-      --muted:#9fb0c6;
-      --soft-border:#1b2742;
-      --glass:rgba(14,23,41,.75);
-      --glass-border:rgba(255,255,255,.08);
+      --color-navy:#0A1931;
+      --color-teal:#18A5A2;
+      --color-gray-bg:#F6F8FB;
+      --shadow:0 10px 30px rgba(0,0,0,.12);
+      --red:#EF4444;
+      --amber:#F59E0B;
+      --green:#10B981;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0; font-family:'Tajawal',sans-serif;
-      background:var(--color-gray-bg); color:var(--text); -webkit-tap-highlight-color:transparent;
+      margin:0;
+      font-family:'Tajawal',sans-serif;
+      background:var(--color-gray-bg);
+      color:var(--color-navy);
     }
-    a{color:inherit; text-decoration:none}
 
-    /* Header (mobile-first, compact) */
+    /* Header */
     .app-header{
-      position:sticky; top:0; z-index:1000;
-      background:var(--surface);
-      border-bottom:4px solid #e6f5f4;
-      padding:10px 12px;
-      display:flex; align-items:center; gap:8px;
+      position:sticky;
+      top:0;
+      z-index:1000;
+      background:#fff;
+      border-bottom:3px solid #e6f5f4;
+      padding:8px 10px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      justify-content:space-between;
     }
-    [data-theme="dark"] .app-header{ border-bottom-color:#0f2a2a; }
-    .brand{font-weight:900; letter-spacing:.3px; font-size:16px}
+    .brand{font-weight:900; letter-spacing:.5px; font-size:16px}
     .brand span{color:var(--color-teal)}
-    .header-actions{margin-inline-start:auto; display:flex; gap:6px; align-items:center}
-
-    /* Compact buttons for mobile */
+    .header-actions{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
     .btn{
       display:inline-flex; align-items:center; gap:6px;
-      padding:8px 10px; border:none; border-radius:999px; cursor:pointer;
-      font-weight:800; font-size:12px; transition:.2s;
-      box-shadow:0 4px 10px rgba(10,25,49,.08)
+      padding:7px 10px; border:none; border-radius:999px;
+      font-weight:800; cursor:pointer; transition:.2s;
+      font-size:12px; box-shadow:0 3px 6px rgba(0,0,0,.1)
     }
-    .btn i{width:16px; height:16px}
-    .btn:hover{transform:translateY(-1px)}
-    .btn:active{transform:translateY(0)}
     .btn-primary{background:var(--color-teal); color:#fff}
     .btn-dark{background:var(--color-navy); color:#fff}
-    .btn-soft{background:transparent; color:var(--text); border:1px solid var(--soft-border)}
-    .btn-ghost{background:transparent; color:var(--text); border:1px solid var(--soft-border)}
-    .chip{background:#f1f5f9; padding:4px 10px; border-radius:999px; font-weight:800; font-size:11px}
-    [data-theme="dark"] .chip{ background:#0f172a; color:#dbeafe; border:1px solid #1e293b}
+    .btn-soft{background:#fff; color:var(--color-navy); border:1px solid #dbe1ea}
+    .btn:hover{transform:translateY(-1px)}
+    .chip{background:#f1f5f9; padding:4px 10px; border-radius:999px; font-weight:700; font-size:11px}
 
-    /* Larger on tablets/desktop */
-    @media (min-width:640px){
-      .brand{font-size:18px}
-      .btn{padding:9px 12px; font-size:13px}
-      .btn i{width:18px;height:18px}
-    }
-
-    /* Map frame wrapper (Balady-like frame) */
+    /* Map frame (Dark border, Balady style) */
     .map-frame{
       position:relative;
-      margin:10px 12px 12px;
-      border:8px solid #eaf6f5;
+      margin:8px;
+      border:10px solid #1a2438;
       background:#fff;
-      border-radius:20px;
-      box-shadow:0 8px 30px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.8);
+      border-radius:18px;
       overflow:hidden;
-    }
-    [data-theme="dark"] .map-frame{
-      background:#0a1324; border-color:#0d2a2a;
-      box-shadow:0 8px 30px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+      box-shadow:0 10px 25px rgba(0,0,0,.25), inset 0 0 10px rgba(255,255,255,.3);
     }
 
     /* Map container */
-    #map{width:100%; height:calc(100vh - 112px)} /* header ~64 + margins */
-    @media (min-width:640px){ #map{ height:calc(100vh - 128px)} }
+    #map{width:100%; height:calc(100vh - 100px)}
 
-    /* Floating tools (left column) — made narrower on mobile */
+    /* Floating tools */
     .toolbar{
-      position:absolute; top:16px; inset-inline-start:16px; z-index:900;
+      position:absolute; top:14px; inset-inline-start:14px; z-index:900;
       display:flex; flex-direction:column; gap:10px;
-      width: min(90vw, 300px);
     }
-    .card{
-      background:var(--glass);
-      border:1px solid var(--glass-border);
-      border-radius:14px; box-shadow:var(--shadow); backdrop-filter: blur(8px);
-    }
-    .tool-card{padding:10px}
+    .card{background:rgba(255,255,255,0.95); border:1px solid #e0e6ed; border-radius:14px; box-shadow:var(--shadow)}
+    .tool-card{padding:8px 10px}
     .tool-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
     .select, .range{
-      border:1px solid var(--soft-border); border-radius:12px; padding:8px 10px;
-      font-weight:600; background:var(--surface); color:var(--text)
+      border:1px solid #e2e8f0; border-radius:12px; padding:7px 8px;
+      font-weight:600; background:#fff; color:#0a1931; font-size:12px
     }
-    .tool-row .select{font-size:12px}
-    .tool-row .range{width:160px}
 
-    /* Legend (small, bottom-right) with smart show/hide */
+    /* Legend */
     .legend{
-      position:absolute; right:16px; bottom:16px; z-index:901;
-      padding:8px 10px; font-size:12px; line-height:1.6;
-      display:flex; flex-direction:column; gap:4px; min-width:140px;
-      opacity:1; transform:translateY(0) scale(1); transition:.25s ease;
+      position:absolute; right:12px; bottom:12px; z-index:901;
+      background:rgba(255,255,255,0.95);
+      border:1px solid #e0e6ed;
+      border-radius:12px;
+      padding:8px 10px;
+      font-size:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.15);
+      transition:opacity .3s, transform .3s;
     }
-    .legend.hidden{opacity:0; transform:translateY(6px) scale(.98); pointer-events:none}
-    .legend .title{font-weight:900; margin-bottom:4px; font-size:12px}
-    .legend .item{display:flex; align-items:center; gap:8px}
-    .dot{width:12px; height:12px; border-radius:50%}
+    .legend.hidden{opacity:0; transform:translateY(8px); pointer-events:none}
+    .legend .title{font-weight:900; margin-bottom:4px}
+    .legend .item{display:flex; align-items:center; gap:6px; margin:3px 0}
+    .dot{width:10px; height:10px; border-radius:50%}
     .dot.red{background:var(--red)}
     .dot.amber{background:var(--amber)}
     .dot.green{background:var(--green)}
 
-    /* Marker styles (Uber-like) */
+    /* Marker */
     .pulse{
-      width:14px; height:14px; border-radius:50%; position:relative; box-shadow:0 0 0 2px #fff, 0 4px 10px rgba(0,0,0,.25)
+      width:14px; height:14px; border-radius:50%; position:relative;
+      box-shadow:0 0 0 2px #fff, 0 3px 6px rgba(0,0,0,.3)
     }
     .pulse.red{background:var(--red)}
     .pulse.amber{background:var(--amber)}
     .pulse.green{background:var(--green)}
     .pulse.red::after, .pulse.amber::after{
-      content:""; position:absolute; inset:0; border-radius:50%; box-shadow:0 0 0 0 currentColor; animation:pulse 1.8s infinite; opacity:.55
+      content:""; position:absolute; inset:0; border-radius:50%;
+      box-shadow:0 0 0 0 currentColor; animation:pulse 1.8s infinite; opacity:.55
     }
     .pulse.red::after{color:var(--red)}
     .pulse.amber::after{color:var(--amber)}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor} 70%{box-shadow:0 0 0 14px rgba(0,0,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor}70%{box-shadow:0 0 0 14px rgba(0,0,0,0)}100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
 
-    /* Modal (smaller, responsive, animated) */
+    /* Modal */
     .modal{position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:2000; padding:16px}
     .modal.open{display:flex}
     .modal-content{
-      background:var(--surface); color:var(--text);
-      width:min(640px, 94vw); border-radius:16px; padding:14px;
-      box-shadow:0 20px 60px rgba(0,0,0,.25); border:1px solid var(--soft-border);
-      transform:translateY(6px) scale(.98); opacity:0; transition:.22s ease;
+      background:#fff; width:min(600px, 94vw);
+      border-radius:16px; padding:14px;
+      box-shadow:0 20px 60px rgba(0,0,0,.3);
+      max-height:90vh; overflow-y:auto;
     }
-    .modal.open .modal-content{ transform:translateY(0) scale(1); opacity:1; }
-    .modal-header{display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--soft-border); padding-bottom:8px; margin-bottom:10px}
-    .modal-header i{width:18px;height:18px}
+    .modal-header{display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0; padding-bottom:8px; margin-bottom:10px}
     .modal-actions{display:flex; gap:8px; margin-top:12px; justify-content:flex-end}
-    .field{display:flex; flex-direction:column; gap:6px}
-    textarea, select, input[type="file"]{
-      border:1px solid var(--soft-border); border-radius:10px; padding:8px 10px; font-family:inherit; background:var(--surface); color:var(--text)
-    }
+    .field{display:flex; flex-direction:column; gap:4px}
+    textarea, select, input[type="file"]{border:1px solid #e2e8f0; border-radius:10px; padding:8px 10px; font-family:inherit}
     .pill{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800; font-size:12px}
     .pill.red{background:#fee2e2; color:#991b1b}
     .pill.amber{background:#fef3c7; color:#92400e}
     .pill.green{background:#dcfce7; color:#065f46}
-    [data-theme="dark"] .pill.red{ background:#3c0e0e; color:#fecaca }
-    [data-theme="dark"] .pill.amber{ background:#3a2a0e; color:#fde68a }
-    [data-theme="dark"] .pill.green{ background:#052e1f; color:#bbf7d0 }
 
     /* Toast */
-    .toast{
-      position:fixed; bottom:12px; inset-inline-start:12px;
-      background:var(--color-navy); color:#fff; padding:10px 12px; border-radius:12px;
-      box-shadow:var(--shadow); z-index:3000; display:none; font-weight:800; font-size:13px
-    }
+    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
     .toast.show{display:block}
-
-    /* Map attribution smaller & placed bottom-left inside frame */
-    .leaflet-control-attribution{ font-size:10px !important; background:transparent !important; color:var(--muted) !important; padding:2px 6px !important }
-    .leaflet-bottom.leaflet-left .leaflet-control{ margin:0 0 6px 6px }
-
-    /* Compact zoom control */
-    .leaflet-control-zoom a{ width:28px !important; height:28px !important; line-height:26px !important; }
-
-    /* Grid of modal body */
-    #modalBody{display:grid; grid-template-columns:1fr; gap:10px}
-    @media (min-width:640px){
-      #modalBody{grid-template-columns:1fr 1fr}
-    }
-    /* Media in modal */
-    #mMedia img{ width:100%; border-radius:12px }
   </style>
 </head>
 <body>
@@ -201,15 +152,13 @@
   <!-- Header -->
   <header class="app-header">
     <div class="brand">Smart HSR <span>Live&nbsp;Map</span></div>
-
-    <!-- small near stats (auto hidden on mobile if needed) -->
-    <div id="nearStats" class="chip" title="حول موقعي الآن" style="display:flex;gap:8px;align-items:center">
-      <i data-lucide="map-pin" class="w-4 h-4"></i><span id="meDistLabel">—</span>
-      <span style="display:inline-flex;gap:6px;align-items:center"><i data-lucide="alert-triangle" class="w-4 h-4"></i>قريب: <b id="nearCount">0</b></span>
+    <div id="nearStats" class="chip" title="حول موقعي الآن">
+      <i data-lucide="map-pin" class="w-4 h-4"></i>
+      <span id="meDistLabel">—</span> |
+      <i data-lucide="alert-triangle" class="w-4 h-4"></i>قريب:
+      <b id="nearCount">0</b>
     </div>
-
     <div class="header-actions">
-      <button id="themeBtn" class="btn btn-ghost" title="الوضع الليلي/النهاري"><i data-lucide="moon"></i><span class="hide-sm">الوضع</span></button>
       <button id="locBtn" class="btn btn-primary" title="تحديد موقعي"><i data-lucide="crosshair"></i></button>
       <button id="centerBtn" class="btn btn-dark" title="إعادة التمركز"><i data-lucide="navigation"></i></button>
       <a href="index.html" class="btn btn-soft" title="اللوحة التنفيذية"><i data-lucide="layout-dashboard"></i></a>
@@ -218,10 +167,8 @@
 
   <!-- Map frame -->
   <div class="map-frame">
-    <!-- Map -->
     <div id="map"></div>
 
-    <!-- Floating tools (left) -->
     <div class="toolbar">
       <div class="tool-card card">
         <div class="tool-row">
@@ -231,17 +178,17 @@
             <option value="IN_PROGRESS">قيد التنفيذ</option>
             <option value="COMPLETED">مغلق</option>
           </select>
-          <label class="select" style="display:flex;align-items:center;gap:8px;">
+          <label class="select" style="display:flex;align-items:center;gap:6px;">
             <i data-lucide="radar" class="w-4 h-4"></i>
             نصف القطر:
-            <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range">
+            <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:150px">
             <span id="radiusLabel" style="font-weight:800">2000 م</span>
           </label>
         </div>
       </div>
     </div>
 
-    <!-- Legend (bottom-right) -->
+    <!-- Legend -->
     <div id="legend" class="legend card">
       <div class="title">أسطورة الحالات</div>
       <div class="item"><span class="dot red"></span> جديد</div>
@@ -251,26 +198,25 @@
   </div>
 
   <!-- Modal -->
-  <div id="smartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div id="smartModal" class="modal" role="dialog">
     <div class="modal-content">
       <div class="modal-header">
         <i data-lucide="file-search" class="w-5 h-5"></i>
         <h3 id="modalTitle" style="margin:0;font-weight:900">تفاصيل الملاحظة</h3>
         <span id="modalChip" class="pill" style="margin-inline-start:auto"></span>
       </div>
-
-      <div id="modalBody">
+      <div id="modalBody" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="field">
           <label>العنوان</label>
-          <div id="mTitle" class="card" style="padding:10px; font-weight:800;"></div>
+          <div id="mTitle" class="card" style="padding:10px;font-weight:800"></div>
         </div>
         <div class="field">
           <label>المسافة من موقعي</label>
-          <div id="mDistance" class="card" style="padding:10px; font-weight:800;"></div>
+          <div id="mDistance" class="card" style="padding:10px;font-weight:800"></div>
         </div>
         <div class="field" style="grid-column:1/-1">
           <label>الوصف</label>
-          <div id="mDetails" class="card" style="padding:12px; line-height:1.8"></div>
+          <div id="mDetails" class="card" style="padding:12px;line-height:1.8"></div>
         </div>
         <div class="field">
           <label>الحالة</label>
@@ -281,7 +227,7 @@
           </select>
         </div>
         <div class="field">
-          <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
+          <label>صورة بعد الإصلاح</label>
           <input id="afterInput" type="file" accept="image/*">
         </div>
         <div class="field" style="grid-column:1/-1">
@@ -293,9 +239,8 @@
           <div id="mMedia" class="card" style="padding:8px"></div>
         </div>
       </div>
-
       <div class="modal-actions">
-        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
+        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ</button>
         <button id="closeBtn" class="btn btn-soft"><i data-lucide="x"></i>إغلاق</button>
       </div>
     </div>
@@ -303,358 +248,76 @@
 
   <div id="toast" class="toast">تم الحفظ بنجاح</div>
 
-  <!-- Firebase + App -->
+  <!-- Firebase + Map -->
   <script type="module">
-    // ============ Firebase ============
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
-      authDomain: "gen-lang-client-0349944917.firebaseapp.com",
-      projectId: "gen-lang-client-0349944917",
-      storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
-      messagingSenderId: "883065484771",
-      appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
-      measurementId: "G-V8WG5M8V5B"
-    };
-
+    const firebaseConfig = {apiKey:"AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",authDomain:"gen-lang-client-0349944917.firebaseapp.com",projectId:"gen-lang-client-0349944917",storageBucket:"gen-lang-client-0349944917.firebasestorage.app",messagingSenderId:"883065484771",appId:"1:883065484771:web:c907bb5a51f68caad75cd6"};
     let app, db, FIREBASE_READY=false;
-    try { app = initializeApp(firebaseConfig); db = getFirestore(app); FIREBASE_READY=true; }
-    catch(e){ console.warn("Firebase init failed, running local-only.", e); }
+    try { app = initializeApp(firebaseConfig); db = getFirestore(app); FIREBASE_READY=true; } catch(e){ console.warn(e); }
 
-    // ============ Theme (day/night) ============
-    const THEME_KEY = 'smarthsr_theme';
-    const themeBtn = document.getElementById('themeBtn');
+    const map = L.map('map',{zoomControl:false});
+    map.setView([24.7136,46.6753],10);
+    L.control.zoom({position:'topright'}).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
 
-    function applyTheme(t){
-      document.body.setAttribute('data-theme', t);
-      // update icon
-      themeBtn.innerHTML = t==='dark'
-        ? '<i data-lucide="sun"></i>'
-        : '<i data-lucide="moon"></i>';
-      lucide.createIcons();
-      // swap map layer
-      swapBaseLayer(t==='dark' ? 'dark' : 'light');
-      showToast(t==='dark' ? '🌙 تم تفعيل الوضع الليلي' : '☀️ تم تفعيل الوضع النهاري');
-      // persist
-      try{ localStorage.setItem(THEME_KEY, t); } catch(_){}
-    }
+    const markerIcon = (status)=>L.divIcon({html:`<div class="pulse ${status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green'}"></div>`,className:'',iconSize:[16,16],iconAnchor:[8,8]});
 
-    function initTheme(){
-      let t='light';
-      try{
-        const saved = localStorage.getItem(THEME_KEY);
-        if (saved==='dark' || saved==='light') t=saved;
-        else {
-          // optional: match OS
-          t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
-        }
-      }catch(_){}
-      applyTheme(t);
-    }
-
-    themeBtn.addEventListener('click', ()=>{
-      const cur = document.body.getAttribute('data-theme') || 'light';
-      applyTheme(cur==='light' ? 'dark' : 'light');
-    });
-
-    // ============ Map Init ============
-    const map = L.map('map', { zoomControl:false, attributionControl:true });
-    map.setView([24.7136, 46.6753], 10);
-    L.control.zoom({ position:'topright' }).addTo(map);
-
-    // Two base layers (light/dark) — Carto
-    const lightLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      maxZoom:19,
-      attribution:'&copy; OpenStreetMap &copy; CARTO'
-    });
-    const darkLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom:19,
-      attribution:'&copy; OpenStreetMap &copy; CARTO'
-    });
-
-    let activeBase = null;
-    function swapBaseLayer(mode){
-      if (activeBase) map.removeLayer(activeBase);
-      activeBase = (mode==='dark') ? darkLayer : lightLayer;
-      activeBase.addTo(map);
-    }
-
-    // ============ Icons ============
-    const markerIcon = (status)=> L.divIcon({
-      html:`<div class="pulse ${status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green'}"></div>`,
-      className:'', iconSize:[16,16], iconAnchor:[8,8]
-    });
-
-    // ============ My location ============
     let meMarker=null, meCircle=null, lastMe=[24.7136,46.6753];
-    const radiusInput=document.getElementById('radiusInput');
-    const radiusLabel=document.getElementById('radiusLabel');
-    radiusInput.value=2000; radiusLabel.textContent='2000 م';
-
+    const radiusInput=document.getElementById('radiusInput'),radiusLabel=document.getElementById('radiusLabel');
+    radiusInput.value=2000;
     function drawMe(){
       const r=parseInt(radiusInput.value||2000,10);
-      if (meMarker) meMarker.remove();
-      if (meCircle) meCircle.remove();
-      meMarker = L.marker(lastMe, { icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8]})}).addTo(map);
-      meCircle = L.circle(lastMe, { radius:r, color:'#18A5A2', fillColor:'#18A5A2', fillOpacity:0.08, weight:2 }).addTo(map);
+      if(meMarker)meMarker.remove();
+      if(meCircle)meCircle.remove();
+      meMarker=L.marker(lastMe,{icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>',className:'',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(map);
+      meCircle=L.circle(lastMe,{radius:r,color:'#18A5A2',fillColor:'#18A5A2',fillOpacity:0.08,weight:2}).addTo(map);
     }
 
-    function haversine(a,b){
-      const toRad = d=> d*Math.PI/180;
-      const [lat1,lon1]=a, [lat2,lon2]=b;
-      const R=6371000; // meters
-      const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
-      const s1=Math.sin(dLat/2), s2=Math.sin(dLon/2);
-      const c=2*Math.asin(Math.sqrt(s1*s1 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*s2*s2));
-      return R*c;
-    }
-
-    const statusFilter = document.getElementById('statusFilter');
-    const nearCountEl  = document.getElementById('nearCount');
-    const meDistLabel  = document.getElementById('meDistLabel');
-
-    function fmtMeters(m){ return m<1000 ? `${Math.round(m)} م` : `${(m/1000).toFixed(1)} كم`; }
-
-    // ============ Observations Layer ============
-    const markers = new Map(); // docId -> marker
-    let observations = [];     // raw list
+    function haversine(a,b){const toRad=d=>d*Math.PI/180;const[lat1,lon1]=a,[lat2,lon2]=b;const R=6371000;const dLat=toRad(lat2-lat1),dLon=toRad(lon2-lon1);const s1=Math.sin(dLat/2),s2=Math.sin(dLon/2);const c=2*Math.asin(Math.sqrt(s1*s1+Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*s2*s2));return R*c;}
+    const statusFilter=document.getElementById('statusFilter'),nearCountEl=document.getElementById('nearCount'),meDistLabel=document.getElementById('meDistLabel');
+    const fmtMeters=m=>m<1000?`${Math.round(m)} م`:`${(m/1000).toFixed(1)} كم`;
+    const markers=new Map();let observations=[];
 
     function paint(){
-      // update my radius + label
-      drawMe();
-      const filter = statusFilter.value;
-      const r = parseInt(radiusInput.value,10);
-      radiusLabel.textContent = `${r} م`;
-
-      let near=0;
-      const presentIds=new Set();
-      for (const o of observations){
-        if (!o.location) continue;
-        const [lat, lon] = o.location.split(',').map(n=>parseFloat(n.trim()));
-        if (Number.isNaN(lat) || Number.isNaN(lon)) continue;
-
-        // filter status
-        if (filter!=='ALL' && o.status!==filter) continue;
-
-        const dist = haversine(lastMe, [lat,lon]);
-        const inRadius = dist<=r;
-        if (inRadius) near++;
-
-        let m = markers.get(o.docId);
-        if (!m){
-          m = L.marker([lat,lon], { icon: markerIcon(o.status) }).addTo(map);
-          m.bindTooltip(o.title || '', { direction:'top', offset:[0,-10] });
-          m.on('click', ()=> openModalFor(o, dist));
-          markers.set(o.docId, m);
-        } else {
-          m.setIcon(markerIcon(o.status));
-          m.setLatLng([lat,lon]);
-        }
+      drawMe();const filter=statusFilter.value;const r=parseInt(radiusInput.value,10);radiusLabel.textContent=`${r} م`;
+      let near=0;const presentIds=new Set();
+      for(const o of observations){
+        if(!o.location)continue;
+        const[lat,lon]=o.location.split(',').map(n=>parseFloat(n.trim()));if(Number.isNaN(lat))continue;
+        if(filter!=='ALL'&&o.status!==filter)continue;
+        const dist=haversine(lastMe,[lat,lon]);if(dist<=r)near++;
+        let m=markers.get(o.docId);
+        if(!m){m=L.marker([lat,lon],{icon:markerIcon(o.status)}).addTo(map);m.bindTooltip(o.title||'',{direction:'top',offset:[0,-10]});m.on('click',()=>openModalFor(o,dist));markers.set(o.docId,m);}else{m.setIcon(markerIcon(o.status));m.setLatLng([lat,lon]);}
         presentIds.add(o.docId);
       }
-      // remove stale
-      for (const [id, m] of markers){
-        if (!presentIds.has(id)){ m.remove(); markers.delete(id); }
-      }
-      nearCountEl.textContent = near.toString();
-      meDistLabel.textContent = `نطاقي: ${fmtMeters(r)}`;
+      for(const[id,m]of markers){if(!presentIds.has(id)){m.remove();markers.delete(id);}}
+      nearCountEl.textContent=near;meDistLabel.textContent=`نطاقي: ${fmtMeters(r)}`;
     }
 
-    // ============ Firestore live ============
     async function startLive(){
-      if (!FIREBASE_READY){
-        // Demo fallback
-        observations = [
-          {docId:'local-1', id:1, title:'هبوط بسيط بالممر الجانبي', status:'PENDING', type:'MAINTENANCE', date:'2025-10-01', details:'ملاحظة تجربة.', location:'24.774265,46.738586', imagePath:'https://picsum.photos/600/400?1'},
-          {docId:'local-2', id:2, title:'تشققات عرضية', status:'IN_PROGRESS', type:'QUALITY', date:'2025-10-03', details:'جاري الإصلاح.', location:'24.633333,46.716667', imagePath:'https://picsum.photos/600/400?2'},
-          {docId:'local-3', id:3, title:'لوحة إرشادية تالفة', status:'COMPLETED', type:'QUALITY', date:'2025-10-05', details:'تم الاستبدال.', location:'24.7136,46.6753', imagePath:'https://picsum.photos/600/400?3', afterImagePath:'https://picsum.photos/600/400?4', resolutionNote:'حسب المواصفات'}
-        ];
-        paint();
-        return;
-      }
-      const q = query(collection(db,'observations'), orderBy('createdAt','desc'));
-      onSnapshot(q, (snap)=>{
-        const arr=[];
-        snap.forEach(d=>{
-          const data=d.data();
-          arr.push({
-            docId:d.id,
-            id: data.displayId || 0,
-            title:data.title||'—',
-            status:data.status||'PENDING',
-            type:data.type||'MAINTENANCE',
-            date:data.date||'',
-            details:data.details||'',
-            location:data.location||'',
-            imagePath:data.imagePath||null,
-            afterImagePath:data.afterImagePath||null,
-            resolutionNote:data.resolutionNote||''
-          });
-        });
-        observations = arr;
-        paint();
-      });
+      if(!FIREBASE_READY){observations=[{docId:'1',id:1,title:'هبوط بسيط',status:'PENDING',details:'تم رصده ميدانيًا',location:'24.774265,46.738586',imagePath:'https://picsum.photos/600/400?1'}];paint();return;}
+      const q=query(collection(db,'observations'),orderBy('createdAt','desc'));
+      onSnapshot(q,snap=>{const arr=[];snap.forEach(d=>{const data=d.data();arr.push({docId:d.id,id:data.displayId||0,title:data.title||'—',status:data.status||'PENDING',details:data.details||'',location:data.location||'',imagePath:data.imagePath||null});});observations=arr;paint();});
     }
 
-    // ============ Geolocation ============
-    const locBtn=document.getElementById('locBtn');
-    const centerBtn=document.getElementById('centerBtn');
+    const locBtn=document.getElementById('locBtn'),centerBtn=document.getElementById('centerBtn');let watchId=null;
+    function startWatch(){if(!navigator.geolocation){alert('لا يدعم الموقع');return;}if(watchId!==null)return;watchId=navigator.geolocation.watchPosition(pos=>{lastMe=[pos.coords.latitude,pos.coords.longitude];paint();});}
+    locBtn.addEventListener('click',()=>{startWatch();map.setView(lastMe,14,{animate:true});});
+    centerBtn.addEventListener('click',()=>map.setView(lastMe,14,{animate:true}));
+    statusFilter.addEventListener('change',paint);radiusInput.addEventListener('input',paint);
 
-    let watchId=null;
-    function startWatch(){
-      if (!navigator.geolocation){ alert('المتصفح لا يدعم تحديد الموقع.'); return; }
-      if (watchId!==null) return;
-      watchId = navigator.geolocation.watchPosition(pos=>{
-        lastMe=[pos.coords.latitude, pos.coords.longitude];
-        paint();
-      }, err=>{
-        console.warn(err);
-        alert('تعذر تحديد الموقع. يرجى السماح بالصلاحيات.');
-      }, { enableHighAccuracy:true, maximumAge:2000, timeout:10000 });
-    }
-
-    locBtn.addEventListener('click', ()=>{
-      startWatch();
-      map.setView(lastMe, 14, { animate:true });
-    });
-    centerBtn.addEventListener('click', ()=>{
-      map.setView(lastMe, map.getZoom()<14?14:map.getZoom(), { animate:true });
-    });
-
-    statusFilter.addEventListener('change', paint);
-    radiusInput.addEventListener('input', paint);
-
-    // ============ Modal Logic ============
-    const modal = document.getElementById('smartModal');
-    const closeBtn = document.getElementById('closeBtn');
-    const saveBtn  = document.getElementById('saveBtn');
-    const mStatus  = document.getElementById('mStatus');
-    const mTitleEl = document.getElementById('mTitle');
-    const mDetails = document.getElementById('mDetails');
-    const mMedia   = document.getElementById('mMedia');
-    const mNote    = document.getElementById('mNote');
-    const mDistance= document.getElementById('mDistance');
-    const modalChip= document.getElementById('modalChip');
-    const afterInput = document.getElementById('afterInput');
-
-    let currentDocId=null, currentAfterData=null;
-
-    afterInput.addEventListener('change', async (e)=>{
-      const f=e.target.files?.[0];
-      if (!f) { currentAfterData=null; return; }
-      if (!f.type.startsWith('image/')) { alert('يجب اختيار صورة.'); e.target.value=''; return; }
-      currentAfterData = await toBase64(f);
-    });
-
-    function setChip(status){
-      modalChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
-      modalChip.innerHTML = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
-    }
-
-    function openModalFor(o, dist){
-      currentDocId=o.docId; currentAfterData=null;
-      document.getElementById('modalTitle').textContent = `ملاحظة #${o.id||'—'}`;
-      mTitleEl.textContent = o.title||'—';
-      mDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
-      mStatus.value = o.status||'PENDING';
-      setChip(o.status||'PENDING');
-      mNote.value = o.resolutionNote||'';
-      mDistance.textContent = fmtMeters(dist||0);
-
-      mMedia.innerHTML = '';
-      if (o.afterImagePath){
-        mMedia.innerHTML = `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <img src="${o.imagePath||''}" alt="قبل">
-            <img src="${o.afterImagePath||''}" alt="بعد">
-          </div>`;
-      } else if (o.imagePath){
-        mMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق">`;
-      } else {
-        mMedia.innerHTML = `<div class="card" style="padding:10px;text-align:center">لا يوجد مرفق</div>`;
-      }
-
-      modal.classList.add('open');
-    }
-
-    closeBtn.addEventListener('click', ()=> modal.classList.remove('open'));
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
-
-    saveBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ modal.classList.remove('open'); return; }
-      const newStatus = mStatus.value;
-      if (newStatus==='COMPLETED' && !currentAfterData){
-        const ok = confirm('إغلاق يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
-        if (!ok) return;
-      }
-      const payload = {
-        status: newStatus,
-        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
-
-      try {
-        if (FIREBASE_READY){
-          await updateDoc(doc(db,'observations', currentDocId), payload);
-        } else {
-          // Demo update
-          const idx = observations.findIndex(x=>x.docId===currentDocId);
-          if (idx>-1){
-            observations[idx] = { ...observations[idx], ...payload };
-          }
-        }
-        showToast('تم الحفظ بنجاح');
-        modal.classList.remove('open');
-      } catch (e){
-        console.error(e);
-        showToast('تعذر الحفظ، تحقق من الاتصال');
-      }
-    });
-
-    // ============ Legend smart behavior ============
-    const legend = document.getElementById('legend');
-    let legendTimer = null;
-
-    function showLegend(){
-      legend.classList.remove('hidden');
-      if (legendTimer) clearTimeout(legendTimer);
-      legendTimer = setTimeout(()=> legend.classList.add('hidden'), 3000);
-    }
-    // show on load for 3s
-    showLegend();
-
-    // show when user interacts with map
-    ['movestart','zoomstart','click'].forEach(evt=>{
-      map.on(evt, showLegend);
-    });
-    // keep when hover over legend
-    legend.addEventListener('pointerenter', ()=> { if (legendTimer) clearTimeout(legendTimer); });
-    legend.addEventListener('pointerleave', showLegend);
-
-    // ============ Helpers ============
-    function showToast(text){
-      const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), 1600);
-    }
-    function toBase64(file){
-      return new Promise((res,rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=> res(e.target.result);
-        reader.onerror = rej;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // ============ Start ============
-    initTheme();          // set theme and base layer
-    startLive();          // start data stream
-    drawMe();             // draw my location frame
-    lucide.createIcons(); // icons init
-
+    const modal=document.getElementById('smartModal'),closeBtn=document.getElementById('closeBtn'),saveBtn=document.getElementById('saveBtn'),mStatus=document.getElementById('mStatus'),mTitleEl=document.getElementById('mTitle'),mDetails=document.getElementById('mDetails'),mMedia=document.getElementById('mMedia'),mNote=document.getElementById('mNote'),mDistance=document.getElementById('mDistance'),modalChip=document.getElementById('modalChip');
+    let currentDocId=null;function setChip(status){modalChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');modalChip.textContent=status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';}
+    function openModalFor(o,dist){currentDocId=o.docId;mTitleEl.textContent=o.title;mDetails.textContent=o.details;mStatus.value=o.status;setChip(o.status);mNote.value='';mDistance.textContent=fmtMeters(dist);mMedia.innerHTML=o.imagePath?`<img src="${o.imagePath}" style="width:100%;border-radius:10px">`:'—';modal.classList.add('open');}
+    closeBtn.onclick=()=>modal.classList.remove('open');
+    modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open');};
+    saveBtn.onclick=()=>{modal.classList.remove('open');showToast('تم الحفظ بنجاح');};
+    const legend=document.getElementById('legend');let legendTimer=null;function showLegend(){legend.classList.remove('hidden');if(legendTimer)clearTimeout(legendTimer);legendTimer=setTimeout(()=>legend.classList.add('hidden'),3000);}
+    showLegend();['movestart','zoomstart','click'].forEach(evt=>map.on(evt,showLegend));
+    const toast=document.getElementById('toast');function showToast(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1600);}
+    startLive();drawMe();lucide.createIcons();
   </script>
 </body>
 </html>
