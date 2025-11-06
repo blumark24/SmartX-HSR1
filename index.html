@@ -95,6 +95,179 @@
 </head>
 
 <body class="text-gray-800">
+<!-- ========== SMART HSR UNIFIED EXECUTIVE HEADER WITH FIREBASE GPS LIVE ========== -->
+<header id="hsrHeader" class="hsr-header">
+  <div class="hsr-top">
+    <div class="brand">
+      <span class="dot"></span>
+      <strong>Smart HSR</strong>
+      <span class="accent">System</span>
+    </div>
+
+    <div class="user-info">
+      <i data-lucide="user" class="w-4 h-4"></i>
+      <span id="userName">—</span>
+      <span id="userRole" class="role-badge">—</span>
+    </div>
+
+    <div class="actions">
+      <div id="gpsIndicator" class="gps-indicator" title="حالة الموقع">
+        <span class="circle off"></span>
+        <small id="gpsText">غير متاح</small>
+      </div>
+      <button class="btn primary" onclick="window.open('mobile-map.html','_blank')">
+        <i data-lucide='map'></i> الخريطة الميدانية
+      </button>
+      <button class="btn soft" onclick="window.location.href='dashboard.html'">
+        <i data-lucide='layout-dashboard'></i> اللوحة
+      </button>
+      <button id="logoutBtn" class="btn dark">
+        <i data-lucide='log-out'></i> تسجيل الخروج
+      </button>
+    </div>
+  </div>
+
+  <div class="hsr-bottom">
+    <div class="stats">
+      <div class="chip total">
+        <i data-lucide="clipboard-list" class="w-4 h-4"></i>
+        <span id="stat-total">0</span> إجمالي البلاغات
+      </div>
+      <div class="chip open">
+        <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+        <span id="stat-open">0</span> مفتوحة
+      </div>
+      <div class="chip closed">
+        <i data-lucide="check-circle" class="w-4 h-4"></i>
+        <span id="stat-closed">0</span> مغلقة
+      </div>
+    </div>
+
+    <div class="filters">
+      <select id="statusFilterQuick" onchange="quickFilterStatus(this.value)">
+        <option value="ALL">كل الحالات</option>
+        <option value="PENDING">جديد</option>
+        <option value="IN_PROGRESS">قيد التنفيذ</option>
+        <option value="COMPLETED">مغلق</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<!-- ====== STYLES ====== -->
+<style>
+  .hsr-header {background:#fff;box-shadow:0 8px 25px rgba(0,0,0,.08);
+    border-bottom:6px solid #18A5A2;border-radius:0 0 20px 20px;margin-bottom:18px;}
+  .hsr-top {display:flex;align-items:center;justify-content:space-between;padding:12px 20px;}
+  .brand {display:flex;align-items:center;gap:8px;font-weight:900;font-size:20px;}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:#18A5A2;box-shadow:0 0 0 4px #ACE2E150}
+  .brand .accent{color:#18A5A2;}
+  .user-info {display:flex;align-items:center;gap:6px;font-weight:700;
+    background:#F1F5F9;padding:6px 12px;border-radius:999px;}
+  .role-badge {padding:2px 10px;border-radius:999px;font-size:12px;font-weight:800;color:#fff;}
+  .actions {display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .btn {display:inline-flex;align-items:center;gap:6px;border:none;cursor:pointer;
+        padding:8px 14px;border-radius:999px;font-weight:800;transition:.2s;}
+  .btn i{width:16px;height:16px}
+  .btn.primary {background:#18A5A2;color:#fff;box-shadow:0 4px 10px rgba(24,165,162,.3);}
+  .btn.soft {background:#fff;color:#0A1931;border:1px solid #e5e7eb;}
+  .btn.dark {background:#0A1931;color:#fff;box-shadow:0 4px 10px rgba(10,25,49,.2);}
+  .btn:hover{transform:translateY(-1px);opacity:.95}
+  .hsr-bottom {display:flex;align-items:center;justify-content:space-between;
+    padding:10px 20px;background:#F8FAFC;border-top:1px solid #E2E8F0;flex-wrap:wrap;gap:10px;}
+  .chip {display:flex;align-items:center;gap:6px;border-radius:999px;
+    padding:6px 12px;font-weight:800;font-size:13px;}
+  .chip.total{background:#e0f2fe;color:#0369a1;}
+  .chip.open{background:#fee2e2;color:#b91c1c;}
+  .chip.closed{background:#dcfce7;color:#166534;}
+  .filters select {padding:8px 12px;border-radius:999px;border:1px solid #CBD5E1;font-weight:700;background:#fff;}
+  .gps-indicator {display:flex;align-items:center;gap:6px;background:#F1F5F9;
+    padding:6px 12px;border-radius:999px;font-weight:700;}
+  .gps-indicator .circle {width:10px;height:10px;border-radius:50%;transition:0.3s;}
+  .gps-indicator .circle.off {background:#ef4444;}
+  .gps-indicator .circle.waiting {background:#facc15;}
+  .gps-indicator .circle.on {background:#22c55e;box-shadow:0 0 6px #22c55e;}
+  .gps-indicator small {font-size:12px;color:#334155;}
+</style>
+
+<!-- ====== SCRIPT ====== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// إعداد Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCXCiNeaO9lhM79tKb98x4oaNqNy5xKvWM",
+  authDomain: "smart-hsr-manager.firebaseapp.com",
+  projectId: "smart-hsr-manager",
+  storageBucket: "smart-hsr-manager.firebasestorage.app",
+  messagingSenderId: "38965508031",
+  appId: "1:38965508031:web:6fd0b6c6b0b63fa513930a"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let gpsWatchId = null;
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    const user = JSON.parse(sessionStorage.getItem('smartHSRUser')) || {};
+    const name = user.name || '—';
+    const role = user.role || 'unknown';
+    const roleText = { manager:'مدير', inspector:'مراقب', contractor:'مقاول' }[role] || '—';
+    const colors = { manager:'#0A1931', inspector:'#0284C7', contractor:'#059669' };
+    document.getElementById('userName').textContent = name;
+    const roleEl = document.getElementById('userRole');
+    roleEl.textContent = roleText;
+    roleEl.style.background = colors[role] || '#6B7280';
+    document.getElementById('hsrHeader').style.borderBottomColor = colors[role] || '#18A5A2';
+  }catch(e){console.warn(e);}
+  lucide.createIcons();
+  document.getElementById('logoutBtn').addEventListener('click',()=>logout());
+  startGPSLive();
+});
+
+function logout(){
+  sessionStorage.removeItem('smartHSRUser');
+  sessionStorage.removeItem('welcomed');
+  window.location.href='manager-login.html';
+}
+
+// 🔵 التتبع الحي الحقيقي
+async function startGPSLive(){
+  const gps = document.querySelector('#gpsIndicator .circle');
+  const text = document.querySelector('#gpsText');
+  const user = JSON.parse(sessionStorage.getItem('smartHSRUser')) || {};
+  if(!('geolocation' in navigator)){ gps.className='circle off'; text.textContent='غير مدعوم'; return; }
+
+  gps.className='circle waiting'; text.textContent='جارِ التحديد...';
+
+  gpsWatchId = navigator.geolocation.watchPosition(async pos=>{
+    gps.className='circle on'; text.textContent='نشط';
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    if(user.email){
+      await setDoc(doc(db, 'presence', user.email), {
+        name: user.name || '—',
+        role: user.role || '—',
+        email: user.email,
+        lat, lng,
+        updatedAt: serverTimestamp()
+      });
+    }
+  }, err=>{
+    gps.className='circle off'; text.textContent='مغلق';
+  }, {enableHighAccuracy:true, timeout:15000, maximumAge:5000});
+}
+
+// تحديث عدادات البلاغات
+window.updateHeaderStats = function(total, open, closed){
+  document.getElementById('stat-total').textContent = total ?? 0;
+  document.getElementById('stat-open').textContent = open ?? 0;
+  document.getElementById('stat-closed').textContent = closed ?? 0;
+};
+</script>
+<!-- ========== /SMART HSR UNIFIED EXECUTIVE HEADER WITH FIREBASE GPS LIVE ========== -->
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-start mb-6 no-print">
