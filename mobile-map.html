@@ -9,197 +9,129 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Fonts & Icons -->
+  <!-- Icons & Font -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --color-navy:#0A1931; --color-teal:#18A5A2; --color-light-teal:#ACE2E1;
-      --color-gray-bg:#F7F9FC; --shadow:0 10px 30px rgba(0,0,0,.12);
+      --teal:#18A5A2; --navy:#0A1931; --gray:#F7F9FC;
       --red:#EF4444; --amber:#F59E0B; --green:#10B981;
     }
     *{box-sizing:border-box}
-    body{margin:0; font-family:'Tajawal',sans-serif; background:var(--color-gray-bg); color:var(--color-navy)}
-    a{color:inherit; text-decoration:none}
+    body{margin:0;font-family:'Tajawal',sans-serif;background:var(--gray);color:var(--navy);overflow:hidden;}
+    #map{width:100%;height:100vh}
 
-    /* Header */
+    /* header */
     .app-header{
-      position:sticky; top:0; z-index:1000;
-      background:#fff; border-bottom:4px solid #e6f5f4;
-      padding:12px 16px; display:flex; align-items:center; gap:10px;
+      position:absolute;top:0;inset-inline:0;z-index:1000;
+      background:#fff;border-bottom:3px solid #e6f5f4;
+      padding:10px 14px;display:flex;align-items:center;gap:10px;
     }
-    .brand{font-weight:900; letter-spacing:.5px}
-    .brand span{color:var(--color-teal)}
-    .chip{background:#f1f5f9; padding:6px 12px; border-radius:999px; font-weight:800}
-    .header-actions{margin-inline-start:auto; display:flex; gap:8px; align-items:center}
-    .btn{display:inline-flex; align-items:center; gap:6px; padding:10px 14px; border:none; border-radius:999px; cursor:pointer; font-weight:800; transition:.2s; box-shadow:0 4px 10px rgba(10,25,49,.08)}
+    .brand{font-weight:900}.brand span{color:var(--teal)}
+    .btn{display:inline-flex;align-items:center;gap:6px;border:none;
+      border-radius:999px;padding:8px 14px;cursor:pointer;
+      font-weight:800;transition:.2s;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+    .btn-primary{background:var(--teal);color:#fff}
+    .btn-soft{background:#fff;color:var(--navy);border:1px solid #e5e7eb}
     .btn:hover{transform:translateY(-1px)}
-    .btn-primary{background:var(--color-teal); color:#fff}
-    .btn-dark{background:var(--color-navy); color:#fff}
-    .btn-soft{background:#fff; color:var(--color-navy); border:1px solid #e2e8f0}
-    .counter{display:flex; gap:8px; flex-wrap:wrap}
-    .counter .stat{background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:8px 12px; font-weight:800; display:flex; align-items:center; gap:6px}
 
-    /* Map container */
-    #map{width:100%; height:calc(100vh - 84px)}
-
-    /* Toolbar floating */
-    .toolbar{
-      position:absolute; top:88px; inset-inline-start:12px; z-index:900;
-      display:flex; flex-direction:column; gap:8px;
+    /* modal responsive */
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);z-index:2000;transition:.3s;}
+    .modal.open{display:flex;}
+    .modal-content{
+      background:#fff;width:min(600px,95vw);border-radius:18px;padding:16px;
+      box-shadow:0 12px 40px rgba(0,0,0,.25);
+      max-height:90vh;overflow:auto;
+      animation:pop .3s ease;
     }
-    .card{background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:var(--shadow)}
-    .tool-card{padding:10px}
-    .tool-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-    .select, .range{
-      border:1px solid #e2e8f0; border-radius:12px; padding:8px 10px; font-weight:600; background:#fff; color:#0a1931
-    }
-    .legend{padding:10px 12px; font-size:13px}
-    .legend .item{display:flex; align-items:center; gap:8px; margin:6px 0}
-    .dot{width:12px; height:12px; border-radius:50%}
-    .dot.red{background:var(--red)}
-    .dot.amber{background:var(--amber)}
-    .dot.green{background:var(--green)}
+    @keyframes pop{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
 
-    /* Marker styles (Uber-like) */
-    .pulse{
-      width:14px; height:14px; border-radius:50%; position:relative; box-shadow:0 0 0 2px #fff, 0 4px 10px rgba(0,0,0,.25)
+    /* bottom sheet mode for mobile */
+    @media (max-width:720px){
+      .modal{align-items:flex-end;}
+      .modal-content{
+        width:100%;border-radius:18px 18px 0 0;
+        max-height:92vh;animation:slideUp .35s ease;
+      }
+      @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
     }
-    .pulse.red{background:var(--red)}
-    .pulse.amber{background:var(--amber)}
-    .pulse.green{background:var(--green)}
-    .pulse.red::after, .pulse.amber::after{
-      content:""; position:absolute; inset:0; border-radius:50%; box-shadow:0 0 0 0 currentColor; animation:pulse 1.8s infinite; opacity:.55
-    }
-    .pulse.red::after{color:var(--red)}
-    .pulse.amber::after{color:var(--amber)}
-    @keyframes pulse{0%{box-shadow:0 0 0 0 currentColor} 70%{box-shadow:0 0 0 14px rgba(0,0,0,0)} 100%{box-shadow:0 0 0 0 rgba(0,0,0,0)}}
 
-    /* Modal */
-    .modal{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:2000; padding:16px}
-    .modal.open{display:flex}
-    .modal-content{background:#fff; width:min(720px, 95vw); border-radius:18px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
-    .modal-header{display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0; padding-bottom:10px; margin-bottom:12px}
-    .modal-actions{display:flex; gap:8px; margin-top:14px; justify-content:flex-end}
-    .field{display:flex; flex-direction:column; gap:6px}
-    textarea, select, input[type="file"]{border:1px solid #e2e8f0; border-radius:12px; padding:10px; font-family:inherit}
-    .pill{display:inline-flex; gap:6px; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800}
-    .pill.red{background:#fee2e2; color:#991b1b}
-    .pill.amber{background:#fef3c7; color:#92400e}
-    .pill.green{background:#dcfce7; color:#065f46}
+    .modal-header{display:flex;align-items:center;gap:8px;
+      border-bottom:1px solid #eee;padding-bottom:8px;margin-bottom:10px;}
+    .pill{padding:4px 10px;border-radius:999px;font-weight:800;}
+    .pill.red{background:#fee2e2;color:#991b1b}
+    .pill.amber{background:#fef3c7;color:#92400e}
+    .pill.green{background:#dcfce7;color:#065f46}
 
-    /* Toast */
-    .toast{position:fixed; bottom:12px; inset-inline-start:12px; background:#0a1931; color:#fff; padding:10px 12px; border-radius:12px; box-shadow:var(--shadow); z-index:3000; display:none}
-    .toast.show{display:block}
+    .field{display:flex;flex-direction:column;gap:6px;margin:6px 0}
+    textarea,select,input[type=file]{border:1px solid #e5e7eb;border-radius:10px;padding:8px;font-family:inherit;}
+    img{border-radius:12px;width:100%;object-fit:cover}
+
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+    .toast{position:fixed;bottom:12px;inset-inline-start:12px;background:var(--navy);color:#fff;
+      padding:10px 12px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.3);display:none;}
+    .toast.show{display:block;}
   </style>
 </head>
 <body>
-
-  <!-- Header -->
   <header class="app-header">
-    <div class="brand">Smart HSR <span>Live&nbsp;Map</span></div>
-    <div id="nearStats" class="counter" title="حول موقعي الآن">
-      <div class="stat"><i data-lucide="map-pin" class="w-4 h-4"></i><span id="meDistLabel">—</span></div>
-      <div class="stat"><i data-lucide="alert-triangle" class="w-4 h-4"></i>قريب: <b id="nearCount">0</b></div>
-    </div>
-    <div class="header-actions">
-      <button id="locBtn" class="btn btn-primary"><i data-lucide="crosshair"></i>تحديد موقعي</button>
-      <button id="centerBtn" class="btn btn-dark"><i data-lucide="navigation"></i>إعادة التمركز</button>
-      <a href="index.html" class="btn btn-soft"><i data-lucide="layout-dashboard"></i>اللوحة التنفيذية</a>
-    </div>
+    <div class="brand">Smart HSR <span>Live Map</span></div>
+    <button id="locBtn" class="btn btn-primary"><i data-lucide="crosshair"></i> موقعي</button>
+    <a href="manager.html" class="btn btn-soft"><i data-lucide="layout-dashboard"></i>لوحة المدير</a>
   </header>
 
-  <!-- Map -->
   <div id="map"></div>
 
-  <!-- Floating tools -->
-  <div class="toolbar">
-    <div class="tool-card card">
-      <div class="tool-row" style="padding:8px 10px">
-        <select id="statusFilter" class="select">
-          <option value="ALL">كل الحالات</option>
+  <!-- Modal -->
+  <div id="smartModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <i data-lucide="file-search"></i>
+        <h3 id="modalTitle" style="margin:0;font-weight:900;">تفاصيل الملاحظة</h3>
+        <span id="modalChip" class="pill" style="margin-inline-start:auto"></span>
+      </div>
+      <div class="field">
+        <label>العنوان</label>
+        <div id="mTitle" style="font-weight:700"></div>
+      </div>
+      <div class="field">
+        <label>المسافة من موقعي</label>
+        <div id="mDistance" style="font-weight:700"></div>
+      </div>
+      <div class="field">
+        <label>الوصف</label>
+        <div id="mDetails" style="line-height:1.8"></div>
+      </div>
+      <div id="mMedia" class="field"></div>
+      <div class="field">
+        <label>الحالة</label>
+        <select id="mStatus">
           <option value="PENDING">جديد</option>
           <option value="IN_PROGRESS">قيد التنفيذ</option>
           <option value="COMPLETED">مغلق</option>
         </select>
-        <label class="select" style="display:flex;align-items:center;gap:8px;">
-          <i data-lucide="radar" class="w-4 h-4"></i>
-          نصف القطر: <input id="radiusInput" type="range" min="500" max="5000" step="100" class="range" style="width:160px">
-          <span id="radiusLabel" style="font-weight:800">2000 م</span>
-        </label>
       </div>
-    </div>
-
-    <div class="legend card">
-      <div style="font-weight:900; margin-bottom:6px">أسطورة الحالات</div>
-      <div class="item"><span class="dot red"></span> جديد</div>
-      <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
-      <div class="item"><span class="dot green"></span> مغلق</div>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <div id="smartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-content">
-      <div class="modal-header">
-        <i data-lucide="file-search" class="w-5 h-5"></i>
-        <h3 id="modalTitle" style="margin:0;font-weight:900">تفاصيل الملاحظة</h3>
-        <span id="modalChip" class="pill" style="margin-inline-start:auto"></span>
+      <div class="field">
+        <label>صورة بعد الإصلاح</label>
+        <input id="afterInput" type="file" accept="image/*">
       </div>
-
-      <div id="modalBody" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-        <div class="field">
-          <label>العنوان</label>
-          <div id="mTitle" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field">
-          <label>المسافة من موقعي</label>
-          <div id="mDistance" class="card" style="padding:10px; font-weight:800;"></div>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>الوصف</label>
-          <div id="mDetails" class="card" style="padding:12px; line-height:1.8"></div>
-        </div>
-        <div class="field">
-          <label>الحالة</label>
-          <select id="mStatus" class="select">
-            <option value="PENDING">جديد</option>
-            <option value="IN_PROGRESS">قيد التنفيذ</option>
-            <option value="COMPLETED">مغلق</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>صورة بعد الإصلاح (اختياري/إلزامي عند الإغلاق)</label>
-          <input id="afterInput" type="file" accept="image/*">
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المذكرة الختامية</label>
-          <textarea id="mNote" rows="3" placeholder="اكتب المذكرة هنا..."></textarea>
-        </div>
-        <div class="field" style="grid-column:1/-1">
-          <label>المرفق الحالي</label>
-          <div id="mMedia" class="card" style="padding:8px"></div>
-        </div>
+      <div class="field">
+        <label>المذكرة الختامية</label>
+        <textarea id="mNote" rows="3"></textarea>
       </div>
-
       <div class="modal-actions">
-        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i>حفظ التحديث</button>
-        <button id="closeBtn" class="btn btn-soft"><i data-lucide="x"></i>إغلاق</button>
+        <button id="saveBtn" class="btn btn-primary"><i data-lucide="save"></i> حفظ</button>
+        <button id="closeBtn" class="btn btn-soft"><i data-lucide="x"></i> إغلاق</button>
       </div>
     </div>
   </div>
 
   <div id="toast" class="toast">تم الحفظ بنجاح</div>
 
-  <!-- Firebase -->
   <script type="module">
-    // ============ Firebase ============
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore, collection, onSnapshot, doc, updateDoc, query, orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
@@ -207,277 +139,95 @@
       projectId: "gen-lang-client-0349944917",
       storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
       messagingSenderId: "883065484771",
-      appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
-      measurementId: "G-V8WG5M8V5B"
+      appId: "1:883065484771:web:c907bb5a51f68caad75cd6"
     };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    let app, db, FIREBASE_READY=false;
-    try { app = initializeApp(firebaseConfig); db = getFirestore(app); FIREBASE_READY=true; }
-    catch(e){ console.warn("Firebase init failed, running local-only.", e); }
+    const map = L.map('map').setView([24.7136, 46.6753], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    // ============ Map Init ============
-    const map = L.map('map', { zoomControl:false, attributionControl:true });
-    // نبدأ على الرياض كإفتراضي (يمكن التحريك مباشرة)
-    map.setView([24.7136, 46.6753], 10);
-    L.control.zoom({ position:'topright' }).addTo(map);
+    const markers = new Map();
+    let lastMe = [24.7136,46.6753];
 
-    // طبقة أساسية داكنة بسيطة
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom:19, attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+    function haversine(a,b){const toRad=d=>d*Math.PI/180;const [la1,lo1]=a,[la2,lo2]=b;
+      const R=6371000,dLat=toRad(la2-la1),dLon=toRad(lo2-lo1);
+      const s1=Math.sin(dLat/2),s2=Math.sin(dLon/2);
+      return 2*R*Math.asin(Math.sqrt(s1*s1+Math.cos(toRad(la1))*Math.cos(toRad(la2))*s2*s2));}
 
-    // أيقونات ديناميكية
-    const markerIcon = (status)=> L.divIcon({
-      html:`<div class="pulse ${status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green'}"></div>`,
-      className:'', iconSize:[16,16], iconAnchor:[8,8]
-    });
+    const modal=document.getElementById('smartModal');
+    const mTitle=document.getElementById('mTitle');
+    const mDetails=document.getElementById('mDetails');
+    const mDistance=document.getElementById('mDistance');
+    const mStatus=document.getElementById('mStatus');
+    const mNote=document.getElementById('mNote');
+    const mMedia=document.getElementById('mMedia');
+    const modalChip=document.getElementById('modalChip');
+    const afterInput=document.getElementById('afterInput');
+    const saveBtn=document.getElementById('saveBtn');
+    const closeBtn=document.getElementById('closeBtn');
+    const toast=document.getElementById('toast');
+    let currentDoc=null, afterData=null;
 
-    // موقعي
-    let meMarker=null, meCircle=null, lastMe=[24.7136,46.6753];
-    const radiusInput=document.getElementById('radiusInput');
-    radiusInput.value=2000;
+    function chipColor(s){modalChip.className='pill '+(s==='PENDING'?'red':s==='IN_PROGRESS'?'amber':'green');
+      modalChip.textContent=s==='PENDING'?'جديد':s==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';}
 
-    function drawMe(){
-      const r=parseInt(radiusInput.value||2000,10);
-      if (meMarker) meMarker.remove();
-      if (meCircle) meCircle.remove();
-      meMarker = L.marker(lastMe, { icon:L.divIcon({html:'<div class="pulse amber" style="width:16px;height:16px"></div>', className:'', iconSize:[16,16], iconAnchor:[8,8]})}).addTo(map);
-      meCircle = L.circle(lastMe, { radius:r, color:'#18A5A2', fillColor:'#18A5A2', fillOpacity:0.08, weight:2 }).addTo(map);
-    }
-
-    function haversine(a,b){
-      const toRad = d=> d*Math.PI/180;
-      const [lat1,lon1]=a, [lat2,lon2]=b;
-      const R=6371000; // meters
-      const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
-      const s1=Math.sin(dLat/2), s2=Math.sin(dLon/2);
-      const c=2*Math.asin(Math.sqrt(s1*s1 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*s2*s2));
-      return R*c;
-    }
-
-    // ============ Observations Layer ============
-    const markers = new Map(); // docId -> marker
-    let observations = [];     // raw list
-
-    const statusFilter = document.getElementById('statusFilter');
-    const nearCountEl  = document.getElementById('nearCount');
-    const meDistLabel  = document.getElementById('meDistLabel');
-    const radiusLabel  = document.getElementById('radiusLabel');
-
-    function fmtMeters(m){ return m<1000 ? `${Math.round(m)} م` : `${(m/1000).toFixed(1)} كم`; }
-
-    function paint(){
-      // تحديث دائرة/موقعي
-      drawMe();
-
-      const filter = statusFilter.value;
-      const r = parseInt(radiusInput.value,10);
-      radiusLabel.textContent = `${r} م`;
-
-      let near=0;
-      // حدّث/أضف/أزل علامات
-      const presentIds=new Set();
-      for (const o of observations){
-        if (!o.location) continue;
-        const [lat, lon] = o.location.split(',').map(n=>parseFloat(n.trim()));
-        if (Number.isNaN(lat) || Number.isNaN(lon)) continue;
-
-        // فلترة الحالة
-        if (filter!=='ALL' && o.status!==filter) continue;
-
-        const dist = haversine(lastMe, [lat,lon]);
-        const inRadius = dist<=r;
-        if (inRadius) near++;
-
-        // إظهار جميع العلامات لكن نظهر المسافة في البطاقة
-        let m = markers.get(o.docId);
-        if (!m){
-          m = L.marker([lat,lon], { icon: markerIcon(o.status) }).addTo(map);
-          m.bindTooltip(o.title || '', { direction:'top', offset:[0,-10] });
-          m.on('click', ()=> openModalFor(o, dist));
-          markers.set(o.docId, m);
-        } else {
-          m.setIcon(markerIcon(o.status));
-          m.setLatLng([lat,lon]);
-        }
-        presentIds.add(o.docId);
-      }
-      // إزالة أي علامة لم تعد ضمن البيانات/الفلتر
-      for (const [id, m] of markers){
-        if (!presentIds.has(id)){ m.remove(); markers.delete(id); }
-      }
-      nearCountEl.textContent = near.toString();
-      meDistLabel.textContent = `نطاقي: ${fmtMeters(r)}`;
-    }
-
-    // ============ Firestore live ============
-    async function startLive(){
-      if (!FIREBASE_READY){
-        // Demo fallback
-        observations = [
-          {docId:'local-1', id:1, title:'هبوط بسيط بالممر الجانبي', status:'PENDING', type:'MAINTENANCE', date:'2025-10-01', details:'ملاحظة تجربة.', location:'24.774265,46.738586', imagePath:'https://picsum.photos/600/400?1'},
-          {docId:'local-2', id:2, title:'تشققات عرضية', status:'IN_PROGRESS', type:'QUALITY', date:'2025-10-03', details:'جاري الإصلاح.', location:'24.633333,46.716667', imagePath:'https://picsum.photos/600/400?2'},
-          {docId:'local-3', id:3, title:'لوحة إرشادية تالفة', status:'COMPLETED', type:'QUALITY', date:'2025-10-05', details:'تم الاستبدال.', location:'24.7136,46.6753', imagePath:'https://picsum.photos/600/400?3', afterImagePath:'https://picsum.photos/600/400?4', resolutionNote:'حسب المواصفات'}
-        ];
-        paint();
-        return;
-      }
-      const q = query(collection(db,'observations'), orderBy('createdAt','desc'));
-      onSnapshot(q, (snap)=>{
-        const arr=[];
-        snap.forEach(d=>{
-          const data=d.data();
-          arr.push({
-            docId:d.id,
-            id: data.displayId || 0,
-            title:data.title||'—',
-            status:data.status||'PENDING',
-            type:data.type||'MAINTENANCE',
-            date:data.date||'',
-            details:data.details||'',
-            location:data.location||'',
-            imagePath:data.imagePath||null,
-            afterImagePath:data.afterImagePath||null,
-            resolutionNote:data.resolutionNote||''
-          });
-        });
-        observations = arr;
-        paint();
-      });
-    }
-
-    // ============ Geolocation ============
-    const locBtn=document.getElementById('locBtn');
-    const centerBtn=document.getElementById('centerBtn');
-
-    let watchId=null;
-    function startWatch(){
-      if (!navigator.geolocation){ alert('المتصفح لا يدعم تحديد الموقع.'); return; }
-      if (watchId!==null) return;
-      watchId = navigator.geolocation.watchPosition(pos=>{
-        lastMe=[pos.coords.latitude, pos.coords.longitude];
-        paint();
-      }, err=>{
-        console.warn(err);
-        alert('تعذر تحديد الموقع. يرجى السماح بالصلاحيات.');
-      }, { enableHighAccuracy:true, maximumAge:2000, timeout:10000 });
-    }
-
-    locBtn.addEventListener('click', ()=>{
-      startWatch();
-      map.setView(lastMe, 14, { animate:true });
-    });
-    centerBtn.addEventListener('click', ()=>{
-      map.setView(lastMe, map.getZoom()<14?14:map.getZoom(), { animate:true });
-    });
-
-    statusFilter.addEventListener('change', paint);
-    radiusInput.addEventListener('input', paint);
-
-    // ============ Modal Logic ============
-    const modal = document.getElementById('smartModal');
-    const closeBtn = document.getElementById('closeBtn');
-    const saveBtn  = document.getElementById('saveBtn');
-    const mStatus  = document.getElementById('mStatus');
-    const mTitleEl = document.getElementById('mTitle');
-    const mDetails = document.getElementById('mDetails');
-    const mMedia   = document.getElementById('mMedia');
-    const mNote    = document.getElementById('mNote');
-    const mDistance= document.getElementById('mDistance');
-    const modalChip= document.getElementById('modalChip');
-    const afterInput = document.getElementById('afterInput');
-
-    let currentDocId=null, currentImagePath=null, currentAfterData=null;
-
-    afterInput.addEventListener('change', async (e)=>{
-      const f=e.target.files?.[0];
-      if (!f) { currentAfterData=null; return; }
-      if (!f.type.startsWith('image/')) { alert('يجب اختيار صورة.'); e.target.value=''; return; }
-      currentAfterData = await toBase64(f);
-    });
-
-    function setChip(status){
-      modalChip.className='pill '+(status==='PENDING'?'red':status==='IN_PROGRESS'?'amber':'green');
-      modalChip.innerHTML = status==='PENDING'?'جديد':status==='IN_PROGRESS'?'قيد التنفيذ':'مغلق';
-    }
-
-    function openModalFor(o, dist){
-      currentDocId=o.docId; currentImagePath=o.imagePath||null; currentAfterData=null;
-      document.getElementById('modalTitle').textContent = `ملاحظة #${o.id||'—'}`;
-      mTitleEl.textContent = o.title||'—';
-      mDetails.innerHTML = (o.details||'—').replace(/\n/g,'<br>');
-      mStatus.value = o.status||'PENDING';
-      setChip(o.status||'PENDING');
-      mNote.value = o.resolutionNote||'';
-      mDistance.textContent = fmtMeters(dist||0);
-
-      mMedia.innerHTML = '';
-      if (o.afterImagePath){
-        mMedia.innerHTML = `
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <img src="${o.imagePath||''}" alt="قبل" style="width:100%;border-radius:12px">
-            <img src="${o.afterImagePath||''}" alt="بعد" style="width:100%;border-radius:12px">
-          </div>`;
-      } else if (o.imagePath){
-        mMedia.innerHTML = `<img src="${o.imagePath}" alt="مرفق" style="width:100%;border-radius:12px">`;
-      } else {
-        mMedia.innerHTML = `<div class="card" style="padding:10px;text-align:center">لا يوجد مرفق</div>`;
-      }
-
+    function openModal(o){
+      currentDoc=o;
+      mTitle.textContent=o.title||'—';
+      mDetails.textContent=o.details||'—';
+      mStatus.value=o.status||'PENDING';
+      mNote.value=o.resolutionNote||'';
+      chipColor(o.status);
+      const dist=haversine(lastMe,o.latlon);
+      mDistance.textContent=`${dist<1000?dist.toFixed(0)+' م':(dist/1000).toFixed(1)+' كم'}`;
+      mMedia.innerHTML = o.afterImagePath ?
+        `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <img src="${o.imagePath}" alt="قبل"><img src="${o.afterImagePath}" alt="بعد"></div>` :
+        `<img src="${o.imagePath}" alt="مرفق">`;
       modal.classList.add('open');
     }
 
-    closeBtn.addEventListener('click', ()=> modal.classList.remove('open'));
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.classList.remove('open'); });
+    closeBtn.onclick=()=>modal.classList.remove('open');
+    modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open');}
+    afterInput.onchange=async e=>{
+      const f=e.target.files[0];if(!f)return;
+      afterData=await new Promise(r=>{const R=new FileReader();R.onload=()=>r(R.result);R.readAsDataURL(f);});
+    }
 
-    saveBtn.addEventListener('click', async ()=>{
-      if (!currentDocId){ modal.classList.remove('open'); return; }
-      const newStatus = mStatus.value;
-      if (newStatus==='COMPLETED' && !currentAfterData){
-        const ok = confirm('إغلاق يتطلب صورة "بعد". هل تريد المتابعة بدون صورة؟');
-        if (!ok) return;
-      }
-      const payload = {
-        status: newStatus,
-        resolutionNote: mNote.value || `تم التحديث بتاريخ ${new Date().toLocaleString('ar-SA')}`
-      };
-      if (currentAfterData) payload.afterImagePath = currentAfterData;
+    saveBtn.onclick=async ()=>{
+      if(!currentDoc)return;
+      const newData={status:mStatus.value,resolutionNote:mNote.value||''};
+      if(afterData)newData.afterImagePath=afterData;
+      try{await updateDoc(doc(db,'observations',currentDoc.id),newData);
+        showToast('تم الحفظ بنجاح');modal.classList.remove('open');
+      }catch(e){showToast('تعذر الحفظ');}
+    }
 
-      try {
-        if (FIREBASE_READY){
-          await updateDoc(doc(db,'observations', currentDocId), payload);
-        } else {
-          // Demo update
-          const idx = observations.findIndex(x=>x.docId===currentDocId);
-          if (idx>-1){
-            observations[idx] = { ...observations[idx], ...payload };
-          }
+    function showToast(t){toast.textContent=t;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2000);}
+
+    // markers from Firestore
+    onSnapshot(collection(db,'observations'),snap=>{
+      snap.forEach(d=>{
+        const data=d.data();const [lat,lon]=data.location.split(',').map(Number);
+        const o={id:d.id,title:data.title,details:data.details,imagePath:data.imagePath,afterImagePath:data.afterImagePath,status:data.status,resolutionNote:data.resolutionNote,latlon:[lat,lon]};
+        if(!markers.has(d.id)){
+          const m=L.marker([lat,lon]).addTo(map);
+          m.on('click',()=>openModal(o));
+          markers.set(d.id,m);
         }
-        showToast('تم الحفظ بنجاح');
-        modal.classList.remove('open');
-      } catch (e){
-        console.error(e);
-        showToast('تعذر الحفظ، تحقق من الاتصال');
-      }
+      });
     });
 
-    // ============ Helpers ============
-    function showToast(text){
-      const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
-      setTimeout(()=> t.classList.remove('show'), 2000);
-    }
-    function toBase64(file){
-      return new Promise((res,rej)=>{
-        const reader = new FileReader();
-        reader.onload = e=> res(e.target.result);
-        reader.onerror = rej;
-        reader.readAsDataURL(file);
+    // geolocation
+    document.getElementById('locBtn').onclick=()=>{
+      navigator.geolocation.getCurrentPosition(pos=>{
+        lastMe=[pos.coords.latitude,pos.coords.longitude];
+        L.marker(lastMe).addTo(map);
+        map.setView(lastMe,14);
       });
-    }
+    };
 
-    // ============ Start ============
-    startLive();
-    drawMe();
     lucide.createIcons();
   </script>
 </body>
