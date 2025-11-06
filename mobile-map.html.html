@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart HSR | الخريطة الميدانية</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {font-family:'Tajawal',sans-serif;background:#F7F9FC;color:#0A1931;}
+    #map {height:calc(100vh - 120px);border-radius:1rem;box-shadow:0 10px 30px rgba(0,0,0,.08);}
+    .bottom-nav {position:fixed;bottom:0;right:0;left:0;background:#fff;border-top:1px solid #E2E8F0;display:flex;justify-content:space-around;padding:.5rem 0;box-shadow:0 -5px 20px rgba(0,0,0,.05);}
+    .nav-btn {text-align:center;font-size:.8rem;font-weight:800;color:#475569;transition:.2s;}
+    .nav-btn i {display:block;margin:auto;margin-bottom:.25rem;}
+    .nav-btn.active {color:#18A5A2;}
+    .badge {display:inline-flex;align-items:center;gap:.3rem;background:#F1F5F9;border-radius:999px;padding:.25rem .5rem;font-size:.7rem;font-weight:800;}
+    .dot{width:.7rem;height:.7rem;border-radius:50%;display:inline-block;}
+  </style>
+</head>
+<body>
+  <header class="bg-white shadow-md p-4 flex items-center justify-between">
+    <span class="font-extrabold text-lg">🗺️ Smart HSR Mobile Map</span>
+    <button onclick="window.location.href='dashboard.html'" class="bg-[#18A5A2] text-white px-3 py-1 rounded-full font-bold text-sm">عودة</button>
+  </header>
+
+  <main class="p-4">
+    <div id="map"></div>
+  </main>
+
+  <nav class="bottom-nav">
+    <button id="tabMap" class="nav-btn active" onclick="switchTab('map')"><i data-lucide="map"></i>الخريطة</button>
+    <button id="tabList" class="nav-btn" onclick="switchTab('list')"><i data-lucide="list"></i>بلاغاتي</button>
+    <button id="tabSettings" class="nav-btn" onclick="switchTab('settings')"><i data-lucide="settings"></i>إعدادات</button>
+  </nav>
+
+  <div id="listTab" class="hidden p-4">
+    <h2 class="text-xl font-extrabold mb-3">📋 بلاغاتي</h2>
+    <table class="w-full text-sm border">
+      <thead class="bg-gray-50 font-bold"><tr><th>المعرف</th><th>الحالة</th><th>العنوان</th></tr></thead>
+      <tbody id="myReports"><tr><td colspan="3" class="text-center p-4 text-gray-500">جاري التحميل...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div id="settingsTab" class="hidden p-4">
+    <h2 class="text-xl font-extrabold mb-3">⚙️ الإعدادات</h2>
+    <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-full font-bold">تسجيل الخروج</button>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXCiNeaO9lhM79tKb98x4oaNqNy5xKvWM",
+      authDomain: "smart-hsr-manager.firebaseapp.com",
+      projectId: "smart-hsr-manager",
+      storageBucket: "smart-hsr-manager.firebasestorage.app",
+      messagingSenderId: "38965508031",
+      appId: "1:38965508031:web:6fd0b6c6b0b63fa513930a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    let map = L.map('map').setView([24.7136, 46.6753], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    const markersLayer = L.layerGroup().addTo(map);
+
+    const user = JSON.parse(sessionStorage.getItem('smartHSRUser') || '{}');
+    const role = user.role || 'inspector';
+
+    function loadObservations() {
+      let q = query(collection(db, 'observations'));
+      onSnapshot(q, snap => {
+        markersLayer.clearLayers();
+        const listBody = document.getElementById('myReports');
+        listBody.innerHTML = '';
+        snap.forEach(d => {
+          const data = d.data();
+          if ((role === 'inspector' && data.inspector === user.name) || (role === 'contractor' && data.contractor === user.name)) {
+            let color = data.status === 'COMPLETED' ? '#10B981' : data.status === 'IN_PROGRESS' ? '#F59E0B' : '#EF4444';
+            const icon = L.divIcon({ html:`<div style='background:${color};width:16px;height:16px;border-radius:50%;border:2px solid white;'></div>` });
+            const marker = L.marker([data.lat, data.lng], { icon }).addTo(markersLayer);
+            marker.bindPopup(`<b>${data.title || 'بدون عنوان'}</b><br>الحالة: ${data.status}`);
+            listBody.innerHTML += `<tr><td>${data.id || d.id}</td><td>${data.status}</td><td>${data.title || '-'}</td></tr>`;
+          }
+        });
+      });
+    }
+
+    loadObservations();
+
+    function switchTab(tab){
+      document.getElementById('map').classList.toggle('hidden', tab!=='map');
+      document.getElementById('listTab').classList.toggle('hidden', tab!=='list');
+      document.getElementById('settingsTab').classList.toggle('hidden', tab!=='settings');
+      document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.remove('active'));
+      document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+    }
+
+    window.logout = ()=>{ sessionStorage.clear(); window.location.href='login.html'; }
+
+    if('geolocation' in navigator){
+      navigator.geolocation.watchPosition(pos => {
+        const {latitude: lat, longitude: lng} = pos.coords;
+        const meIcon = L.divIcon({ html:`<div style='background:#3B82F6;width:20px;height:20px;border-radius:50%;border:3px solid white;'></div>` });
+        L.marker([lat, lng], {icon:meIcon}).addTo(map).bindPopup('موقعي الحالي');
+      });
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
