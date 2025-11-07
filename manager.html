@@ -648,61 +648,7 @@ const firebaseConfig = {
     }
     window.addEventListener('DOMContentLoaded', boot);
 
-    // ===== Show Observation Images (Firebase + LocalStorage) =====
-    async function showObservationImages(id) {
-      // ابحث أولاً داخل الذاكرة الحالية
-      let o = observations.find(x => (x.docId || x.id) == id);
-
-      // إذا ما وجدناها هنا، نحاول من localStorage
-      if (!o) {
-        const localData = JSON.parse(localStorage.getItem("observations") || "[]");
-        o = localData.find(x => (x.id || x.docId) == id);
-      }
-
-      if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
-
-      // نحاول نجيب الصور من الحقول المختلفة
-      const before =
-        o.imagePath ||
-        o.beforeImagePath ||
-        o.beforeImage ||
-        (o.images && o.images.before) ||
-        null;
-      const after =
-        o.afterImagePath ||
-        o.afterImage ||
-        (o.images && o.images.after) ||
-        null;
-
-      if (!before && !after) {
-        alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
-        return;
-      }
-
-      // إنشاء نافذة عرض الصور
-      const modal = document.createElement("div");
-      modal.style = `
-        position:fixed;top:0;left:0;width:100%;height:100%;
-        background:rgba(0,0,0,0.8);display:flex;flex-direction:column;
-        align-items:center;justify-content:center;z-index:9999;
-      `;
-
-      modal.innerHTML = `
-        <div style="background:white; border-radius:12px; padding:16px; max-width:90%; text-align:center;">
-          <h3 style="margin-bottom:12px;">📸 صور البلاغ</h3>
-          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-            ${before ? `<div><p>قبل:</p><img src="${before}" style="max-width:250px; border-radius:8px;"></div>` : ""}
-            ${after ? `<div><p>بعد:</p><img src="${after}" style="max-width:250px; border-radius:8px;"></div>` : ""}
-          </div>
-          <button id="closeImageModal" style="margin-top:16px; background:#333; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">إغلاق</button>
-        </div>
-      `;
-
-      document.body.appendChild(modal);
-      document.getElementById("closeImageModal").addEventListener("click", () => modal.remove());
-    }
-    window.showObservationImages = showObservationImages;
-
+  
     
         // ===== Delete Observation =====
     async function deleteObservation(id) {
