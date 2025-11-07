@@ -419,6 +419,7 @@ const firebaseConfig = {
               <button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-full" onclick="openAssign('${o.docId||o.id}')">تعيين</button>
               <button class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full" onclick="cycleStatus('${o.docId||o.id}')">تغيير الحالة</button>
               <button class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onclick="closeTicket('${o.docId||o.id}')">إغلاق</button>
+              <button class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full" onclick="showObservationImages('${o.docId||o.id}')">📸 عرض الصور</button>
               <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full" onclick="deleteObservation('${o.docId||o.id}')">🗑️ حذف</button>
             </div>
           </td>
@@ -641,7 +642,8 @@ const firebaseConfig = {
       try{ lucide.createIcons(); }catch(e){}
     }
     window.addEventListener('DOMContentLoaded', boot);
-    // ===== Delete Observation =====
+
+        // ===== Delete Observation =====
     async function deleteObservation(id) {
       if (!confirm("⚠️ هل أنت متأكد أنك تريد حذف هذه الملاحظة نهائيًا؟")) return;
       const o = observations.find(x => (x.docId || x.id) == id);
@@ -665,6 +667,50 @@ const firebaseConfig = {
       }
     }
     window.deleteObservation = deleteObservation;
+
+
+    // ===== Show Observation Images =====
+    async function showObservationImages(id) {
+      const o = observations.find(x => (x.docId || x.id) == id);
+      if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
+
+      const before = o.imagePath || o.beforeImagePath || null;
+      const after  = o.afterImagePath || null;
+
+      if (!before && !after) {
+        alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
+        return;
+      }
+
+      // إنشاء نافذة عرض الصور
+      const modal = document.createElement("div");
+      modal.style.position = "fixed";
+      modal.style.top = "0";
+      modal.style.left = "0";
+      modal.style.width = "100%";
+      modal.style.height = "100%";
+      modal.style.background = "rgba(0,0,0,0.8)";
+      modal.style.display = "flex";
+      modal.style.flexDirection = "column";
+      modal.style.alignItems = "center";
+      modal.style.justifyContent = "center";
+      modal.style.zIndex = "9999";
+
+      modal.innerHTML = `
+        <div style="background:white; border-radius:12px; padding:16px; max-width:90%; text-align:center;">
+          <h3 style="margin-bottom:12px;">📸 صور البلاغ</h3>
+          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+            ${before ? `<div><p>قبل:</p><img src="${before}" style="max-width:250px; border-radius:8px;"></div>` : ""}
+            ${after ? `<div><p>بعد:</p><img src="${after}" style="max-width:250px; border-radius:8px;"></div>` : ""}
+          </div>
+          <button id="closeImageModal" style="margin-top:16px; background:#333; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">إغلاق</button>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+      document.getElementById("closeImageModal").addEventListener("click", () => modal.remove());
+    }
+    window.showObservationImages = showObservationImages;
 
     
   </script>
