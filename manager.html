@@ -730,47 +730,78 @@ const firebaseConfig = {
     window.deleteObservation = deleteObservation;
 
 
-    // ===== Show Observation Images =====
-    async function showObservationImages(id) {
-      const o = observations.find(x => (x.docId || x.id) == id);
-      if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
+// ===== Show Observation Images (محسّنة) =====
+async function showObservationImages(id) {
+  let o = observations.find(x => (x.docId || x.id) == id);
 
-      const before = o.imagePath || o.beforeImagePath || null;
-      const after  = o.afterImagePath || null;
+  // جلب من localStorage في حال الملاحظة غير موجودة بالذاكرة
+  if (!o) {
+    const localData = JSON.parse(localStorage.getItem("observations") || "[]");
+    o = localData.find(x => (x.id || x.docId) == id);
+  }
 
-      if (!before && !after) {
-        alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
-        return;
-      }
+  if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
 
-      // إنشاء نافذة عرض الصور
-      const modal = document.createElement("div");
-      modal.style.position = "fixed";
-      modal.style.top = "0";
-      modal.style.left = "0";
-      modal.style.width = "100%";
-      modal.style.height = "100%";
-      modal.style.background = "rgba(0,0,0,0.8)";
-      modal.style.display = "flex";
-      modal.style.flexDirection = "column";
-      modal.style.alignItems = "center";
-      modal.style.justifyContent = "center";
-      modal.style.zIndex = "9999";
+  // تحديد روابط الصور
+  const before =
+    o.imagePath ||
+    o.beforeImagePath ||
+    o.beforeImage ||
+    (o.images && o.images.before) ||
+    null;
+  const after =
+    o.afterImagePath ||
+    o.afterImage ||
+    (o.images && o.images.after) ||
+    null;
 
-      modal.innerHTML = `
-        <div style="background:white; border-radius:12px; padding:16px; max-width:90%; text-align:center;">
-          <h3 style="margin-bottom:12px;">📸 صور البلاغ</h3>
-          <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-            ${before ? `<div><p>قبل:</p><img src="${before}" style="max-width:250px; border-radius:8px;"></div>` : ""}
-            ${after ? `<div><p>بعد:</p><img src="${after}" style="max-width:250px; border-radius:8px;"></div>` : ""}
-          </div>
-          <button id="closeImageModal" style="margin-top:16px; background:#333; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer;">إغلاق</button>
-        </div>
-      `;
+  if (!before && !after) {
+    alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
+    return;
+  }
 
-      document.body.appendChild(modal);
-      document.getElementById("closeImageModal").addEventListener("click", () => modal.remove());
-    }
+  // إنشاء نافذة العرض
+  const modal = document.createElement("div");
+  modal.style = `
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;
+    z-index:9999;padding:20px;backdrop-filter:blur(2px);
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background:white; border-radius:16px; padding:20px;
+      max-width:95%; max-height:90%; overflow:auto; text-align:center;
+      box-shadow:0 10px 35px rgba(0,0,0,0.3); animation:fadeIn .3s ease;
+    ">
+      <h3 style="margin-bottom:16px; font-size:18px; font-weight:800;">📸 صور البلاغ</h3>
+      <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+        ${
+          before
+            ? `<div><p style="font-weight:bold;">قبل:</p><img src="${before}" class="zoomable" style="max-width:280px; border-radius:10px; transition:transform .3s ease; cursor:pointer;"></div>`
+            : ""
+        }
+        ${
+          after
+            ? `<div><p style="font-weight:bold;">بعد:</p><img src="${after}" class="zoomable" style="max-width:280px; border-radius:10px; transition:transform .3s ease; cursor:pointer;"></div>`
+            : ""
+        }
+      </div>
+      <button id="closeImageModal" style="
+        margin-top:20px; background:#0ea5a1; color:white; border:none;
+        padding:10px 22px; border-radius:8px; cursor:pointer; font-weight:bold;
+      ">إغلاق</button>
+    </div>
+    <style>
+      @keyframes fadeIn { from {opacity:0; transform:scale(.95);} to {opacity:1; transform:scale(1);} }
+      .zoomable:hover { transform:scale(1.05); }
+    </style>
+  `;
+
+  document.body.appendChild(modal);
+  document.getElementById("closeImageModal").addEventListener("click", () => modal.remove());
+}
+
     window.showObservationImages = showObservationImages;
 
     
