@@ -676,36 +676,51 @@ const firebaseConfig = {
     window.deleteObservation = deleteObservation;
 
 
-// ===== Show Observation Images (تصميم احترافي متناسق) =====
+// ===== Show Observation Images (إصدار ذكي نهائي تلقائي) =====
 async function showObservationImages(id) {
+  // نحاول نلقا البلاغ من الذاكرة
   let o = observations.find(x => (x.docId || x.id) == id);
 
-  // جلب من localStorage إذا لم تكن الملاحظة موجودة في الذاكرة
+  // نحاول نلقاه من localStorage لو مو موجود
   if (!o) {
     const localData = JSON.parse(localStorage.getItem("observations") || "[]");
     o = localData.find(x => (x.id || x.docId) == id);
   }
 
-  if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
+  if (!o) {
+    alert("❌ لم يتم العثور على الملاحظة.");
+    return;
+  }
 
-  // جلب الصور من الحقول الممكنة (قبل / بعد)
-  const before =
-    o.beforeImagePath ||
-    (o.images && o.images.before) ||
-    o.imagePath ||
-    null;
-  const after =
-    o.afterImagePath ||
-    (o.images && o.images.after) ||
-    null;
+  // نحاول استخراج الصور من كل الحقول الممكنة
+  const possibleKeys = [
+    "beforeImagePath", "afterImagePath", "imagePath",
+    "beforeImage", "afterImage", "photoPath", "imgPath"
+  ];
 
+  let before = null, after = null;
+
+  for (const key of possibleKeys) {
+    if (o[key] && typeof o[key] === "string") {
+      if (!before) before = o[key];
+      else if (!after && o[key] !== before) after = o[key];
+    }
+  }
+
+  // فحص كائن images إن وجد
+  if (o.images) {
+    if (o.images.before && !before) before = o.images.before;
+    if (o.images.after && !after) after = o.images.after;
+  }
+
+  // لو مافي صور أبدًا
   if (!before && !after) {
     alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
     console.log("🔍 بيانات البلاغ:", o);
     return;
   }
 
-  // إنشاء نافذة عرض الصور
+  // إنشاء النافذة الاحترافية
   const modal = document.createElement("div");
   modal.className = "observation-modal";
   modal.innerHTML = `
@@ -713,113 +728,93 @@ async function showObservationImages(id) {
     <div class="modal-content animate-in">
       <h3>📸 صور البلاغ</h3>
       <div class="images">
-        ${before ? `<div><p>قبل</p><img src="${before}" alt="قبل"></div>` : ""}
-        ${after ? `<div><p>بعد</p><img src="${after}" alt="بعد"></div>` : ""}
+        ${before ? `<div><p>قبل</p><img src="${before}" alt="قبل" onclick="window.open('${before}', '_blank')"></div>` : ""}
+        ${after ? `<div><p>بعد</p><img src="${after}" alt="بعد" onclick="window.open('${after}', '_blank')"></div>` : ""}
       </div>
       <button id="closeImageModal">إغلاق</button>
     </div>
   `;
-
   document.body.appendChild(modal);
 
-  // عند الضغط على إغلاق أو الخلفية
   modal.querySelector("#closeImageModal").addEventListener("click", () => modal.remove());
   modal.querySelector(".modal-overlay").addEventListener("click", () => modal.remove());
 }
-
-// تسجيل الدالة للاستخدام من الزر
 window.showObservationImages = showObservationImages;
 
-// ===== CSS للنافذة (داخل سكربت JS لتعمل فورًا) =====
+// ===== CSS لتصميم النافذة =====
 const style = document.createElement("style");
 style.textContent = `
 .observation-modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
   z-index: 9999;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.observation-modal .modal-overlay {
+.modal-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(11, 43, 58, 0.75);
+  background: rgba(0,0,0,0.75);
   backdrop-filter: blur(4px);
   animation: fadeIn 0.3s ease;
 }
-
-.observation-modal .modal-content {
-  position: relative;
-  background: #ffffff;
+.modal-content {
+  background: #fff;
   border-radius: 18px;
   padding: 24px;
-  max-width: 92%;
-  box-shadow: 0 8px 35px rgba(0,0,0,0.3);
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
   text-align: center;
   z-index: 10;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   animation: scaleIn 0.25s ease;
 }
-
-.observation-modal h3 {
-  color: #0b2b3a;
+.modal-content h3 {
   font-size: 20px;
-  margin-bottom: 18px;
+  color: #0b2b3a;
   font-weight: 800;
+  margin-bottom: 16px;
 }
-
-.observation-modal .images {
+.images {
   display: flex;
-  flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  flex-wrap: wrap;
 }
-
-.observation-modal .images div p {
+.images div p {
   font-weight: bold;
   color: #0ea5a1;
   margin-bottom: 6px;
 }
-
-.observation-modal .images img {
-  max-width: 260px;
+.images img {
+  max-width: 280px;
   border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.25);
   transition: transform 0.3s ease;
   cursor: zoom-in;
 }
-
-.observation-modal .images img:hover {
+.images img:hover {
   transform: scale(1.05);
 }
-
-.observation-modal button {
-  background: linear-gradient(90deg, #0b2b3a, #0ea5a1);
-  color: white;
+.modal-content button {
+  background: linear-gradient(90deg,#0b2b3a,#0ea5a1);
+  color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 10px 24px;
-  font-size: 15px;
-  font-weight: bold;
+  border-radius: 8px;
+  padding: 10px 22px;
   margin-top: 20px;
+  font-weight: bold;
   cursor: pointer;
   transition: opacity 0.3s ease;
 }
-
-.observation-modal button:hover {
-  opacity: 0.85;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; } to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
+.modal-content button:hover { opacity: 0.85; }
+@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+@keyframes scaleIn { from{opacity:0;transform:scale(.9);} to{opacity:1;transform:scale(1);} }
 `;
 document.head.appendChild(style);
+
 
     
   </script>
