@@ -220,14 +220,19 @@
         </div>
       </div>
 
-      <div class="legend card" aria-label="أسطورة الحالات">
-        <div class="legend-title">أسطورة الحالات</div>
-        <div class="item"><span class="dot red"></span> جديد</div>
-        <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
-        <div class="item"><span class="dot green"></span> مغلق</div>
-      </div>
-    </div>
-  </div>
+  <!-- زر عرض الأسطورة + عداد الحالات -->
+<button id="legendToggle" class="legend-toggle" title="إظهار/إخفاء الأسطورة">
+  <span id="legendCount" class="legend-count">0</span>
+  <i data-lucide="info"></i>
+</button>
+
+<!-- أسطورة الحالات -->
+<div id="legendBox" class="legend card" aria-label="أسطورة الحالات">
+  <div class="legend-title">أسطورة الحالات</div>
+  <div class="item"><span class="dot red"></span> جديد</div>
+  <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
+  <div class="item"><span class="dot green"></span> مغلق</div>
+</div>
 
   <!-- Bottom Sheet (نافذة ذكية) -->
   <section id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
