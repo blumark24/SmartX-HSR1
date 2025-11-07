@@ -419,6 +419,7 @@ const firebaseConfig = {
               <button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-full" onclick="openAssign('${o.docId||o.id}')">تعيين</button>
               <button class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full" onclick="cycleStatus('${o.docId||o.id}')">تغيير الحالة</button>
               <button class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onclick="closeTicket('${o.docId||o.id}')">إغلاق</button>
+              <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full" onclick="deleteObservation('${o.docId||o.id}')">🗑️ حذف</button>
             </div>
           </td>
         </tr>`
@@ -640,6 +641,32 @@ const firebaseConfig = {
       try{ lucide.createIcons(); }catch(e){}
     }
     window.addEventListener('DOMContentLoaded', boot);
+    // ===== Delete Observation =====
+    async function deleteObservation(id) {
+      if (!confirm("⚠️ هل أنت متأكد أنك تريد حذف هذه الملاحظة نهائيًا؟")) return;
+      const o = observations.find(x => (x.docId || x.id) == id);
+      if (!o) return;
+
+      // حذف من الواجهة
+      observations = observations.filter(x => (x.docId || x.id) != id);
+      renderObservations();
+      renderKPIs();
+      refreshMapMarkers?.();
+
+      // حذف من Firestore
+      if (FIREBASE_READY && o.docId) {
+        try {
+          await deleteDoc(doc(db, "observations", o.docId));
+          alert("✅ تم حذف الملاحظة بنجاح");
+        } catch (err) {
+          console.error(err);
+          alert("حدث خطأ أثناء الحذف ❌");
+        }
+      }
+    }
+    window.deleteObservation = deleteObservation;
+
+    
   </script>
 
   <!-- App helpers (non-module so we can call them from inline HTML) -->
