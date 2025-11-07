@@ -209,6 +209,7 @@ body { padding-top: 68px; }
   flex-wrap: wrap;
 }
 
+/* شعار */
 .brand {
   display: flex;
   align-items: center;
@@ -216,23 +217,29 @@ body { padding-top: 68px; }
   font-size: 1.15rem;
   font-weight: 700;
 }
-.brand .dot{width:10px;height:10px;background:#22c55e;border-radius:50%;}
-.brand .accent{color:#d1f4f2;}
+.brand .dot {width:10px;height:10px;background:#22c55e;border-radius:50%;}
+.brand .accent {color:#d1f4f2;}
 
-/* ===== بيانات المستخدم (اسم + دور في نفس السطر) ===== */
+/* ===== بيانات المستخدم ===== */
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
+  background: rgba(255,255,255,0.1);
+  padding: 6px 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 .user-info .icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.9;
 }
 .user-text {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -244,7 +251,7 @@ body { padding-top: 68px; }
 #userRole {
   font-size: 0.8rem;
   border-radius: 6px;
-  padding: 2px 6px;
+  padding: 3px 8px;
   text-transform: capitalize;
 }
 
@@ -293,9 +300,10 @@ body { padding-top: 68px; }
   .actions{display:none;flex-direction:column;width:100%;background:var(--secondary-navy);padding:0.7rem;border-radius:8px;margin-top:0.5rem;}
   .actions.active{display:flex;}
   .menu-toggle{display:block;}
+  .user-info {width: 100%;justify-content: center;margin-top: 6px;}
 }
 
-/* ===== Toast notifications ===== */
+/* Toast */
 .toast{
   position:fixed;bottom:20px;right:20px;background:#0ea5a1;color:white;
   padding:10px 18px;border-radius:10px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,0.2);
@@ -331,57 +339,56 @@ const userRole = document.getElementById('userRole');
 const menuToggle = document.getElementById('menuToggle');
 const actions = document.querySelector('.actions');
 
-// ===== جلب بيانات المستخدم من Firestore أو localStorage =====
+// ===== جلب بيانات المستخدم من Firestore =====
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     let stored = JSON.parse(localStorage.getItem("hsrUserData") || "{}");
 
-    if (!stored.name || !stored.role) {
-      try {
-        const ref = doc(db, "managers", user.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          stored = snap.data();
-          localStorage.setItem("hsrUserData", JSON.stringify(stored));
-        }
-      } catch (err) {
-        console.warn("تعذر جلب بيانات المستخدم:", err);
+    try {
+      // أولاً نحاول جلبه من managers
+      const ref1 = doc(db, "managers", user.uid);
+      const snap1 = await getDoc(ref1);
+      if (snap1.exists()) stored = snap1.data();
+      else {
+        // لو ما وجدناه نحاول users
+        const ref2 = doc(db, "users", user.uid);
+        const snap2 = await getDoc(ref2);
+        if (snap2.exists()) stored = snap2.data();
       }
+      localStorage.setItem("hsrUserData", JSON.stringify(stored));
+    } catch (err) {
+      console.warn("خطأ أثناء جلب البيانات:", err);
     }
 
+    // تحويل الدور إلى عربي + تنسيق اللون
     const rawRole = (stored.role || "manager").toLowerCase().trim();
     let arabicRole = "";
     let roleClass = "";
-    let roleEmoji = "";
 
     if (rawRole.includes("manager") || rawRole.includes("مدير")) {
       arabicRole = "مدير";
       roleClass = "user-role-manager";
-      roleEmoji = "🟦";
     } else if (rawRole.includes("inspector") || rawRole.includes("مراقب")) {
       arabicRole = "مراقب";
       roleClass = "user-role-inspector";
-      roleEmoji = "🟢";
     } else if (rawRole.includes("contractor") || rawRole.includes("مقاول")) {
       arabicRole = "مقاول";
       roleClass = "user-role-contractor";
-      roleEmoji = "🟠";
     } else {
       arabicRole = "مستخدم";
-      roleEmoji = "⚪";
     }
 
+    // عرض الاسم والدور في سطر واحد أنيق
     userName.textContent = stored.name || user.displayName || "مستخدم";
-    userRole.classList.remove("user-role-inspector","user-role-contractor","user-role-manager");
-    userRole.classList.add(roleClass);
-    userRole.innerHTML = `— ${roleEmoji} ${arabicRole}`;
+    userRole.className = roleClass;
+    userRole.textContent = arabicRole;
 
   } else {
     redirectToLogin();
   }
 });
 
-// ===== زر الخروج =====
+// ===== تسجيل الخروج =====
 logoutBtn.addEventListener('click', async () => {
   logoutBtn.innerHTML = "<i data-lucide='loader-2' class='spin'></i> جاري تسجيل الخروج...";
   logoutBtn.disabled = true;
