@@ -240,6 +240,40 @@
   <!-- Map frame -->
   <div class="map-wrap">
     <div id="map" aria-label="الخريطة التفاعلية"></div>
+/* تنسيق زر الأسطورة بشكل متناسق أسفل الخريطة */
+.legend-toggle {
+  position: absolute;
+  bottom: 22px;  /* مسافة من أسفل الخريطة */
+  right: 24px;   /* مسافة من اليمين */
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  transition: all 0.3s ease;
+}
+
+/* تأثير حركة خفيفة عند تمرير الماوس */
+.legend-toggle:hover {
+  transform: translateY(-3px);
+  background: var(--teal-600);
+}
+
+/* شكل الزر عند التفعيل */
+.legend-toggle.active {
+  background: var(--navy);
+  transform: rotate(180deg);
+}
+
+/* عشان ما يلتصق الزر بأسفل الصفحة */
+.map-wrap {
+  margin-bottom: 50px;
+}
 
     <!-- Floating tools (legend only) -->
     <div class="toolbar">
