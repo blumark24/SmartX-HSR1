@@ -96,17 +96,17 @@
 
 <body class="text-gray-800">
 
-<!-- ========== SMART HSR EXECUTIVE HEADER (Firebase Integrated) ========== -->
+<!-- ========== SMART HSR EXECUTIVE HEADER ========== -->
 <header id="hsrHeader" class="hsr-header">
   <div class="hsr-top">
-    <!-- الشعار -->
+    <!-- شعار -->
     <div class="brand">
       <span class="dot"></span>
       <strong>Smart HSR</strong>
       <span class="accent">System</span>
     </div>
 
-    <!-- معلومات المستخدم -->
+    <!-- بيانات المستخدم -->
     <div class="user-info">
       <i data-lucide="user" class="icon"></i>
       <div class="user-text">
@@ -120,7 +120,7 @@
       <i data-lucide="menu"></i>
     </button>
 
-    <!-- الإجراءات -->
+    <!-- الأزرار -->
     <div class="actions">
       <div id="gpsIndicator" class="gps-indicator" title="حالة الموقع">
         <span class="circle off"></span>
@@ -130,11 +130,9 @@
       <button class="btn primary" onclick="window.open('mobile-map.html','_blank')">
         <i data-lucide='map'></i> <span>الخريطة</span>
       </button>
-
       <button class="btn soft" onclick="window.location.href='dashboard.html'">
         <i data-lucide='layout-dashboard'></i> <span>اللوحة</span>
       </button>
-
       <button id="logoutBtn" class="btn dark">
         <i data-lucide='log-out'></i> <span>خروج</span>
       </button>
@@ -142,7 +140,6 @@
   </div>
 </header>
 
-<!-- ===== CSS STYLE ===== -->
 <style>
 :root {
   --primary-teal:#0ea5a1;
@@ -191,12 +188,11 @@
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 </style>
 
-<!-- ===== JS (Firebase Integration) ===== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-// إعداد Firebase (نفس الإعدادات من صفحة تسجيل الدخول)
+// إعداد Firebase (نفس إعداد login.html)
 const firebaseConfig = {
   apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
   authDomain: "gen-lang-client-0349944917.firebaseapp.com",
@@ -208,29 +204,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// عناصر الواجهة
 const logoutBtn = document.getElementById('logoutBtn');
 const userName = document.getElementById('userName');
 const userRole = document.getElementById('userRole');
 const menuToggle = document.getElementById('menuToggle');
 const actions = document.querySelector('.actions');
 
-// عرض بيانات المستخدم بعد تسجيل الدخول
+// عرض بيانات المستخدم المسجلة
 onAuthStateChanged(auth, (user) => {
   if (user) {
     const stored = JSON.parse(localStorage.getItem("hsrUserData") || "{}");
     userName.textContent = stored.name || user.displayName || "مستخدم";
     userRole.textContent = stored.role || "تنفيذي";
   } else {
-    // في حال لم يكن هناك مستخدم => الرجوع إلى صفحة تسجيل الدخول
-    window.location.href = "login (3).html";
+    redirectToLogin();
   }
 });
 
-// تبديل القائمة في الجوال
-menuToggle.addEventListener('click', () => actions.classList.toggle('active'));
-
-// زر الخروج مع Feedback حقيقي
+// خروج فعلي مع Feedback
 logoutBtn.addEventListener('click', async () => {
   logoutBtn.innerHTML = "<i data-lucide='loader-2' class='spin'></i> جاري تسجيل الخروج...";
   logoutBtn.disabled = true;
@@ -239,12 +230,8 @@ logoutBtn.addEventListener('click', async () => {
   try {
     await signOut(auth);
     localStorage.removeItem("hsrUserData");
-
     showToast("تم تسجيل الخروج بنجاح ✔️");
-
-    setTimeout(() => {
-      window.location.href = "login (3).html";
-    }, 1500);
+    setTimeout(() => redirectToLogin(), 1600);
   } catch (e) {
     showToast("حدث خطأ أثناء تسجيل الخروج ❌");
     logoutBtn.disabled = false;
@@ -253,21 +240,33 @@ logoutBtn.addEventListener('click', async () => {
   }
 });
 
-// إشعار صغير (Feedback Toast)
+menuToggle.addEventListener('click', () => actions.classList.toggle('active'));
+
+// ===== دعم تلقائي للمسار الصحيح لصفحة login =====
+function redirectToLogin() {
+  const candidates = ["login.html", "../login.html", "/login.html", "./login.html"];
+  for (const path of candidates) {
+    fetch(path, { method: "HEAD" })
+      .then(res => { if (res.ok) window.location.href = path; })
+      .catch(()=>{});
+  }
+  // fallback لو لم يُعثر على الصفحة
+  setTimeout(()=>window.location.href="login.html", 2000);
+}
+
+// ===== إشعار (Feedback) =====
 function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(() => t.classList.add('show'), 50);
-  setTimeout(() => {
-    t.classList.remove('show');
-    setTimeout(() => t.remove(), 500);
-  }, 2000);
+  setTimeout(() => {t.classList.remove('show'); setTimeout(() => t.remove(), 500);}, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 </script>
+
 
 
     <!-- HERO -->
