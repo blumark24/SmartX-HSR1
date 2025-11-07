@@ -676,31 +676,27 @@ const firebaseConfig = {
     window.deleteObservation = deleteObservation;
 
 
-// ===== Show Observation Images (محسّنة) =====
+// ===== Show Observation Images (ذكي حسب المتوفر) =====
 async function showObservationImages(id) {
+  // ابحث عن الملاحظة
   let o = observations.find(x => (x.docId || x.id) == id);
-
-  // جلب من localStorage في حال الملاحظة غير موجودة بالذاكرة
-  if (!o) {
-    const localData = JSON.parse(localStorage.getItem("observations") || "[]");
-    o = localData.find(x => (x.id || x.docId) == id);
-  }
-
   if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
 
-  // تحديد روابط الصور
+  // جلب الصور من الحقول المختلفة
   const before =
-    o.imagePath ||
     o.beforeImagePath ||
     o.beforeImage ||
+    o.imagePath || // 👈 أحياناً الصورة تكون هنا فقط
     (o.images && o.images.before) ||
     null;
+
   const after =
     o.afterImagePath ||
     o.afterImage ||
     (o.images && o.images.after) ||
     null;
 
+  // لا توجد أي صور
   if (!before && !after) {
     alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
     return;
@@ -710,45 +706,60 @@ async function showObservationImages(id) {
   const modal = document.createElement("div");
   modal.style = `
     position:fixed;top:0;left:0;width:100%;height:100%;
-    background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;
-    z-index:9999;padding:20px;backdrop-filter:blur(2px);
+    background:rgba(0,0,0,0.85);
+    display:flex;align-items:center;justify-content:center;
+    z-index:9999;padding:20px;backdrop-filter:blur(3px);
   `;
 
-  modal.innerHTML = `
+  // بناء واجهة العرض تلقائيًا
+  let html = `
     <div style="
-      background:white; border-radius:16px; padding:20px;
-      max-width:95%; max-height:90%; overflow:auto; text-align:center;
-      box-shadow:0 10px 35px rgba(0,0,0,0.3); animation:fadeIn .3s ease;
+      background:white;border-radius:16px;padding:20px;
+      max-width:95%;max-height:90%;overflow:auto;text-align:center;
+      box-shadow:0 10px 35px rgba(0,0,0,0.3);animation:fadeIn .3s ease;
     ">
-      <h3 style="margin-bottom:16px; font-size:18px; font-weight:800;">📸 صور البلاغ</h3>
-      <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
-        ${
-          before
-            ? `<div><p style="font-weight:bold;">قبل:</p><img src="${before}" class="zoomable" style="max-width:280px; border-radius:10px; transition:transform .3s ease; cursor:pointer;"></div>`
-            : ""
-        }
-        ${
-          after
-            ? `<div><p style="font-weight:bold;">بعد:</p><img src="${after}" class="zoomable" style="max-width:280px; border-radius:10px; transition:transform .3s ease; cursor:pointer;"></div>`
-            : ""
-        }
+      <h3 style="margin-bottom:16px;font-size:18px;font-weight:800;">📸 صور البلاغ</h3>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+  `;
+
+  // إذا فيه "قبل"
+  if (before) {
+    html += `
+      <div>
+        <p style="font-weight:bold;">قبل:</p>
+        <img src="${before}" style="max-width:280px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.2);">
+      </div>`;
+  }
+
+  // إذا فيه "بعد"
+  if (after) {
+    html += `
+      <div>
+        <p style="font-weight:bold;">بعد:</p>
+        <img src="${after}" style="max-width:280px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,.2);">
+      </div>`;
+  }
+
+  html += `
       </div>
       <button id="closeImageModal" style="
-        margin-top:20px; background:#0ea5a1; color:white; border:none;
-        padding:10px 22px; border-radius:8px; cursor:pointer; font-weight:bold;
+        margin-top:20px;background:#0ea5a1;color:white;border:none;
+        padding:10px 22px;border-radius:8px;cursor:pointer;font-weight:bold;
       ">إغلاق</button>
     </div>
     <style>
-      @keyframes fadeIn { from {opacity:0; transform:scale(.95);} to {opacity:1; transform:scale(1);} }
-      .zoomable:hover { transform:scale(1.05); }
+      @keyframes fadeIn { from {opacity:0;transform:scale(.95);} to {opacity:1;transform:scale(1);} }
     </style>
   `;
 
+  modal.innerHTML = html;
   document.body.appendChild(modal);
+
+  // زر الإغلاق
   document.getElementById("closeImageModal").addEventListener("click", () => modal.remove());
 }
+window.showObservationImages = showObservationImages;
 
-    window.showObservationImages = showObservationImages;
 
     
   </script>
