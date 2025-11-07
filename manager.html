@@ -414,15 +414,20 @@ const firebaseConfig = {
           <td>${o.inspector||'—'}</td>
           <td>${o.contractor||'—'}</td>
           <td class="text-gray-600">${o.date||'—'}</td>
-          <td class="text-center">
-            <div class="flex items-center gap-2 justify-center">
-              <button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-full" onclick="openAssign('${o.docId||o.id}')">تعيين</button>
-              <button class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full" onclick="cycleStatus('${o.docId||o.id}')">تغيير الحالة</button>
-              <button class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onclick="closeTicket('${o.docId||o.id}')">إغلاق</button>
-              <button class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full" onclick="showObservationImages('${o.docId||o.id}')">📸 عرض الصور</button>
-              <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full" onclick="deleteObservation('${o.docId||o.id}')">🗑️ حذف</button>
-            </div>
-          </td>
+<td class="text-center">
+  <div class="flex items-center gap-2 justify-center">
+    <button class="px-3 py-1 bg-slate-700 hover:bg-slate-800 text-white rounded-full" onclick="openAssign('${o.docId||o.id}')">تعيين</button>
+    <button class="px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-full" onclick="cycleStatus('${o.docId||o.id}')">تغيير الحالة</button>
+    <button class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full" onclick="closeTicket('${o.docId||o.id}')">إغلاق</button>
+
+    <!-- 🔴 زر الحذف -->
+    <button class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-full" onclick="deleteObservation('${o.docId||o.id}')">🗑️ حذف</button>
+
+    <!-- 🔵 زر عرض الصور -->
+    <button class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full" onclick="showObservationImages('${o.docId||o.id}')">📸 عرض الصور</button>
+  </div>
+</td>
+
         </tr>`
       ).join('');
       try{ lucide.createIcons(); }catch(e){}
