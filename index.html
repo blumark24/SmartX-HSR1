@@ -96,10 +96,10 @@
 
 <body class="text-gray-800">
 
-<!-- ========== SMART HSR EXECUTIVE HEADER (Responsive + Feedback) ========== -->
+<!-- ========== SMART HSR EXECUTIVE HEADER (Firebase Integrated) ========== -->
 <header id="hsrHeader" class="hsr-header">
   <div class="hsr-top">
-    <!-- شعار النظام -->
+    <!-- الشعار -->
     <div class="brand">
       <span class="dot"></span>
       <strong>Smart HSR</strong>
@@ -110,8 +110,8 @@
     <div class="user-info">
       <i data-lucide="user" class="icon"></i>
       <div class="user-text">
-        <span id="userName">أحمد الزهراني</span>
-        <span id="userRole" class="role-badge">مدير العمليات</span>
+        <span id="userName">—</span>
+        <span id="userRole" class="role-badge">—</span>
       </div>
     </div>
 
@@ -147,10 +147,8 @@
 :root {
   --primary-teal:#0ea5a1;
   --secondary-navy:#0b2b3a;
-  --light-bg:#f1f5f9;
   --white:#ffffff;
 }
-
 .hsr-header {
   background: linear-gradient(90deg, var(--secondary-navy) 0%, var(--primary-teal) 100%);
   color: var(--white);
@@ -160,164 +158,117 @@
   z-index: 999;
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+.hsr-top {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+.brand {display:flex;align-items:center;gap:0.4rem;font-size:1.15rem;font-weight:700;}
+.brand .dot{width:10px;height:10px;background:#22c55e;border-radius:50%;}
+.brand .accent{color:#d1f4f2;}
+.user-info{display:flex;align-items:center;gap:0.4rem;}
+.user-info .icon{width:18px;height:18px;}
+.role-badge{background:rgba(255,255,255,0.15);padding:2px 6px;border-radius:6px;font-size:0.75rem;}
+.actions{display:flex;align-items:center;gap:0.5rem;}
+.actions .btn{display:flex;align-items:center;gap:0.3rem;padding:0.35rem 0.7rem;border:none;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:all 0.3s ease;}
+.btn.primary{background:var(--primary-teal);color:#fff;}
+.btn.soft{background:rgba(255,255,255,0.15);color:#fff;}
+.btn.dark{background:rgba(255,255,255,0.1);color:#fff;}
+.btn:hover{transform:scale(1.04);opacity:0.9;}
+.gps-indicator{display:flex;align-items:center;gap:0.3rem;}
+.gps-indicator .circle{width:10px;height:10px;border-radius:50%;}
+.circle.off{background:#ef4444;}
+.circle.on{background:#22c55e;}
+.menu-toggle{display:none;background:transparent;border:none;color:#fff;cursor:pointer;}
+@media (max-width:768px){
+  .actions{display:none;flex-direction:column;width:100%;background:var(--secondary-navy);padding:0.7rem;border-radius:8px;margin-top:0.5rem;}
+  .actions.active{display:flex;}
+  .menu-toggle{display:block;}
+}
+.toast{
+  position:fixed;bottom:20px;right:20px;background:#0ea5a1;color:white;
+  padding:10px 18px;border-radius:10px;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,0.2);
+  opacity:0;transform:translateY(10px);transition:all 0.4s ease;z-index:2000;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+.spin{animation:spin 1s linear infinite;}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style>
 
-.hsr-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-}
+<!-- ===== JS (Firebase Integration) ===== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-.brand .dot {
-  width: 10px;
-  height: 10px;
-  background: #22c55e;
-  border-radius: 50%;
-}
-.brand .accent {
-  color: #d1f4f2;
-}
+// إعداد Firebase (نفس الإعدادات من صفحة تسجيل الدخول)
+const firebaseConfig = {
+  apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
+  authDomain: "gen-lang-client-0349944917.firebaseapp.com",
+  projectId: "gen-lang-client-0349944917",
+  storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
+  messagingSenderId: "883065484771",
+  appId: "1:883065484771:web:c907bb5a51f68caad75cd6"
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-.user-info .icon {
-  width: 18px;
-  height: 18px;
-}
-.role-badge {
-  background: rgba(255,255,255,0.15);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-}
+// عناصر الواجهة
+const logoutBtn = document.getElementById('logoutBtn');
+const userName = document.getElementById('userName');
+const userRole = document.getElementById('userRole');
+const menuToggle = document.getElementById('menuToggle');
+const actions = document.querySelector('.actions');
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.actions .btn {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.7rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.btn.primary {
-  background: var(--primary-teal);
-  color: #fff;
-}
-.btn.soft {
-  background: rgba(255,255,255,0.15);
-  color: #fff;
-}
-.btn.dark {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-.btn:hover { transform: scale(1.04); opacity: 0.9; }
-
-/* GPS Indicator */
-.gps-indicator {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-.gps-indicator .circle {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.circle.off { background: #ef4444; }
-.circle.on { background: #22c55e; }
-
-/* Menu Toggle (Mobile) */
-.menu-toggle {
-  display: none;
-  background: transparent;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .actions {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    background: var(--secondary-navy);
-    padding: 0.7rem;
-    border-radius: 8px;
-    margin-top: 0.5rem;
+// عرض بيانات المستخدم بعد تسجيل الدخول
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const stored = JSON.parse(localStorage.getItem("hsrUserData") || "{}");
+    userName.textContent = stored.name || user.displayName || "مستخدم";
+    userRole.textContent = stored.role || "تنفيذي";
+  } else {
+    // في حال لم يكن هناك مستخدم => الرجوع إلى صفحة تسجيل الدخول
+    window.location.href = "login (3).html";
   }
-  .actions.active { display: flex; }
-  .menu-toggle { display: block; }
-}
-</style>
+});
 
-<!-- ===== JS (Lucide + Logout Feedback) ===== -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+// تبديل القائمة في الجوال
+menuToggle.addEventListener('click', () => actions.classList.toggle('active'));
+
+// زر الخروج مع Feedback حقيقي
+logoutBtn.addEventListener('click', async () => {
+  logoutBtn.innerHTML = "<i data-lucide='loader-2' class='spin'></i> جاري تسجيل الخروج...";
+  logoutBtn.disabled = true;
   lucide.createIcons();
-  
-  const menuToggle = document.getElementById('menuToggle');
-  const actions = document.querySelector('.actions');
-  const logoutBtn = document.getElementById('logoutBtn');
 
-  menuToggle.addEventListener('click', () => actions.classList.toggle('active'));
+  try {
+    await signOut(auth);
+    localStorage.removeItem("hsrUserData");
 
-  // Logout feedback animation
-  logoutBtn.addEventListener('click', () => {
-    logoutBtn.innerHTML = "<i data-lucide='loader-2' class='spin'></i> جاري تسجيل الخروج...";
-    logoutBtn.disabled = true;
-    lucide.createIcons();
-    
+    showToast("تم تسجيل الخروج بنجاح ✔️");
+
     setTimeout(() => {
-      window.location.href = "login (3).html"; // الانتقال لصفحة تسجيل الدخول المرفقة
+      window.location.href = "login (3).html";
     }, 1500);
-  });
+  } catch (e) {
+    showToast("حدث خطأ أثناء تسجيل الخروج ❌");
+    logoutBtn.disabled = false;
+    logoutBtn.innerHTML = "<i data-lucide='log-out'></i> خروج";
+    lucide.createIcons();
+  }
 });
+
+// إشعار صغير (Feedback Toast)
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 50);
+  setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => t.remove(), 500);
+  }, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 </script>
 
-<style>
-/* دوران الأيقونة أثناء التحميل */
-.spin {
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  from {transform: rotate(0);}
-  to {transform: rotate(360deg);}
-}
-</style>
-
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  lucide.createIcons();
-
-  const menuToggle = document.getElementById('menuToggle');
-  const actions = document.querySelector('.actions');
-  
-  menuToggle.addEventListener('click', () => {
-    actions.classList.toggle('active');
-  });
-});
-</script>
 
     <!-- HERO -->
     <section id="hero" class="text-center py-12 md:py-16 bg-white rounded-3xl shadow-2xl mb-12 border-b-8 border-t-8 border-teal-100 no-print">
