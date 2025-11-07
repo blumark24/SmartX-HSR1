@@ -168,7 +168,8 @@
 
       <button class="btn primary" onclick="window.open('mobile-map.html','_blank')">
         <i data-lucide='map'></i> <span> الخريطة الذكية</span>
-   
+      </button>
+
       <button id="logoutBtn" class="btn dark">
         <i data-lucide='log-out'></i> <span>خروج</span>
       </button>
@@ -177,39 +178,12 @@
 </header>
 
 <style>
-
-/* === تحسين التثبيت والمسافة تحت الخريطة === */
-
-.hsr-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  background: linear-gradient(90deg, var(--secondary-navy) 0%, var(--primary-teal) 100%);
-  color: var(--white);
-  padding: 0.6rem 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-  backdrop-filter: blur(6px);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* نحجز مساحة تحت الهيدر حتى لا يغطي المحتوى */
-body {
-  padding-top: 70px;
-}
-
-/* مسافة بسيطة أسفل الخريطة */
-#map {
-  margin-bottom: 60px;
-}
-
-  
 :root {
   --primary-teal:#0ea5a1;
   --secondary-navy:#0b2b3a;
   --white:#ffffff;
 }
+
 .hsr-header {
   background: linear-gradient(90deg, var(--secondary-navy) 0%, var(--primary-teal) 100%);
   color: var(--white);
@@ -223,8 +197,9 @@ body {
   backdrop-filter: blur(6px);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
+
 body {
-  padding-top: 68px; /* تعويض ارتفاع الهيدر لتجنب تغطية المحتوى */
+  padding-top: 68px;
 }
 
 .hsr-top {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;}
@@ -237,7 +212,6 @@ body {
 .actions{display:flex;align-items:center;gap:0.5rem;}
 .actions .btn{display:flex;align-items:center;gap:0.3rem;padding:0.35rem 0.7rem;border:none;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:all 0.3s ease;}
 .btn.primary{background:var(--primary-teal);color:#fff;}
-.btn.soft{background:rgba(255,255,255,0.15);color:#fff;}
 .btn.dark{background:rgba(255,255,255,0.1);color:#fff;}
 .btn:hover{transform:scale(1.04);opacity:0.9;}
 .gps-indicator{display:flex;align-items:center;gap:0.3rem;}
@@ -263,8 +237,8 @@ body {
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-// إعدادات Firebase الخاصة بك
 const firebaseConfig = {
   apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
   authDomain: "gen-lang-client-0349944917.firebaseapp.com",
@@ -277,6 +251,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const logoutBtn = document.getElementById('logoutBtn');
 const userName = document.getElementById('userName');
@@ -284,10 +259,24 @@ const userRole = document.getElementById('userRole');
 const menuToggle = document.getElementById('menuToggle');
 const actions = document.querySelector('.actions');
 
-// عرض بيانات المستخدم المسجلة
-onAuthStateChanged(auth, (user) => {
+// ===== جلب بيانات المستخدم من Firestore أو localStorage =====
+onAuthStateChanged(auth, async (user) => {
   if (user) {
-    const stored = JSON.parse(localStorage.getItem("hsrUserData") || "{}");
+    let stored = JSON.parse(localStorage.getItem("hsrUserData") || "{}");
+
+    if (!stored.name || !stored.role) {
+      try {
+        const ref = doc(db, "managers", user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          stored = snap.data();
+          localStorage.setItem("hsrUserData", JSON.stringify(stored));
+        }
+      } catch (err) {
+        console.warn("تعذر جلب بيانات المستخدم:", err);
+      }
+    }
+
     userName.textContent = stored.name || user.displayName || "مستخدم";
     userRole.textContent = stored.role || "تنفيذي";
   } else {
@@ -295,7 +284,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// خروج فعلي مع Feedback
+// ===== زر الخروج =====
 logoutBtn.addEventListener('click', async () => {
   logoutBtn.innerHTML = "<i data-lucide='loader-2' class='spin'></i> جاري تسجيل الخروج...";
   logoutBtn.disabled = true;
@@ -316,7 +305,6 @@ logoutBtn.addEventListener('click', async () => {
 
 menuToggle.addEventListener('click', () => actions.classList.toggle('active'));
 
-// ===== دعم تلقائي للمسار الصحيح لصفحة login =====
 function redirectToLogin() {
   const candidates = ["login.html", "../login.html", "/login.html", "./login.html"];
   for (const path of candidates) {
@@ -324,11 +312,9 @@ function redirectToLogin() {
       .then(res => { if (res.ok) window.location.href = path; })
       .catch(()=>{});
   }
-  // fallback لو لم يُعثر على الصفحة
   setTimeout(()=>window.location.href="login.html", 2000);
 }
 
-// ===== إشعار (Feedback) =====
 function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
