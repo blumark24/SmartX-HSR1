@@ -683,18 +683,24 @@ async function showObservationImages(id) {
   if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
 
   // جلب الصور من الحقول المختلفة
-  const before =
-    o.beforeImagePath ||
-    o.beforeImage ||
-    o.imagePath || // 👈 أحياناً الصورة تكون هنا فقط
-    (o.images && o.images.before) ||
-    null;
+const before =
+  o.beforeImagePath ||
+  o.beforeImage ||
+  o.imagePath ||
+  (o.images && (o.images.before || o.images[0])) ||
+  o.photoPath ||
+  o.imgPath ||
+  o.image ||
+  null;
 
-  const after =
-    o.afterImagePath ||
-    o.afterImage ||
-    (o.images && o.images.after) ||
-    null;
+const after =
+  o.afterImagePath ||
+  o.afterImage ||
+  (o.images && (o.images.after || o.images[1])) ||
+  o.imageAfter ||
+  o.after ||
+  null;
+
 
   // لا توجد أي صور
   if (!before && !after) {
