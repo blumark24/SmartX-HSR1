@@ -177,6 +177,34 @@
 </header>
 
 <style>
+
+/* === تحسين التثبيت والمسافة تحت الخريطة === */
+
+.hsr-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: linear-gradient(90deg, var(--secondary-navy) 0%, var(--primary-teal) 100%);
+  color: var(--white);
+  padding: 0.6rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* نحجز مساحة تحت الهيدر حتى لا يغطي المحتوى */
+body {
+  padding-top: 70px;
+}
+
+/* مسافة بسيطة أسفل الخريطة */
+#map {
+  margin-bottom: 60px;
+}
+
+  
 :root {
   --primary-teal:#0ea5a1;
   --secondary-navy:#0b2b3a;
@@ -186,11 +214,19 @@
   background: linear-gradient(90deg, var(--secondary-navy) 0%, var(--primary-teal) 100%);
   color: var(--white);
   padding: 0.6rem 1rem;
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 999;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  backdrop-filter: blur(6px);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
+body {
+  padding-top: 68px; /* تعويض ارتفاع الهيدر لتجنب تغطية المحتوى */
+}
+
 .hsr-top {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;}
 .brand {display:flex;align-items:center;gap:0.4rem;font-size:1.15rem;font-weight:700;}
 .brand .dot{width:10px;height:10px;background:#22c55e;border-radius:50%;}
