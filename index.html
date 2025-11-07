@@ -91,6 +91,45 @@
       .grid.grid-cols-1.md\3a grid-cols-3>div{border:none!important; padding:5px}
       .print-logo{display:block!important}
     }
+
+    /* نبض ناعم تلقائي كل 5 ثوانٍ حول زر الأسطورة */
+.legend-toggle::after{
+  content:"";
+  position:absolute;
+  inset:-6px;                /* هالة خارجية صغيرة */
+  border-radius:50%;
+  box-shadow:0 0 0 0 rgba(24,165,162,0.45);
+  opacity:0;
+  pointer-events:none;
+  animation:legendSoftRing 5s ease-out infinite;
+}
+
+/* إيقاف النبض عند فتح الأسطورة (حالة active) */
+.legend-toggle.active::after{
+  animation:none;
+}
+
+/* احترام تفضيل المستخدم لتقليل الحركة */
+@media (prefers-reduced-motion: reduce){
+  .legend-toggle::after{ animation:none; }
+}
+
+/* الإطارات الزمنية للنبض */
+@keyframes legendSoftRing{
+  0%, 80%{
+    opacity:0;
+    box-shadow:0 0 0 0 rgba(24,165,162,0);
+  }
+  85%{
+    opacity:.6;
+    box-shadow:0 0 0 0 rgba(24,165,162,0.45);
+  }
+  100%{
+    opacity:0;
+    box-shadow:0 0 0 22px rgba(24,165,162,0); /* يتلاشى للخارج */
+  }
+}
+
   </style>
 </head>
 
