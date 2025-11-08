@@ -157,3 +157,117 @@
     border-radius: 12px;
   }
 }
+
+
+/* ===============================
+   تنسيق بطاقات الملاحظات - Smart HSR
+   بأسلوب رسمي وراقي (iOS + حكومي)
+   =============================== */
+.observation-card {
+  background: #f9fdfd;
+  border: 1px solid rgba(24, 165, 162, 0.15);
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.2rem;
+  transition: all 0.25s ease-in-out;
+  position: relative;
+}
+.observation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* العنوان داخل الكارت */
+.observation-card h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  margin-bottom: 0.6rem;
+}
+
+/* النصوص العامة */
+.observation-card p {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 0.4rem;
+}
+
+/* حالة الملاحظة */
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.status-pending {
+  background: linear-gradient(145deg, #e8b006, #dca306);
+}
+.status-done {
+  background: linear-gradient(145deg, #16a34a, #0d9240);
+}
+.status-closed {
+  background: linear-gradient(145deg, #94a3b8, #64748b);
+}
+
+/* القسم الداخلي */
+.section-header {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-navy);
+  margin-bottom: 0.6rem;
+  border-right: 4px solid var(--color-teal);
+  padding-right: 0.6rem;
+}
+
+/* صناديق النصوص الداخلية (الوصف - خطة العمل) */
+.info-box {
+  background: rgba(24, 165, 162, 0.05);
+  border: 1px solid rgba(24, 165, 162, 0.12);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #374151;
+}
+
+/* العناوين داخل الصندوق */
+.info-box strong {
+  color: var(--color-navy);
+  font-weight: 700;
+}
+
+/* حركة ناعمة عند الظهور */
+.observation-card {
+  opacity: 0;
+  transform: translateY(25px);
+  animation: fadeSlideUp 0.6s ease forwards;
+}
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* للجوال */
+@media (max-width: 480px) {
+  .observation-card {
+    padding: 1rem;
+    border-radius: 0.9rem;
+  }
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+  .info-box {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.9rem;
+  }
+}
+
+
