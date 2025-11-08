@@ -319,23 +319,28 @@ body { padding-top: 68px; }
 </style>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
   authDomain: "gen-lang-client-0349944917.firebaseapp.com",
   projectId: "gen-lang-client-0349944917",
-  storageBucket: "smart-hsr-manager.firebasestorage.app",
+  storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
   messagingSenderId: "883065484771",
   appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
   measurementId: "G-V8WG5M8V5B"
 };
 
+// ✅ تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
+
 
 const logoutBtn = document.getElementById('logoutBtn');
 const userName = document.getElementById('userName');
@@ -763,7 +768,11 @@ const firebaseConfig = {
 
 // تهيئة التطبيق وقاعدة البيانات
 let app, db, FIREBASE_READY = false;
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+const storage = getStorage(app);
 
+    
 try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
@@ -1011,12 +1020,17 @@ async function uploadImageBase64(file) {
       hide('modalStep1'); unhide('modalResult');
       setHTML('modalResultContent', loaderHTML('جاري معالجة البيانات...'));
 
-      try {
-        let uploadedUrl = null;
-        if (currentFile) {
-  uploadedUrl = await uploadImageBase64(currentFile);
+try {
+  let uploadedUrl = null;
 
-        }
+  // ✅ رفع الصورة إلى Firebase Storage بدل Base64
+  if (currentFile) {
+    const fileRef = ref(storage, `beforeImages/${Date.now()}_${currentFile.name}`);
+    await uploadBytes(fileRef, currentFile);
+    uploadedUrl = await getDownloadURL(fileRef);
+    console.log("📸 تم رفع الصورة إلى Storage:", uploadedUrl);
+  }
+
 
         // نحسب displayId بسيط: أكبر قيمة + 1
         const nextDisplayId = (observationsData.reduce((m,o)=>Math.max(m,o.id||0),0) + 1) || 1;
@@ -1125,10 +1139,16 @@ async function uploadImageBase64(file) {
         || `تم الإغلاق التنفيذي في ${new Date().toLocaleString('ar-SA')} وتوثيقه بالصورة المرفقة.`;
 
       try {
-        // ارفع صورة AFTER لـ ImgBB
-        setButtonBusy('finalCloseoutBtn', true);
-        const afterUrl = await uploadImageBase64(currentAfterFile);
 
+// ✅ رفع صورة AFTER إلى Firebase Storage
+setButtonBusy('finalCloseoutBtn', true);
+const afterRef = ref(storage, `afterImages/${Date.now()}_${currentAfterFile.name}`);
+await uploadBytes(afterRef, currentAfterFile);
+const afterUrl = await getDownloadURL(afterRef);
+console.log("✅ تم رفع صورة الإغلاق إلى Firebase Storage:", afterUrl);
+
+
+        
         // حدّث Firestore إن كان متاح
         if (FIREBASE_READY) {
           await updateObservationInFirestore(currentSelectedObservation.docId, {
