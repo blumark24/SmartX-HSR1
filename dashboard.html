@@ -182,110 +182,6 @@
 </header>
 
 <style>
-/* ===============================
-   تحسين زر الإدخال الذكي (Smart Input)
-   =============================== */
-#add-observation-btn {
-  padding: 0.6rem 1.3rem !important;
-  font-size: 0.9rem !important;
-  border-radius: 999px;
-  background: linear-gradient(145deg, #18a5a2, #0fa39f);
-  color: #fff;
-  box-shadow: 0 6px 18px rgba(24,165,162,0.45);
-  transform: scale(0.92);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* لمعة Apple */
-#add-observation-btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -80%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255,255,255,0.4) 0%,
-    rgba(255,255,255,0) 80%
-  );
-  transform: skewX(-25deg);
-  transition: 0.7s;
-}
-
-#add-observation-btn:hover::after {
-  left: 130%;
-}
-
-#add-observation-btn:hover {
-  transform: scale(0.95);
-  box-shadow: 0 8px 22px rgba(24,165,162,0.6);
-}
-
-/* تناسق على الجوال */
-@media (max-width: 480px) {
-  #add-observation-btn {
-    font-size: 0.85rem !important;
-    padding: 0.7rem 1.1rem !important;
-    transform: scale(0.96);
-    width: 100%;
-  }
-}
-</style>
-
-  
-</head>
-
-<body class="text-gray-800">
-
-<!-- ========== SMART HSR EXECUTIVE HEADER ========== -->
-<header id="hsrHeader" class="hsr-header">
-  <div class="hsr-top">
-    <!-- شعار -->
-    <div class="brand">
-      <span class="dot"></span>
-      <strong>Smart HSR</strong>
-      <span class="accent">System</span>
-    </div>
-
-    <!-- بيانات المستخدم -->
- <div class="user-info">
-  <i data-lucide="user" class="icon"></i>
-  <div class="user-text">
-    <span id="userFullInfo">
-      <span id="userName">—</span>
-      <span id="userRole" class="role-badge">—</span>
-    </span>
-  </div>
-</div>
-
-
-    <!-- زر القائمة للجوال -->
-    <button id="menuToggle" class="menu-toggle">
-      <i data-lucide="menu"></i>
-    </button>
-
-    <!-- الأزرار -->
-    <div class="actions">
-      <div id="gpsIndicator" class="gps-indicator" title="حالة الموقع">
-        <span class="circle off"></span>
-        <small id="gpsText">غير متاح</small>
-      </div>
-
-      <button class="btn primary" onclick="window.open('mobile-map.html','_blank')">
-        <i data-lucide='map'></i> <span> الخريطة الذكية</span>
-      </button>
-
-      <button id="logoutBtn" class="btn dark">
-        <i data-lucide='log-out'></i> <span>خروج</span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<style>
 :root {
   --primary-teal:#0ea5a1;
   --secondary-navy:#0b2b3a;
@@ -539,19 +435,16 @@ document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 
 
 
- <!-- HERO -->
-<section id="hero" class="hero-section no-print">
-  <h1 class="hero-title">
-    Smart HSR <span>Dashboard</span>
-  </h1>
-  <h2 class="hero-subtitle" style="font-weight:800; color:#374151;">
-    نظام المراقبة وإدارة الجودة الرقمي
-  </h2>
-  <p class="hero-subtext">
-    "منصة تنفيذية ذكية لإدارة الجودة والمراقبة الرقمية، توفر رؤية دقيقة للأداء وتدعم اتخاذ القرار المبني على البيانات."
-  </p>
-</section>
-
+    <!-- HERO -->
+    <section id="hero" class="text-center py-12 md:py-16 bg-white rounded-3xl shadow-2xl mb-12 border-b-8 border-t-8 border-teal-100 no-print">
+      <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 tracking-tight" style="color:var(--color-navy);">
+        Smart HSR <span style="color:var(--color-teal);">Dashboard</span>
+      </h1>
+      <h2 class="text-xl md:text-3xl font-extrabold text-gray-600 mt-4">نظام المراقبة وإدارة الجودة الرقمي</h2>
+      <p class="mt-4 text-lg max-w-4xl mx-auto text-gray-500 font-medium">
+        "منصة تنفيذية ذكية لإدارة الجودة والمراقبة الرقمية، توفر رؤية دقيقة للأداء وتدعم اتخاذ القرار المبني على البيانات."
+      </p>
+    </section>
 
     <!-- OBSERVATIONS -->
     <section id="observations-log" class="my-20">
@@ -1418,8 +1311,5 @@ function setButtonBusy(buttonId, busy) {
 }
 
   </script>
-  
-  <script src="modal-script.js"></script>
-
 </body>
 </html>
