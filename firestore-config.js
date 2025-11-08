@@ -13,15 +13,15 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// 🔹 إعداد Firebase
+// 🔹 إعدادات Firebase الخاصة بك (Smart HSR الرسمي)
 const firebaseConfig = {
-  apiKey: "AIzaSyCRrBnPYtdc86JffEQHERf732uAif7vwho",
-  authDomain: "smart-hsr-6c2cf.firebaseapp.com",
-  databaseURL: "https://smart-hsr-6c2cf-default-rtdb.firebaseio.com",
-  projectId: "smart-hsr-6c2cf",
-  storageBucket: "smart-hsr-6c2cf.firebasestorage.app",
-  messagingSenderId: "399213527987",
-  appId: "1:399213527987:web:4531958edfe9dbb95a81c6",
+  apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
+  authDomain: "gen-lang-client-0349944917.firebaseapp.com",
+  projectId: "gen-lang-client-0349944917",
+  storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
+  messagingSenderId: "883065484771",
+  appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
+  measurementId: "G-V8WG5M8V5B"
 };
 
 // 🔹 تهيئة التطبيق وقاعدة البيانات
@@ -103,3 +103,4 @@ async function uploadToImgbb(file) {
     throw new Error("Upload to Imgbb failed");
   }
 }
+
