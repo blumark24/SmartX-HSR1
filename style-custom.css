@@ -1,20 +1,16 @@
-/* ===============================
-   تنسيق بصري أنيق لعناوين Dashboard بأسلوب iOS
-   =============================== */
 .smart-section {
   text-align: center;
-  background: #fff;
-  padding: 2.5rem 1.5rem;
-  border-radius: 1.8rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  padding: 3rem 1.5rem;
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(10,25,49,0.08);
   border: 1px solid rgba(24,165,162,0.15);
-  margin: 2rem auto;
   max-width: 850px;
+  margin: 2rem auto;
   position: relative;
   overflow: hidden;
 }
 
-/* خلفية مضيئة خفيفة */
 .smart-section::after {
   content: "";
   position: absolute;
@@ -27,64 +23,47 @@
   pointer-events: none;
 }
 
-/* العنوان الرئيسي */
-.smart-section-header h2 {
-  font-size: clamp(1.6rem, 5vw, 2.4rem);
-  font-weight: 800;
+.smart-section h2 {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: 900;
   color: var(--color-navy);
   letter-spacing: -0.5px;
   margin-bottom: 0.3rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* السطر الفرعي (دقة الصورة والنص) */
-.smart-section-header p {
-  font-size: clamp(1rem, 3vw, 1.3rem);
+.smart-section p {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
   font-weight: 600;
   color: var(--color-teal);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
-/* النص التوضيحي داخل بطاقة شفافة */
-.section-subtext {
+.smart-section .section-subtext {
   font-size: 1rem;
   font-weight: 500;
   color: #4b5563;
   line-height: 1.8;
-  background: rgba(24,165,162,0.05);
-  border-radius: 1rem;
-  padding: 0.9rem 1rem;
   max-width: 600px;
-  margin: 0 auto;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+  margin: 0.8rem auto 0;
+  background: rgba(24,165,162,0.06);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
 }
 
-/* حركة ناعمة عند الظهور */
-.smart-section {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.7s ease-out forwards;
-}
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* للجوال */
 @media (max-width: 480px) {
   .smart-section {
     padding: 2rem 1rem;
     border-radius: 1.2rem;
   }
-  .smart-section-header h2 {
-    font-size: 1.5rem;
+  .smart-section h2 {
+    font-size: 1.6rem;
   }
-  .smart-section-header p {
+  .smart-section p {
     font-size: 1rem;
   }
-  .section-subtext {
+  .smart-section .section-subtext {
     font-size: 0.9rem;
-    padding: 0.8rem 0.9rem;
+    padding: 0.7rem 0.9rem;
   }
 }
