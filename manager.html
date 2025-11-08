@@ -701,6 +701,70 @@ const firebaseConfig = {
 
 // ===== Show Observation Images (إصدار ذكي نهائي تلقائي) =====
 async function showObservationImages(id) {
+
+  // ===== Show Observation Images (داخل الخريطة الذكية) =====
+async function showObservationImages(id) {
+  const o = observations.find(x => (x.docId || x.id) == id);
+  if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
+
+  // استخراج الصور المحتملة
+  const possibleKeys = [
+    "beforeImagePath", "afterImagePath", "imagePath",
+    "beforeImage", "afterImage", "photoPath", "imgPath"
+  ];
+
+  let before = null, after = null;
+  for (const key of possibleKeys) {
+    if (o[key] && typeof o[key] === "string") {
+      if (!before) before = o[key];
+      else if (!after && o[key] !== before) after = o[key];
+    }
+  }
+
+  if (o.images) {
+    if (o.images.before && !before) before = o.images.before;
+    if (o.images.after && !after) after = o.images.after;
+  }
+
+  // لو مافيه صور
+  if (!before && !after) {
+    L.popup()
+      .setLatLng([o.lat, o.lng])
+      .setContent(`<div style="min-width:220px;text-align:center;font-family:Tajawal;">
+        🚫 لا توجد صور مرفقة لهذه الملاحظة.
+      </div>`)
+      .openOn(map);
+    return;
+  }
+
+  // HTML المقارنة داخل البوب أب
+  const html = `
+    <div style="width:260px;overflow:hidden;border-radius:12px;position:relative;">
+      <div style="position:relative;width:100%;height:auto;">
+        <img src="${before}" style="width:100%;border-radius:12px;display:block;">
+        ${
+          after
+            ? `<div style="position:absolute;top:0;left:0;width:50%;overflow:hidden;transition:width .3s;">
+                 <img src="${after}" style="width:100%;border-radius:12px;display:block;">
+               </div>
+               <div style="position:absolute;top:0;left:50%;width:3px;background:#18A5A2;cursor:ew-resize;height:100%;"></div>`
+            : ""
+        }
+      </div>
+      <div style="text-align:center;margin-top:5px;">
+        <small>📸 مقارنة ${after ? "قبل / بعد" : "صورة مرفقة"}</small>
+      </div>
+    </div>
+  `;
+
+  // عرضها داخل البوب أب
+  L.popup()
+    .setLatLng([o.lat, o.lng])
+    .setContent(html)
+    .openOn(map);
+}
+window.showObservationImages = showObservationImages;
+
   // نحاول نلقا البلاغ من الذاكرة
   let o = observations.find(x => (x.docId || x.id) == id);
 
