@@ -1,5 +1,5 @@
 /* ===============================
-   زر الإدخال الذكي بتأثير iOS التفاعلي
+   زر الإدخال الذكي بتصميم iOS + نبض ولمسة حيّة
    =============================== */
 
 #add-observation-btn {
@@ -43,27 +43,23 @@
   left: 130%;
 }
 
-/* تأثير النبض الذكي عند اللمس أو hover */
+/* تفاعل اللمس والنبض */
 #add-observation-btn:hover,
 #add-observation-btn:active {
-  animation: btnGlow 2.5s ease-in-out 1;
+  animation: btnGlow 2.2s ease-in-out 1;
 }
 
-@keyframes btnGlow {
-  0% {
-    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(24,165,162,0.7);
-  }
-  100% {
-    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
-  }
-}
-
-/* عند اللمس */
+/* تأثير اللمس الحي (Micro Bounce) */
 #add-observation-btn:active {
-  transform: translateY(2px) scale(0.92);
+  animation: microBounce 0.25s ease-out;
+  transform: scale(0.92);
+}
+
+@keyframes microBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.92); }
+  75% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
 
 /* حركة الظهور */
@@ -103,6 +99,16 @@
   100% {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* نبض ناعم عند التمرير */
+@keyframes btnGlow {
+  0%, 100% {
+    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(24,165,162,0.6);
   }
 }
 
