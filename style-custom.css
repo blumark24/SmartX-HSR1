@@ -157,3 +157,143 @@
     border-radius: 12px;
   }
 }
+
+/* ===============================
+   تحسينات حالة الملاحظات - مع أيقونات رسمية وأسلوب iOS
+   =============================== */
+
+/* عنصر الحالة */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #fff;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: all 0.25s ease;
+}
+
+/* الحالة: قيد التنفيذ ⚙️ */
+.status-pending {
+  background: linear-gradient(145deg, #facc15, #eab308);
+  color: #3f3f46;
+}
+.status-pending::before {
+  content: "⚙️";
+  font-size: 0.9rem;
+}
+
+/* الحالة: تمت المعالجة ✅ */
+.status-done {
+  background: linear-gradient(145deg, #16a34a, #0d9240);
+}
+.status-done::before {
+  content: "✅";
+  font-size: 0.9rem;
+}
+
+/* الحالة: مغلقة 🚫 */
+.status-closed {
+  background: linear-gradient(145deg, #94a3b8, #64748b);
+}
+.status-closed::before {
+  content: "🚫";
+  font-size: 0.9rem;
+}
+
+/* تأثير عند المرور */
+.status-badge:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* -------------------------------
+   كروت الملاحظات (نسخة منسقة بالكامل)
+   ------------------------------- */
+.observation-card {
+  background: #f9fdfd;
+  border: 1px solid rgba(24, 165, 162, 0.15);
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.2rem;
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  opacity: 0;
+  transform: translateY(25px);
+  animation: fadeSlideUp 0.6s ease forwards;
+}
+
+.observation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.observation-card h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  margin-bottom: 0.6rem;
+}
+
+.observation-card p {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.7;
+  margin-bottom: 0.4rem;
+}
+
+.section-header {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--color-navy);
+  margin-bottom: 0.6rem;
+  border-right: 4px solid var(--color-teal);
+  padding-right: 0.6rem;
+}
+
+.info-box {
+  background: rgba(24, 165, 162, 0.05);
+  border: 1px solid rgba(24, 165, 162, 0.12);
+  border-radius: 1rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: #374151;
+  transition: background 0.3s ease;
+}
+.info-box:hover {
+  background: rgba(24, 165, 162, 0.08);
+}
+
+.info-box strong {
+  color: var(--color-navy);
+  font-weight: 700;
+}
+
+/* حركة دخول ناعمة */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* للجوال */
+@media (max-width: 480px) {
+  .observation-card {
+    padding: 1rem;
+    border-radius: 0.9rem;
+  }
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+  .info-box {
+    font-size: 0.9rem;
+    padding: 0.7rem 0.9rem;
+  }
+}
