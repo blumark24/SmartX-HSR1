@@ -1,148 +1,68 @@
 /* ===============================
-   ملاحظات Smart HSR - تنسيق رسمي iOS
+   تنسيق Smart HSR Dashboard بأسلوب iOS الرسمي
    =============================== */
 
-/* البطاقة العامة */
-.observation-card {
-  background: #ffffff;
-  border: 1px solid rgba(24, 165, 162, 0.1);
-  border-radius: 1.2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  padding: 1.2rem 1.5rem;
-  margin-bottom: 1.2rem;
-  transition: all 0.25s ease;
+/* === قسم سجل الملاحظات التفاعلي === */
+#observations-log {
+  background: #fff;
+  border-radius: 1.8rem;
+  border: 1px solid rgba(24,165,162,0.1);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  padding: 2.5rem 1.2rem;
+  margin: 2rem auto;
+  max-width: 900px;
+  text-align: center;
   position: relative;
   overflow: hidden;
-  animation: smoothAppear 0.4s ease forwards;
+  animation: fadeUp 0.8s ease-out forwards;
   opacity: 0;
 }
-@keyframes smoothAppear {
-  from { opacity: 0; transform: translateY(10px); }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.observation-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+/* خلفية ناعمة خفيفة */
+#observations-log::before {
+  content: "";
+  position: absolute;
+  top: -30%;
+  left: -10%;
+  width: 130%;
+  height: 160%;
+  background: radial-gradient(circle at center, rgba(24,165,162,0.06), transparent 70%);
+  opacity: 0.7;
+  z-index: 0;
 }
 
-/* عنوان الملاحظة */
-.observation-card h4 {
-  font-size: 1.05rem;
-  font-weight: 800;
+/* العنوان الرئيسي */
+#observations-log h3 {
+  font-size: clamp(1.6rem, 5vw, 2.3rem);
+  font-weight: 900;
   color: var(--color-navy);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
+  position: relative;
+  z-index: 2;
 }
 
-/* نصوص البطاقة */
-.observation-card p {
-  font-size: 0.93rem;
-  color: #374151;
+/* النص التوضيحي */
+#observations-log p {
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  color: #4b5563;
+  max-width: 650px;
+  margin: 0 auto 1rem;
   line-height: 1.7;
-  margin-bottom: 0.4rem;
-}
-
-/* -------------------------------
-   شارة الحالة (status)
-   ------------------------------- */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.9rem;
-  border-radius: 999px;
-  font-weight: 700;
-  font-size: 0.8rem;
-  color: #fff;
-  transition: all 0.25s ease;
-}
-
-/* قيد التنفيذ */
-.status-pending {
-  background: linear-gradient(135deg, #fcd34d, #eab308);
-  color: #3f3f46;
-}
-.status-pending::before {
-  content: "⚙️";
-  font-size: 0.85rem;
-}
-
-/* تمت المعالجة */
-.status-done {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-}
-.status-done::before {
-  content: "✅";
-  font-size: 0.85rem;
-}
-
-/* مغلقة */
-.status-closed {
-  background: linear-gradient(135deg, #94a3b8, #64748b);
-}
-.status-closed::before {
-  content: "🚫";
-  font-size: 0.85rem;
-}
-
-/* تأثير عند المرور */
-.status-badge:hover {
-  transform: scale(1.05);
-  filter: brightness(1.1);
-}
-
-/* -------------------------------
-   أقسام التفاصيل (الوصف + خطة العمل)
-   ------------------------------- */
-.section-header {
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--color-navy);
-  margin-bottom: 0.6rem;
-  border-right: 4px solid var(--color-teal);
-  padding-right: 0.6rem;
-}
-
-.info-box {
-  background: #f9fdfd;
-  border: 1px solid rgba(24, 165, 162, 0.15);
+  font-weight: 500;
+  background: rgba(24,165,162,0.05);
   border-radius: 1rem;
   padding: 0.8rem 1rem;
-  margin-bottom: 1rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #374151;
-  transition: background 0.3s ease;
-}
-.info-box:hover {
-  background: rgba(24, 165, 162, 0.05);
-}
-
-.info-box strong {
-  color: var(--color-navy);
-  font-weight: 700;
-}
-
-/* -------------------------------
-   عرض ممتاز على الجوال
-   ------------------------------- */
-@media (max-width: 480px) {
-  .observation-card {
-    padding: 1rem;
-    border-radius: 0.9rem;
-  }
-  .status-badge {
-    font-size: 0.75rem;
-    padding: 0.35rem 0.7rem;
-  }
-  .info-box {
-    font-size: 0.88rem;
-    padding: 0.7rem 0.9rem;
-  }
+  display: inline-block;
+  position: relative;
+  z-index: 2;
 }
 
 /* ===============================
-   زر الإدخال الذكي بأسلوب iOS حقيقي وواضح
+   زر الإدخال الذكي بأسلوب iOS
    =============================== */
 #add-observation-btn {
   display: inline-flex;
@@ -150,312 +70,21 @@
   justify-content: center;
   gap: 0.5rem;
 
-  padding: 0.65rem 1.5rem !important;
+  padding: 0.7rem 1.8rem !important;
   font-size: 1rem !important;
   font-weight: 700;
-  border: none;
-  outline: none;
-  cursor: pointer;
-
   color: #fff;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #22c1c3 0%, #0ea5a0 100%);
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.15),
-    inset 0 1px 1px rgba(255,255,255,0.4);
-  transition: all 0.25s ease-in-out;
-}
-
-/* لمعة iOS عند المرور */
-#add-observation-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(145deg, rgba(255,255,255,0.35), rgba(255,255,255,0));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-#add-observation-btn:hover::before {
-  opacity: 1;
-}
-
-/* تأثير الضغط والارتداد */
-#add-observation-btn:active {
-  transform: scale(0.94);
-  background: linear-gradient(180deg, #0fa29f 0%, #078a84 100%);
-  box-shadow:
-    0 2px 4px rgba(0,0,0,0.25),
-    inset 0 1px 1px rgba(255,255,255,0.2);
-  transition: transform 0.15s ease;
-}
-
-/* تأثير اهتزاز خفيف عند النقر */
-#add-observation-btn:active {
-  animation: iosBounce 0.25s ease-out;
-}
-@keyframes iosBounce {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.93); }
-  70% { transform: scale(1.02); }
-  100% { transform: scale(1); }
-}
-
-/* للجوال */
-@media (max-width: 480px) {
-  #add-observation-btn {
-    width: 90%;
-    max-width: 270px;
-    font-size: 0.95rem !important;
-    padding: 0.65rem 1.2rem !important;
-    border-radius: 12px;
-    margin: 0 auto;
-    display: flex;
-  }
-}
-
-
-/* ===============================
-   قسم سجل الملاحظات التفاعلي (بأسلوب Apple Dashboard)
-   =============================== */
-.smart-section {
-  text-align: center;
-  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
-  padding: 3rem 1.5rem;
-  border-radius: 2rem;
-  box-shadow: 0 10px 30px rgba(10,25,49,0.08);
-  border: 1px solid rgba(24,165,162,0.15);
-  max-width: 850px;
-  margin: 2rem auto;
-  position: relative;
-  overflow: hidden;
-}
-
-/* لمعة ناعمة في الخلفية */
-.smart-section::after {
-  content: "";
-  position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 140%;
-  height: 180%;
-  background: radial-gradient(circle at center, rgba(24,165,162,0.08) 0%, transparent 70%);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* العنوان الرئيسي */
-.smart-section h2 {
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
-  font-weight: 900;
-  color: var(--color-navy);
-  letter-spacing: -0.5px;
-  margin-bottom: 0.3rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-/* السطر الفرعي الأول */
-.smart-section p {
-  font-size: clamp(1rem, 2.5vw, 1.3rem);
-  font-weight: 600;
-  color: var(--color-teal);
-  margin-bottom: 0.8rem;
-}
-
-/* السطر التوضيحي */
-.smart-section .section-subtext {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #4b5563;
-  line-height: 1.8;
-  max-width: 600px;
-  margin: 0.8rem auto 0;
-  background: rgba(24,165,162,0.06);
-  border-radius: 1rem;
-  padding: 0.8rem 1rem;
-}
-
-/* للجوال */
-@media (max-width: 480px) {
-  .smart-section {
-    padding: 2rem 1rem;
-    border-radius: 1.2rem;
-  }
-  .smart-section h2 {
-    font-size: 1.6rem;
-  }
-  .smart-section p {
-    font-size: 1rem;
-  }
-  .smart-section .section-subtext {
-    font-size: 0.9rem;
-    padding: 0.7rem 0.9rem;
-  }
-}
-
-/* ===============================
-   تنسيق بصري أنيق لعناوين Dashboard بأسلوب iOS
-   =============================== */
-.smart-section {
-  text-align: center;
-  background: #fff;
-  padding: 2.5rem 1.5rem;
-  border-radius: 1.8rem;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-  border: 1px solid rgba(24,165,162,0.15);
-  margin: 2rem auto;
-  max-width: 850px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* خلفية مضيئة خفيفة */
-.smart-section::after {
-  content: "";
-  position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 140%;
-  height: 180%;
-  background: radial-gradient(circle at center, rgba(24,165,162,0.08) 0%, transparent 70%);
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-/* العنوان الرئيسي */
-.smart-section-header h2 {
-  font-size: clamp(1.6rem, 5vw, 2.4rem);
-  font-weight: 800;
-  color: var(--color-navy);
-  letter-spacing: -0.5px;
-  margin-bottom: 0.3rem;
-}
-
-/* السطر الفرعي (دقة الصورة والنص) */
-.smart-section-header p {
-  font-size: clamp(1rem, 3vw, 1.3rem);
-  font-weight: 600;
-  color: var(--color-teal);
-  margin-bottom: 1rem;
-}
-
-/* النص التوضيحي داخل بطاقة شفافة */
-.section-subtext {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #4b5563;
-  line-height: 1.8;
-  background: rgba(24,165,162,0.05);
-  border-radius: 1rem;
-  padding: 0.9rem 1rem;
-  max-width: 600px;
-  margin: 0 auto;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
-}
-
-/* حركة ناعمة عند الظهور */
-.smart-section {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.7s ease-out forwards;
-}
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* للجوال */
-@media (max-width: 480px) {
-  .smart-section {
-    padding: 2rem 1rem;
-    border-radius: 1.2rem;
-  }
-  .smart-section-header h2 {
-    font-size: 1.5rem;
-  }
-  .smart-section-header p {
-    font-size: 1rem;
-  }
-  .section-subtext {
-    font-size: 0.9rem;
-    padding: 0.8rem 0.9rem;
-  }
-}
-
-
-/* ===============================
-   تحسين عرض قسم سجل الملاحظات التفاعلي (أسلوب iOS)
-   =============================== */
-#observations-log {
-  background: #ffffff;
-  border-radius: 2rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
-  padding: 2.5rem 1rem 3rem;
-  max-width: 900px;
-  margin: 2rem auto;
-  border: 1px solid rgba(24, 165, 162, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-/* لمعة خفيفة */
-#observations-log::before {
-  content: "";
-  position: absolute;
-  top: -30%;
-  left: -20%;
-  width: 150%;
-  height: 150%;
-  background: radial-gradient(circle at center, rgba(24, 165, 162, 0.06), transparent 70%);
-  opacity: 0.7;
-  z-index: 0;
-}
-
-/* العنوان الرئيسي */
-#observations-log h3 {
-  font-size: clamp(1.7rem, 5vw, 2.5rem);
-  font-weight: 900;
-  color: var(--color-navy);
-  line-height: 1.3;
-  margin-bottom: 0.8rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  position: relative;
-  z-index: 2;
-}
-
-/* الفقرة */
-#observations-log p {
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
-  color: #4b5563;
-  max-width: 650px;
-  margin: 0 auto 1rem;
-  line-height: 1.7;
-  font-weight: 500;
-  background: rgba(24, 165, 162, 0.05);
-  border-radius: 1rem;
-  padding: 0.8rem 1.2rem;
-  display: inline-block;
-  position: relative;
-  z-index: 2;
-}
-
-/* زر الإدخال الذكي (تصميم أنيق يشبه iOS) */
-#add-observation-btn {
-  position: relative;
-  z-index: 2;
-  transform: scale(0.95);
-  padding: 0.75rem 1.6rem !important;
-  font-size: 1rem !important;
+  border: none;
   border-radius: 999px;
   background: linear-gradient(145deg, #14b8a6, #0d9488);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(13, 148, 136, 0.35);
+  box-shadow: 0 6px 16px rgba(13,148,136,0.35);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
   transition: all 0.25s ease;
 }
 
-/* تأثير لمعة */
+/* لمعة خفيفة */
 #add-observation-btn::after {
   content: "";
   position: absolute;
@@ -467,32 +96,155 @@
   transform: skewX(-25deg);
   transition: 0.7s;
 }
-
 #add-observation-btn:hover::after {
   left: 130%;
 }
 
+/* تأثير الضغط */
 #add-observation-btn:hover {
-  transform: scale(0.98);
-  box-shadow: 0 10px 24px rgba(13, 148, 136, 0.45);
+  transform: scale(0.97);
+  box-shadow: 0 10px 20px rgba(13,148,136,0.45);
+}
+#add-observation-btn:active {
+  transform: scale(0.94);
+  transition: 0.1s ease;
 }
 
-/* متجاوب مع الجوال */
+/* للجوال */
+@media (max-width: 480px) {
+  #add-observation-btn {
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+    font-size: 0.95rem !important;
+    padding: 0.8rem 1rem !important;
+  }
+}
+
+/* ===============================
+   بطاقات الملاحظات (Observation Cards)
+   =============================== */
+.observation-card {
+  background: #fff;
+  border: 1px solid rgba(24,165,162,0.12);
+  border-radius: 1.2rem;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+  transition: all 0.25s ease;
+  opacity: 0;
+  animation: smoothFade 0.5s ease forwards;
+}
+@keyframes smoothFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.observation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+}
+
+/* العنوان */
+.observation-card h4 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  margin-bottom: 0.5rem;
+}
+
+/* النص */
+.observation-card p {
+  font-size: 0.92rem;
+  color: #374151;
+  line-height: 1.7;
+}
+
+/* ===============================
+   شارات الحالة (Status Badges)
+   =============================== */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.status-badge:hover {
+  transform: scale(1.05);
+  filter: brightness(1.05);
+}
+
+/* الحالات */
+.status-pending {
+  background: linear-gradient(135deg, #facc15, #eab308);
+  color: #3f3f46;
+}
+.status-pending::before { content: "⚙️"; }
+
+.status-done {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+.status-done::before { content: "✅"; }
+
+.status-closed {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+.status-closed::before { content: "🚫"; }
+
+/* ===============================
+   صناديق التفاصيل (الوصف + خطة العمل)
+   =============================== */
+.section-header {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--color-navy);
+  margin-bottom: 0.6rem;
+  border-right: 4px solid var(--color-teal);
+  padding-right: 0.6rem;
+}
+
+.info-box {
+  background: rgba(24,165,162,0.04);
+  border: 1px solid rgba(24,165,162,0.12);
+  border-radius: 1rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.6;
+  transition: background 0.3s ease;
+}
+.info-box:hover {
+  background: rgba(24,165,162,0.07);
+}
+.info-box strong {
+  color: var(--color-navy);
+}
+
+/* ===============================
+   تحسين عرض الجوال
+   =============================== */
 @media (max-width: 480px) {
   #observations-log {
     padding: 2rem 1rem;
     border-radius: 1.2rem;
   }
-  #observations-log h3 {
-    font-size: 1.4rem;
+  .observation-card {
+    padding: 1rem;
+    border-radius: 1rem;
   }
-  #observations-log p {
-    font-size: 0.9rem;
-    padding: 0.6rem 1rem;
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
   }
-  #add-observation-btn {
-    width: 100%;
-    font-size: 0.95rem !important;
-    padding: 0.8rem 1rem !important;
+  .info-box {
+    font-size: 0.88rem;
   }
 }
