@@ -135,8 +135,61 @@
 }
 
   </style>
-
 <link rel="stylesheet" href="modal-style.css">
+
+<style>
+/* ===============================
+   تحسين زر الإدخال الذكي (Smart Input)
+   =============================== */
+#add-observation-btn {
+  padding: 0.6rem 1.3rem !important;
+  font-size: 0.9rem !important;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #18a5a2, #0fa39f);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(24,165,162,0.45);
+  transform: scale(0.92);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* لمعة Apple */
+#add-observation-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.4) 0%,
+    rgba(255,255,255,0) 80%
+  );
+  transform: skewX(-25deg);
+  transition: 0.7s;
+}
+
+#add-observation-btn:hover::after {
+  left: 130%;
+}
+
+#add-observation-btn:hover {
+  transform: scale(0.95);
+  box-shadow: 0 8px 22px rgba(24,165,162,0.6);
+}
+
+/* تناسق على الجوال */
+@media (max-width: 480px) {
+  #add-observation-btn {
+    font-size: 0.85rem !important;
+    padding: 0.7rem 1.1rem !important;
+    transform: scale(0.96);
+    width: 100%;
+  }
+}
+</style>
 
   
 </head>
