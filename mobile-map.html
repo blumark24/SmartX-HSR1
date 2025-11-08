@@ -273,12 +273,10 @@
   margin-inline: auto;
   overflow: hidden;
 }
-
-/* عند الفتح الكامل */
 .filter-sheet.open {
   transform: translateY(0);
-  transition: transform 0.55s cubic-bezier(0.25, 1.25, 0.5, 1.1);
 }
+
 
 /* الوضع الليلي */
 [data-theme="dark"] .filter-sheet {
@@ -1041,6 +1039,36 @@ document.getElementById('countGreen').textContent = greens;
     map.on('moveend', drawFrame);
     drawFrame();
 
+    /* ==== التحكم في حركة الشريط السفلي (Filter Sheet) مع حركة Bounce ==== */
+const filterSheet = document.getElementById("filterSheet");
+const filterHandle = document.getElementById("filterHandle");
+let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
+
+function setFilterState(open) {
+  sheetOpen = open;
+  filterSheet.classList.toggle("open", open);
+  if (open) {
+    // حركة Bounce لطيفة عند الفتح
+    filterSheet.animate(
+      [
+        { transform: "translateY(10%)" },
+        { transform: "translateY(-2%)" },
+        { transform: "translateY(0)" }
+      ],
+      { duration: 500, easing: "cubic-bezier(.25,1.25,.5,1)" }
+    );
+  }
+}
+
+filterHandle.addEventListener("mousedown", e => { draggingFilter = true; dragStartY = e.clientY; filterSheet.style.transition = "none"; });
+filterHandle.addEventListener("touchstart", e => { draggingFilter = true; dragStartY = e.touches[0].clientY; filterSheet.style.transition = "none"; });
+window.addEventListener("mousemove", e => { if(!draggingFilter)return; dragY=e.clientY; const dy=Math.max(0,dragY-dragStartY); const sheetHeight=filterSheet.offsetHeight; const translate=Math.max(0,Math.min(sheetHeight*0.8,sheetOpen?dy:sheetHeight*0.8-dy)); filterSheet.style.transform=`translateY(${translate}px)`; });
+window.addEventListener("touchmove", e => { if(!draggingFilter)return; dragY=e.touches[0].clientY; const dy=Math.max(0,dragY-dragStartY); const sheetHeight=filterSheet.offsetHeight; const translate=Math.max(0,Math.min(sheetHeight*0.8,sheetOpen?dy:sheetHeight*0.8-dy)); filterSheet.style.transform=`translateY(${translate}px)`; });
+window.addEventListener("mouseup", ()=>{ if(!draggingFilter)return; draggingFilter=false; const matrix=window.getComputedStyle(filterSheet).transform; let current=0; if(matrix&&matrix!=="none"){const values=matrix.split("(")[1].split(")")[0].split(","); current=parseFloat(values[5]||0);} const threshold=filterSheet.offsetHeight*0.4; if(current>threshold){setFilterState(false);filterSheet.style.transform=`translateY(80%)`;}else{setFilterState(true);filterSheet.style.transform=`translateY(0)`;} filterSheet.style.transition="transform 0.4s cubic-bezier(0.25,1.25,0.5,1)"; });
+window.addEventListener("touchend", ()=>{ if(!draggingFilter)return; draggingFilter=false; const matrix=window.getComputedStyle(filterSheet).transform; let current=0; if(matrix&&matrix!=="none"){const values=matrix.split("(")[1].split(")")[0].split(","); current=parseFloat(values[5]||0);} const threshold=filterSheet.offsetHeight*0.4; if(current>threshold){setFilterState(false);filterSheet.style.transform=`translateY(80%)`;}else{setFilterState(true);filterSheet.style.transform=`translateY(0)`;} filterSheet.style.transition="transform 0.4s cubic-bezier(0.25,1.25,0.5,1)"; });
+document.querySelector(".filter-head").addEventListener("click", ()=>setFilterState(!sheetOpen));
+
+    
     startLive();
     drawMe();
     lucide.createIcons();
