@@ -891,28 +891,7 @@ document.head.appendChild(style);
 }
 </style>
 
-<script>
-function closeImageModal(){
-  document.getElementById('imageModal').classList.add('hidden');
-}
 
-function showObservationImages(id){
-  const modal = document.getElementById('imageModal');
-  const before = document.getElementById('beforeImg');
-  const after = document.getElementById('afterImg');
-  const o = observations.find(x => (x.docId||x.id)==id);
-  if(!o){ alert('❌ لم يتم العثور على الملاحظة.'); return; }
-
-  const beforeImg = o.beforeImagePath || o.imagePath || (o.images?.before) || "";
-  const afterImg  = o.afterImagePath  || (o.images?.after)  || "";
-
-  if(!beforeImg && !afterImg){ alert("🚫 لا توجد صور لهذا البلاغ."); return; }
-
-  before.src = beforeImg || "";
-  after.src  = afterImg || "";
-  modal.classList.remove('hidden');
-}
-</script>
 
 </body>
 </html>
