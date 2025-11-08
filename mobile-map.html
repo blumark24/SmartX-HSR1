@@ -640,6 +640,82 @@
       applyTheme(now);
     });
 
+/* ==== التحكم في حركة الشريط السفلي (Filter Sheet) مع حركة Bounce ==== */
+const filterSheet = document.getElementById("filterSheet");
+const filterHandle = document.getElementById("filterHandle");
+let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
+
+/* دالة لتغيير الحالة */
+function setFilterState(open) {
+  sheetOpen = open;
+  filterSheet.classList.toggle("open", open);
+  if (open) {
+    // حركة Bounce لطيفة عند الفتح
+    filterSheet.animate(
+      [
+        { transform: "translateY(10%)" },
+        { transform: "translateY(-2%)" },
+        { transform: "translateY(0)" }
+      ],
+      { duration: 500, easing: "cubic-bezier(.25,1.25,.5,1)" }
+    );
+  }
+}
+
+/* بداية السحب */
+function onFilterStart(e) {
+  draggingFilter = true;
+  dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
+  filterSheet.style.transition = "none";
+}
+
+/* أثناء السحب */
+function onFilterMove(e) {
+  if (!draggingFilter) return;
+  dragY = (e.touches ? e.touches[0].clientY : e.clientY);
+  const dy = Math.max(0, dragY - dragStartY);
+  const sheetHeight = filterSheet.offsetHeight;
+  const translate = Math.max(0, Math.min(sheetHeight * 0.8, sheetOpen ? dy : sheetHeight * 0.8 - dy));
+  filterSheet.style.transform = `translateY(${translate}px)`;
+}
+
+/* نهاية السحب */
+function onFilterEnd() {
+  if (!draggingFilter) return;
+  draggingFilter = false;
+  filterSheet.style.transition = "transform 0.4s cubic-bezier(0.25, 1.25, 0.5, 1)";
+  
+  const matrix = window.getComputedStyle(filterSheet).transform;
+  let current = 0;
+  if (matrix && matrix !== "none") {
+    const values = matrix.split("(")[1].split(")")[0].split(",");
+    current = parseFloat(values[5] || 0);
+  }
+  
+  const threshold = filterSheet.offsetHeight * 0.4;
+  if (current > threshold) {
+    setFilterState(false);
+    filterSheet.style.transform = `translateY(80%)`;
+  } else {
+    setFilterState(true);
+    filterSheet.style.transform = `translateY(0)`;
+  }
+}
+
+/* الأحداث */
+filterHandle.addEventListener("mousedown", onFilterStart);
+filterHandle.addEventListener("touchstart", onFilterStart);
+window.addEventListener("mousemove", onFilterMove);
+window.addEventListener("touchmove", onFilterMove);
+window.addEventListener("mouseup", onFilterEnd);
+window.addEventListener("touchend", onFilterEnd);
+
+/* الضغط على الرأس لفتح/إغلاق الشريط */
+document.querySelector(".filter-head").addEventListener("click", () =>
+  setFilterState(!sheetOpen)
+);
+
+    
     const map = L.map('map', { zoomControl:false, attributionControl:true });
     map.setView([24.7136, 46.6753], 11);
     L.control.zoom({ position:'topright' }).addTo(map);
