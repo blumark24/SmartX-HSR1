@@ -360,49 +360,65 @@
     <div id="map" aria-label="الخريطة التفاعلية"></div>
 
 
-    <!-- Floating tools (legend only) -->
-    <div class="toolbar">
-      <button id="legendToggle" class="legend-toggle" title="إظهار/إخفاء الأسطورة">
-        <span id="legendCount" class="legend-count">0</span>
-        <i data-lucide="info"></i>
-      </button>
+ <!-- Floating tools (legend only) -->
+<div class="toolbar">
+  <button id="legendToggle" class="legend-toggle" title="إظهار/إخفاء الأسطورة">
+    <span id="legendCount" class="legend-count">0</span>
+    <i data-lucide="info"></i>
+  </button>
 
-      <div id="legendBox" class="legend-glass hidden" aria-label="أسطورة الحالات">
-        <h4 class="legend-title">أسطورة الحالات</h4>
-        <div class="legend-items">
-          <div class="item"><span class="dot red"></span> جديد</div>
-          <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
-          <div class="item"><span class="dot green"></span> مغلق</div>
-        </div>
-      </div>
+  <div id="legendBox" class="legend-glass hidden" aria-label="أسطورة الحالات">
+    <h4 class="legend-title">أسطورة الحالات</h4>
+    <div class="legend-items">
+      <div class="item"><span class="dot red"></span> جديد</div>
+      <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
+      <div class="item"><span class="dot green"></span> مغلق</div>
+    </div>
+  </div>
+</div>
+
+<!-- Smart Bottom Filter Sheet (peek) -->
+<section id="filterSheet" class="filter-sheet" aria-label="أدوات التصفية الذكية">
+  <div id="filterHandle" class="filter-grip" aria-hidden="true"></div>
+  <div class="filter-head">
+    <div class="filter-title">
+      <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> عوامل التصفية
+    </div>
+    <div class="near-badge">
+      <i data-lucide="radar" class="w-4 h-4"></i> قريب: <span id="nearCountMini">0</span>
+    </div>
+  </div>
+
+  <div class="filter-body">
+    <div class="filter-item">
+      <label for="statusFilter"><i data-lucide="list-filter"></i></label>
+      <select id="statusFilter" class="filter-select" title="تصفية حسب الحالة">
+        <option value="ALL">كل الحالات</option>
+        <option value="PENDING">جديد</option>
+        <option value="IN_PROGRESS">قيد التنفيذ</option>
+        <option value="COMPLETED">مغلق</option>
+      </select>
     </div>
 
-    <!-- Smart Bottom Filter Sheet (peek) -->
-    <section id="filterSheet" class="filter-sheet" aria-label="أدوات التصفية الذكية">
-      <div id="filterHandle" class="filter-grip" aria-hidden="true"></div>
-      <div class="filter-head">
-        <div class="filter-title"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i> عوامل التصفية</div>
-        <div class="near-badge"><i data-lucide="radar" class="w-4 h-4"></i> قريب: <span id="nearCountMini">0</span></div>
-      </div>
-      <div class="filter-body">
-        <div class="filter-item">
-          <label for="statusFilter"><i data-lucide="list-filter"></i></label>
-          <select id="statusFilter" class="filter-select" title="تصفية حسب الحالة">
-            <option value="ALL">كل الحالات</option>
-            <option value="PENDING">جديد</option>
-            <option value="IN_PROGRESS">قيد التنفيذ</option>
-            <option value="COMPLETED">مغلق</option>
-          </select>
-        </div>
-        <div class="filter-item">
-          <i data-lucide="radar"></i>
-          <label for="radiusInput">نصف القطر:</label>
-          <input id="radiusInput" type="range" min="500" max="5000" step="100" class="filter-range">
-          <span id="radiusLabel" class="radius-value">2000 م</span>
-        </div>
-      </div>
-    </section>
+    <div class="filter-item">
+      <i data-lucide="radar"></i>
+      <label for="radiusInput">نصف القطر:</label>
+      <input id="radiusInput" type="range" min="500" max="5000" step="100" class="filter-range">
+      <span id="radiusLabel" class="radius-value">2000 م</span>
+    </div>
   </div>
+
+  <!-- ✅ أسطورة الحالات بأسفل الشريط -->
+  <div class="legend-inline">
+    <div class="legend-title">أسطورة الحالات</div>
+    <div class="legend-items">
+      <div class="item"><span class="dot red"></span> جديد (<b id="countRed">0</b>)</div>
+      <div class="item"><span class="dot amber"></span> قيد التنفيذ (<b id="countAmber">0</b>)</div>
+      <div class="item"><span class="dot green"></span> مغلق (<b id="countGreen">0</b>)</div>
+    </div>
+  </div>
+</section>
+
 
   <!-- Observation details sheet (unchanged) -->
   <section id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
@@ -593,6 +609,13 @@
         const ambers = observations.filter(o => o.status === "IN_PROGRESS" && o.location && haversine(lastMe, o.location.split(',').map(Number)) <= r).length;
         const greens = observations.filter(o => o.status === "COMPLETED" && o.location && haversine(lastMe, o.location.split(',').map(Number)) <= r).length;
 
+        // تحديث الأعداد في الأسطورة داخل الشريط السفلي
+document.getElementById('countRed').textContent = reds;
+document.getElementById('countAmber').textContent = ambers;
+document.getElementById('countGreen').textContent = greens;
+
+
+        
         legendBtn.classList.remove('red','amber','green');
         if (reds >= ambers && reds >= greens && reds > 0) legendBtn.classList.add('red');
         else if (ambers >= reds && ambers >= greens && ambers > 0) legendBtn.classList.add('amber');
