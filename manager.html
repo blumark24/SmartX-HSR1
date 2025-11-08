@@ -699,34 +699,32 @@ const firebaseConfig = {
     window.deleteObservation = deleteObservation;
 
 
-// ===== Show Observation Images (إصدار ذكي نهائي تلقائي) =====
-async function showObservationImages(id) {
-
-  // ===== Show Observation Images (داخل الخريطة الذكية) =====
+// ===== Show Observation Images (خريطة ذكية مطورة) =====
 async function showObservationImages(id) {
   const o = observations.find(x => (x.docId || x.id) == id);
-  if (!o) return alert("❌ لم يتم العثور على الملاحظة.");
+  if (!o) {
+    alert("❌ لم يتم العثور على الملاحظة.");
+    return;
+  }
 
-  // استخراج الصور المحتملة
-  const possibleKeys = [
+  // جمع الصور من كل الحقول المحتملة
+  const keys = [
     "beforeImagePath", "afterImagePath", "imagePath",
-    "beforeImage", "afterImage", "photoPath", "imgPath"
+    "beforeImage", "afterImage", "photoPath", "imgPath", "photoUrl"
   ];
-
   let before = null, after = null;
-  for (const key of possibleKeys) {
+  for (const key of keys) {
     if (o[key] && typeof o[key] === "string") {
       if (!before) before = o[key];
       else if (!after && o[key] !== before) after = o[key];
     }
   }
-
   if (o.images) {
     if (o.images.before && !before) before = o.images.before;
     if (o.images.after && !after) after = o.images.after;
   }
 
-  // لو مافيه صور
+  // لو مافيه صور نهائياً
   if (!before && !after) {
     L.popup()
       .setLatLng([o.lat, o.lng])
@@ -737,94 +735,47 @@ async function showObservationImages(id) {
     return;
   }
 
-  // HTML المقارنة داخل البوب أب
+  // بناء محتوى المقارنة
   const html = `
-    <div style="width:260px;overflow:hidden;border-radius:12px;position:relative;">
-      <div style="position:relative;width:100%;height:auto;">
-        <img src="${before}" style="width:100%;border-radius:12px;display:block;">
-        ${
-          after
-            ? `<div style="position:absolute;top:0;left:0;width:50%;overflow:hidden;transition:width .3s;">
-                 <img src="${after}" style="width:100%;border-radius:12px;display:block;">
-               </div>
-               <div style="position:absolute;top:0;left:50%;width:3px;background:#18A5A2;cursor:ew-resize;height:100%;"></div>`
-            : ""
-        }
-      </div>
+    <div style="position:relative;width:270px;overflow:hidden;border-radius:12px;">
+      <img src="${before}" style="width:100%;display:block;border-radius:12px;">
+      ${
+        after
+          ? `<div id="compareAfter" style="position:absolute;top:0;left:0;width:50%;overflow:hidden;">
+               <img src="${after}" style="width:100%;border-radius:12px;">
+             </div>
+             <div id="compareDivider" style="position:absolute;top:0;left:50%;width:3px;height:100%;background:#18A5A2;cursor:ew-resize;"></div>`
+          : ""
+      }
       <div style="text-align:center;margin-top:5px;">
-        <small>📸 مقارنة ${after ? "قبل / بعد" : "صورة مرفقة"}</small>
+        <small>${after ? "📸 قبل / بعد" : "📷 صورة البلاغ"}</small>
       </div>
     </div>
   `;
 
-  // عرضها داخل البوب أب
-  L.popup()
+  // فتح البوب أب
+  const popup = L.popup()
     .setLatLng([o.lat, o.lng])
     .setContent(html)
     .openOn(map);
-}
-window.showObservationImages = showObservationImages;
 
-  // نحاول نلقا البلاغ من الذاكرة
-  let o = observations.find(x => (x.docId || x.id) == id);
-
-  // نحاول نلقاه من localStorage لو مو موجود
-  if (!o) {
-    const localData = JSON.parse(localStorage.getItem("observations") || "[]");
-    o = localData.find(x => (x.id || x.docId) == id);
-  }
-
-  if (!o) {
-    alert("❌ لم يتم العثور على الملاحظة.");
-    return;
-  }
-
-  // نحاول استخراج الصور من كل الحقول الممكنة
-  const possibleKeys = [
-    "beforeImagePath", "afterImagePath", "imagePath",
-    "beforeImage", "afterImage", "photoPath", "imgPath"
-  ];
-
-  let before = null, after = null;
-
-  for (const key of possibleKeys) {
-    if (o[key] && typeof o[key] === "string") {
-      if (!before) before = o[key];
-      else if (!after && o[key] !== before) after = o[key];
-    }
-  }
-
-  // فحص كائن images إن وجد
-  if (o.images) {
-    if (o.images.before && !before) before = o.images.before;
-    if (o.images.after && !after) after = o.images.after;
-  }
-
-  // لو مافي صور أبدًا
-  if (!before && !after) {
-    alert("🚫 لا توجد صور مرفقة لهذه الملاحظة.");
-    console.log("🔍 بيانات البلاغ:", o);
-    return;
-  }
-
-  // إنشاء النافذة الاحترافية
-  const modal = document.createElement("div");
-  modal.className = "observation-modal";
-  modal.innerHTML = `
-    <div class="modal-overlay"></div>
-    <div class="modal-content animate-in">
-      <h3>📸 صور البلاغ</h3>
-      <div class="images">
-        ${before ? `<div><p>قبل</p><img src="${before}" alt="قبل" onclick="window.open('${before}', '_blank')"></div>` : ""}
-        ${after ? `<div><p>بعد</p><img src="${after}" alt="بعد" onclick="window.open('${after}', '_blank')"></div>` : ""}
-      </div>
-      <button id="closeImageModal">إغلاق</button>
-    </div>
-  `;
-  document.body.appendChild(modal);
-
-  modal.querySelector("#closeImageModal").addEventListener("click", () => modal.remove());
-  modal.querySelector(".modal-overlay").addEventListener("click", () => modal.remove());
+  // لو في صورتين — فعل السحب اليدوي
+  setTimeout(() => {
+    const divider = document.getElementById("compareDivider");
+    const afterBox = document.getElementById("compareAfter");
+    if (!divider || !afterBox) return;
+    let dragging = false;
+    divider.addEventListener("mousedown", () => (dragging = true));
+    window.addEventListener("mouseup", () => (dragging = false));
+    window.addEventListener("mousemove", e => {
+      if (!dragging) return;
+      const rect = divider.parentElement.getBoundingClientRect();
+      let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+      const percent = (x / rect.width) * 100;
+      afterBox.style.width = percent + "%";
+      divider.style.left = percent + "%";
+    });
+  }, 300);
 }
 window.showObservationImages = showObservationImages;
 
