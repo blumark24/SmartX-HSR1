@@ -1,124 +1,70 @@
 /* ===============================
-   زر الإدخال الذكي بتصميم iOS + نبض ولمسة حيّة
+   زر الإدخال الذكي بأسلوب iOS حقيقي وواضح
    =============================== */
-
 #add-observation-btn {
-  position: relative;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
 
-  padding: 0.55rem 1.3rem !important;
-  font-size: 0.9rem !important;
+  padding: 0.65rem 1.5rem !important;
+  font-size: 1rem !important;
   font-weight: 700;
-  color: #fff;
-  border-radius: 14px;
-  background: linear-gradient(145deg, #1bb3b0, #0fa29f);
-  box-shadow: 0 4px 10px rgba(24,165,162,0.35);
   border: none;
+  outline: none;
   cursor: pointer;
 
-  transform: translateY(20px) scale(0.95);
-  opacity: 0;
-  animation: btnFadeIn 0.8s ease-out forwards;
-  animation-delay: 0.2s;
+  color: #fff;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #22c1c3 0%, #0ea5a0 100%);
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.15),
+    inset 0 1px 1px rgba(255,255,255,0.4);
   transition: all 0.25s ease-in-out;
 }
 
-/* لمعة Apple */
-#add-observation-btn::after {
+/* لمعة iOS عند المرور */
+#add-observation-btn::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 90%);
-  transform: skewX(-25deg);
-  transition: 0.7s;
-}
-#add-observation-btn:hover::after {
-  left: 130%;
-}
-
-/* تفاعل اللمس والنبض */
-#add-observation-btn:hover,
-#add-observation-btn:active {
-  animation: btnGlow 2.2s ease-in-out 1;
-}
-
-/* تأثير اللمس الحي (Micro Bounce) */
-#add-observation-btn:active {
-  animation: microBounce 0.25s ease-out;
-  transform: scale(0.92);
-}
-
-@keyframes microBounce {
-  0% { transform: scale(1); }
-  40% { transform: scale(0.92); }
-  75% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-
-/* حركة الظهور */
-@keyframes btnFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(25px) scale(0.9);
-  }
-  70% {
-    opacity: 1;
-    transform: translateY(-3px) scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* حركة النص والأيقونة */
-#add-observation-btn span,
-#add-observation-btn i,
-#add-observation-btn svg {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  animation: textMotion 1s ease-out forwards;
-  animation-delay: 0.7s;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,0.35), rgba(255,255,255,0));
   opacity: 0;
-  transform: translateY(6px);
+  transition: opacity 0.3s;
+}
+#add-observation-btn:hover::before {
+  opacity: 1;
 }
 
-@keyframes textMotion {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* تأثير الضغط والارتداد */
+#add-observation-btn:active {
+  transform: scale(0.94);
+  background: linear-gradient(180deg, #0fa29f 0%, #078a84 100%);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.25),
+    inset 0 1px 1px rgba(255,255,255,0.2);
+  transition: transform 0.15s ease;
 }
 
-/* نبض ناعم عند التمرير */
-@keyframes btnGlow {
-  0%, 100% {
-    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
-  }
-  50% {
-    box-shadow: 0 0 22px rgba(24,165,162,0.6);
-  }
+/* تأثير اهتزاز خفيف عند النقر */
+#add-observation-btn:active {
+  animation: iosBounce 0.25s ease-out;
+}
+@keyframes iosBounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(0.93); }
+  70% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
 /* للجوال */
 @media (max-width: 480px) {
   #add-observation-btn {
     width: 90%;
-    max-width: 250px;
-    font-size: 0.85rem !important;
-    padding: 0.5rem 1rem !important;
+    max-width: 270px;
+    font-size: 0.95rem !important;
+    padding: 0.65rem 1.2rem !important;
     border-radius: 12px;
     margin: 0 auto;
     display: flex;
