@@ -254,41 +254,43 @@
 
     .leaflet-control-attribution { display:none !important; }
 
-    /* ===== Smart Bottom Filter Sheet (peek) ===== */
-    .filter-sheet{
-      position: absolute;
-      inset-inline: 12px;
-      bottom: 12px;
-      z-index: 902;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(24,165,162,0.25);
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-      overflow: hidden;
-      transition: transform .28s ease, box-shadow .28s ease;
-      transform: translateY(calc(100% - 60px)); /* peek height */
-      max-width: 520px;
-      margin-inline: auto;
-      pointer-events: auto;
-    }
-    [data-theme="dark"] .filter-sheet{ background: rgba(16,32,54,0.9); border-color: rgba(24,165,162,0.3); }
-    .filter-sheet.open{ transform: translateY(0); }
-    .filter-grip{ width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 10px auto 6px; }
-    .filter-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px 8px; border-bottom:1px solid var(--line); }
-    .filter-title{ font-weight:900; font-size:13px; color: var(--muted); display:flex; align-items:center; gap:6px; }
-    .near-badge{ display:inline-flex; align-items:center; gap:6px; background:#eefaf9; color:#0b6b68; border:1px solid rgba(24,165,162,0.25); padding:4px 8px; border-radius:999px; font-weight:900; font-size:12px; }
-    [data-theme="dark"] .near-badge{ background:#0f2a33; color:#b7f3ef; }
-    .filter-body{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px 12px; flex-wrap: wrap; }
-    .filter-item{ display:flex; align-items:center; gap:6px; font-weight:800; }
-    .filter-item label{ color: var(--teal); font-weight:900; }
-    .filter-select{ border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--text); font-weight:700; padding:4px 8px; font-size:12px; }
-    .filter-range{ width: 140px; accent-color: var(--teal); }
-    .radius-value{ font-weight:900; font-size:12px; color: var(--teal); }
-    @media (max-width:480px){
-      .filter-body{ flex-direction: column; align-items:flex-start; }
-      .filter-range{ width: 100%; }
-    }
+/* ===== Smart Bottom Filter Sheet (peek) ===== */
+.filter-sheet{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 902;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(24,165,162,0.25);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -10px 25px rgba(0,0,0,0.18);
+  overflow: hidden;
+  transition: transform .35s cubic-bezier(.25,1.25,.5,1);
+  transform: translateY(80%); /* يظهر جزء بسيط فقط (20%) */
+  max-width: 520px;
+  margin-inline: auto;
+  pointer-events: auto;
+}
+[data-theme="dark"] .filter-sheet{ background: rgba(16,32,54,0.9); border-color: rgba(24,165,162,0.3); }
+.filter-sheet.open{ transform: translateY(0); }
+.filter-grip{ width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 10px auto 6px; }
+.filter-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px 8px; border-bottom:1px solid var(--line); cursor:pointer; }
+.filter-title{ font-weight:900; font-size:13px; color: var(--muted); display:flex; align-items:center; gap:6px; }
+.near-badge{ display:inline-flex; align-items:center; gap:6px; background:#eefaf9; color:#0b6b68; border:1px solid rgba(24,165,162,0.25); padding:4px 8px; border-radius:999px; font-weight:900; font-size:12px; }
+[data-theme="dark"] .near-badge{ background:#0f2a33; color:#b7f3ef; }
+.filter-body{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px 12px; flex-wrap: wrap; }
+.filter-item{ display:flex; align-items:center; gap:6px; font-weight:800; }
+.filter-item label{ color: var(--teal); font-weight:900; }
+.filter-select{ border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--text); font-weight:700; padding:4px 8px; font-size:12px; }
+.filter-range{ width: 140px; accent-color: var(--teal); }
+.radius-value{ font-weight:900; font-size:12px; color: var(--teal); }
+@media (max-width:480px){
+  .filter-body{ flex-direction: column; align-items:flex-start; }
+  .filter-range{ width: 100%; }
+}
+
 
 /* تنسيق زر الأسطورة بشكل متناسق أسفل الخريطة */
 .legend-toggle {
