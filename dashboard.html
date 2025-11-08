@@ -767,20 +767,28 @@ const firebaseConfig = {
 };
 
 // تهيئة التطبيق وقاعدة البيانات
-let app, db, FIREBASE_READY = false;
+let app, db, storage, FIREBASE_READY = false;
+
 import { getStorage, ref, uploadBytes, getDownloadURL } 
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-const storage = getStorage(app);
 
-    
 try {
+  // ✅ أولاً: تهيئة التطبيق
   app = initializeApp(firebaseConfig);
+
+  // ✅ ثانياً: Firestore
   db = getFirestore(app);
+
+  // ✅ ثالثاً: Storage (بعد تهيئة التطبيق)
+  storage = getStorage(app);
+
   FIREBASE_READY = !!db;
-  document.getElementById('userInfo').textContent = '✅ تم الاتصال بنجاح بـ Firebase / Firestore.';
+  document.getElementById('userInfo').textContent =
+    '✅ تم الاتصال بنجاح بـ Firebase / Firestore.';
 } catch (e) {
   console.warn('Firebase init failed, fallback to local demo mode.', e);
-  document.getElementById('userInfo').textContent = '⚠️ وضع تجريبي محلي (لم يتم ضبط Firebase).';
+  document.getElementById('userInfo').textContent =
+    '⚠️ وضع تجريبي محلي (لم يتم ضبط Firebase).';
 }
 
     // =============================
