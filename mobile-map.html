@@ -254,164 +254,42 @@
 
     .leaflet-control-attribution { display:none !important; }
 
-/* ==== Smart Bottom Filter Sheet (20% peek & smooth style) ==== */
-.filter-sheet {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(16px);
-  border-top: 2px solid rgba(24, 165, 162, 0.25);
-  border-radius: 20px 20px 0 0;
-  box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.25);
-  transform: translateY(80%); /* 👈 يظهر فقط 20% عند التحميل */
-  transition: transform 0.45s cubic-bezier(0.25, 1.25, 0.5, 1);
-  will-change: transform;
-  max-width: 520px;
-  margin-inline: auto;
-  overflow: hidden;
-}
-.filter-sheet.open {
-  transform: translateY(0);
-}
+    /* ===== Smart Bottom Filter Sheet (peek) ===== */
+    .filter-sheet{
+      position: absolute;
+      inset-inline: 12px;
+      bottom: 12px;
+      z-index: 902;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(24,165,162,0.25);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      overflow: hidden;
+      transition: transform .28s ease, box-shadow .28s ease;
+      transform: translateY(calc(100% - 60px)); /* peek height */
+      max-width: 520px;
+      margin-inline: auto;
+      pointer-events: auto;
+    }
+    [data-theme="dark"] .filter-sheet{ background: rgba(16,32,54,0.9); border-color: rgba(24,165,162,0.3); }
+    .filter-sheet.open{ transform: translateY(0); }
+    .filter-grip{ width: 40px; height: 5px; border-radius: 999px; background: var(--line); margin: 10px auto 6px; }
+    .filter-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:0 12px 8px; border-bottom:1px solid var(--line); }
+    .filter-title{ font-weight:900; font-size:13px; color: var(--muted); display:flex; align-items:center; gap:6px; }
+    .near-badge{ display:inline-flex; align-items:center; gap:6px; background:#eefaf9; color:#0b6b68; border:1px solid rgba(24,165,162,0.25); padding:4px 8px; border-radius:999px; font-weight:900; font-size:12px; }
+    [data-theme="dark"] .near-badge{ background:#0f2a33; color:#b7f3ef; }
+    .filter-body{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px 12px; flex-wrap: wrap; }
+    .filter-item{ display:flex; align-items:center; gap:6px; font-weight:800; }
+    .filter-item label{ color: var(--teal); font-weight:900; }
+    .filter-select{ border:1px solid var(--line); border-radius:10px; background:var(--card); color:var(--text); font-weight:700; padding:4px 8px; font-size:12px; }
+    .filter-range{ width: 140px; accent-color: var(--teal); }
+    .radius-value{ font-weight:900; font-size:12px; color: var(--teal); }
+    @media (max-width:480px){
+      .filter-body{ flex-direction: column; align-items:flex-start; }
+      .filter-range{ width: 100%; }
+    }
 
-
-/* الوضع الليلي */
-[data-theme="dark"] .filter-sheet {
-  background: rgba(16, 32, 54, 0.96);
-  border-top-color: rgba(24, 165, 162, 0.35);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.55);
-}
-
-/* المقبض العلوي */
-.filter-grip {
-  width: 46px;
-  height: 5px;
-  border-radius: 999px;
-  background: rgba(24, 165, 162, 0.45);
-  margin: 10px auto 6px;
-}
-
-/* الرأس */
-.filter-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 0 14px 8px;
-  border-bottom: 1px solid var(--line);
-}
-
-.filter-title {
-  font-weight: 900;
-  font-size: 13px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* شارة القريب */
-.near-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #eefaf9;
-  color: #0b6b68;
-  border: 1px solid rgba(24, 165, 162, 0.25);
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 12px;
-}
-[data-theme="dark"] .near-badge {
-  background: #0f2a33;
-  color: #b7f3ef;
-}
-
-/* الجسم */
-.filter-body {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 14px 14px;
-  flex-wrap: wrap;
-}
-
-.filter-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 800;
-}
-
-.filter-item label {
-  color: var(--teal);
-  font-weight: 900;
-}
-
-.filter-select {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--card);
-  color: var(--text);
-  font-weight: 700;
-  padding: 4px 8px;
-  font-size: 12px;
-}
-
-.filter-range {
-  width: 140px;
-  accent-color: var(--teal);
-}
-
-.radius-value {
-  font-weight: 900;
-  font-size: 12px;
-  color: var(--teal);
-}
-
-/* عرض الجوال */
-@media (max-width: 480px) {
-  .filter-body {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .filter-range {
-    width: 100%;
-  }
-}
-
-/* أسطورة الحالات داخل الشريط السفلي */
-.legend-inline {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 14px;
-  font-size: 13px;
-}
-.legend-inline .item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-}
-.legend-inline b {
-  color: var(--teal);
-}
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-.dot.red { background: var(--red); }
-.dot.amber { background: var(--amber); }
-.dot.green { background: var(--green); }
-
-    
 /* تنسيق زر الأسطورة بشكل متناسق أسفل الخريطة */
 .legend-toggle {
   position: absolute;
@@ -452,11 +330,6 @@
 </head>
 <body>
 
-<style>
-  body { scroll-behavior: smooth; }
-</style>
-
-  
  <!-- Header -->
 <header class="app-header">
   <div class="brand">Smart HSR <span>Live&nbsp;Map</span></div>
@@ -487,65 +360,49 @@
     <div id="map" aria-label="الخريطة التفاعلية"></div>
 
 
- <!-- Floating tools (legend only) -->
-<div class="toolbar">
-  <button id="legendToggle" class="legend-toggle" title="إظهار/إخفاء الأسطورة">
-    <span id="legendCount" class="legend-count">0</span>
-    <i data-lucide="info"></i>
-  </button>
+    <!-- Floating tools (legend only) -->
+    <div class="toolbar">
+      <button id="legendToggle" class="legend-toggle" title="إظهار/إخفاء الأسطورة">
+        <span id="legendCount" class="legend-count">0</span>
+        <i data-lucide="info"></i>
+      </button>
 
-  <div id="legendBox" class="legend-glass hidden" aria-label="أسطورة الحالات">
-    <h4 class="legend-title">أسطورة الحالات</h4>
-    <div class="legend-items">
-      <div class="item"><span class="dot red"></span> جديد</div>
-      <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
-      <div class="item"><span class="dot green"></span> مغلق</div>
+      <div id="legendBox" class="legend-glass hidden" aria-label="أسطورة الحالات">
+        <h4 class="legend-title">أسطورة الحالات</h4>
+        <div class="legend-items">
+          <div class="item"><span class="dot red"></span> جديد</div>
+          <div class="item"><span class="dot amber"></span> قيد التنفيذ</div>
+          <div class="item"><span class="dot green"></span> مغلق</div>
+        </div>
+      </div>
     </div>
+
+    <!-- Smart Bottom Filter Sheet (peek) -->
+    <section id="filterSheet" class="filter-sheet" aria-label="أدوات التصفية الذكية">
+      <div id="filterHandle" class="filter-grip" aria-hidden="true"></div>
+      <div class="filter-head">
+        <div class="filter-title"><i data-lucide="sliders-horizontal" class="w-4 h-4"></i> عوامل التصفية</div>
+        <div class="near-badge"><i data-lucide="radar" class="w-4 h-4"></i> قريب: <span id="nearCountMini">0</span></div>
+      </div>
+      <div class="filter-body">
+        <div class="filter-item">
+          <label for="statusFilter"><i data-lucide="list-filter"></i></label>
+          <select id="statusFilter" class="filter-select" title="تصفية حسب الحالة">
+            <option value="ALL">كل الحالات</option>
+            <option value="PENDING">جديد</option>
+            <option value="IN_PROGRESS">قيد التنفيذ</option>
+            <option value="COMPLETED">مغلق</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <i data-lucide="radar"></i>
+          <label for="radiusInput">نصف القطر:</label>
+          <input id="radiusInput" type="range" min="500" max="5000" step="100" class="filter-range">
+          <span id="radiusLabel" class="radius-value">2000 م</span>
+        </div>
+      </div>
+    </section>
   </div>
-</div>
-
-<!-- Smart Bottom Filter Sheet (peek) -->
-<section id="filterSheet" class="filter-sheet" aria-label="أدوات التصفية الذكية">
-  <div id="filterHandle" class="filter-grip" aria-hidden="true"></div>
-  <div class="filter-head">
-    <div class="filter-title">
-      <i data-lucide="sliders-horizontal" class="w-4 h-4"></i> عوامل التصفية
-    </div>
-    <div class="near-badge">
-      <i data-lucide="radar" class="w-4 h-4"></i> قريب: <span id="nearCountMini">0</span>
-    </div>
-  </div>
-
-  <div class="filter-body">
-    <div class="filter-item">
-      <label for="statusFilter"><i data-lucide="list-filter"></i></label>
-      <select id="statusFilter" class="filter-select" title="تصفية حسب الحالة">
-        <option value="ALL">كل الحالات</option>
-        <option value="PENDING">جديد</option>
-        <option value="IN_PROGRESS">قيد التنفيذ</option>
-        <option value="COMPLETED">مغلق</option>
-      </select>
-    </div>
-
-    <div class="filter-item">
-      <i data-lucide="radar"></i>
-      <label for="radiusInput">نصف القطر:</label>
-      <input id="radiusInput" type="range" min="500" max="5000" step="100" class="filter-range">
-      <span id="radiusLabel" class="radius-value">2000 م</span>
-    </div>
-  </div>
-
-  <!-- ✅ أسطورة الحالات بأسفل الشريط -->
-  <div class="legend-inline">
-    <div class="legend-title">أسطورة الحالات</div>
-    <div class="legend-items">
-      <div class="item"><span class="dot red"></span> جديد (<b id="countRed">0</b>)</div>
-      <div class="item"><span class="dot amber"></span> قيد التنفيذ (<b id="countAmber">0</b>)</div>
-      <div class="item"><span class="dot green"></span> مغلق (<b id="countGreen">0</b>)</div>
-    </div>
-  </div>
-</section>
-
 
   <!-- Observation details sheet (unchanged) -->
   <section id="smartSheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
@@ -643,82 +500,6 @@
       applyTheme(now);
     });
 
-/* ==== التحكم في حركة الشريط السفلي (Filter Sheet) مع حركة Bounce ==== */
-const filterSheet = document.getElementById("filterSheet");
-const filterHandle = document.getElementById("filterHandle");
-let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
-
-/* دالة لتغيير الحالة */
-function setFilterState(open) {
-  sheetOpen = open;
-  filterSheet.classList.toggle("open", open);
-  if (open) {
-    // حركة Bounce لطيفة عند الفتح
-    filterSheet.animate(
-      [
-        { transform: "translateY(10%)" },
-        { transform: "translateY(-2%)" },
-        { transform: "translateY(0)" }
-      ],
-      { duration: 500, easing: "cubic-bezier(.25,1.25,.5,1)" }
-    );
-  }
-}
-
-/* بداية السحب */
-function onFilterStart(e) {
-  draggingFilter = true;
-  dragStartY = (e.touches ? e.touches[0].clientY : e.clientY);
-  filterSheet.style.transition = "none";
-}
-
-/* أثناء السحب */
-function onFilterMove(e) {
-  if (!draggingFilter) return;
-  dragY = (e.touches ? e.touches[0].clientY : e.clientY);
-  const dy = Math.max(0, dragY - dragStartY);
-  const sheetHeight = filterSheet.offsetHeight;
-  const translate = Math.max(0, Math.min(sheetHeight * 0.8, sheetOpen ? dy : sheetHeight * 0.8 - dy));
-  filterSheet.style.transform = `translateY(${translate}px)`;
-}
-
-/* نهاية السحب */
-function onFilterEnd() {
-  if (!draggingFilter) return;
-  draggingFilter = false;
-  filterSheet.style.transition = "transform 0.4s cubic-bezier(0.25, 1.25, 0.5, 1)";
-  
-  const matrix = window.getComputedStyle(filterSheet).transform;
-  let current = 0;
-  if (matrix && matrix !== "none") {
-    const values = matrix.split("(")[1].split(")")[0].split(",");
-    current = parseFloat(values[5] || 0);
-  }
-  
-  const threshold = filterSheet.offsetHeight * 0.4;
-  if (current > threshold) {
-    setFilterState(false);
-    filterSheet.style.transform = `translateY(80%)`;
-  } else {
-    setFilterState(true);
-    filterSheet.style.transform = `translateY(0)`;
-  }
-}
-
-/* الأحداث */
-filterHandle.addEventListener("mousedown", onFilterStart);
-filterHandle.addEventListener("touchstart", onFilterStart);
-window.addEventListener("mousemove", onFilterMove);
-window.addEventListener("touchmove", onFilterMove);
-window.addEventListener("mouseup", onFilterEnd);
-window.addEventListener("touchend", onFilterEnd);
-
-/* الضغط على الرأس لفتح/إغلاق الشريط */
-document.querySelector(".filter-head").addEventListener("click", () =>
-  setFilterState(!sheetOpen)
-);
-
-    
     const map = L.map('map', { zoomControl:false, attributionControl:true });
     map.setView([24.7136, 46.6753], 11);
     L.control.zoom({ position:'topright' }).addTo(map);
@@ -812,13 +593,6 @@ document.querySelector(".filter-head").addEventListener("click", () =>
         const ambers = observations.filter(o => o.status === "IN_PROGRESS" && o.location && haversine(lastMe, o.location.split(',').map(Number)) <= r).length;
         const greens = observations.filter(o => o.status === "COMPLETED" && o.location && haversine(lastMe, o.location.split(',').map(Number)) <= r).length;
 
-        // تحديث الأعداد في الأسطورة داخل الشريط السفلي
-document.getElementById('countRed').textContent = reds;
-document.getElementById('countAmber').textContent = ambers;
-document.getElementById('countGreen').textContent = greens;
-
-
-        
         legendBtn.classList.remove('red','amber','green');
         if (reds >= ambers && reds >= greens && reds > 0) legendBtn.classList.add('red');
         else if (ambers >= reds && ambers >= greens && ambers > 0) legendBtn.classList.add('amber');
@@ -1017,6 +791,50 @@ document.getElementById('countGreen').textContent = greens;
       }catch(e){}
     }
 
+    const filterSheet = document.getElementById('filterSheet');
+    const filterHandle = document.getElementById('filterHandle');
+    let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
+
+    function setFilterState(open){
+      sheetOpen = open;
+      filterSheet.classList.toggle('open', open);
+    }
+    function onFilterStart(e){
+      draggingFilter = true;
+      dragStartY = (e.touches?e.touches[0].clientY:e.clientY);
+      filterSheet.style.transition = 'none';
+    }
+    function onFilterMove(e){
+      if(!draggingFilter) return;
+      dragY = (e.touches?e.touches[0].clientY:e.clientY);
+      const dy = Math.max(0, dragY - dragStartY);
+      const base = sheetOpen ? 0 : (filterSheet.offsetHeight - 60);
+      let translate = sheetOpen ? dy : (filterSheet.offsetHeight - 60 - dy);
+      translate = Math.max(0, Math.min(filterSheet.offsetHeight - 60, translate));
+      filterSheet.style.transform = `translateY(${translate}px)`;
+    }
+    function onFilterEnd(){
+      if(!draggingFilter) return;
+      draggingFilter = false;
+      filterSheet.style.transition = '';
+      const matrix = window.getComputedStyle(filterSheet).transform;
+      let current = 0;
+      if (matrix && matrix !== 'none'){
+        const values = matrix.split('(')[1].split(')')[0].split(',');
+        current = parseFloat(values[5] || 0);
+      }
+      const threshold = (filterSheet.offsetHeight - 60)/2;
+      if (current > threshold){ setFilterState(false); filterSheet.style.transform = `translateY(${filterSheet.offsetHeight - 60}px)`; }
+      else { setFilterState(true); filterSheet.style.transform = `translateY(0)`; }
+    }
+
+    filterHandle.addEventListener('mousedown', onFilterStart);
+    filterHandle.addEventListener('touchstart', onFilterStart);
+    window.addEventListener('mousemove', onFilterMove);
+    window.addEventListener('touchmove', onFilterMove);
+    window.addEventListener('mouseup', onFilterEnd);
+    window.addEventListener('touchend', onFilterEnd);
+    document.querySelector('.filter-head').addEventListener('click', ()=> setFilterState(!sheetOpen));
 
     function toast(text){
       const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
@@ -1039,42 +857,9 @@ document.getElementById('countGreen').textContent = greens;
     map.on('moveend', drawFrame);
     drawFrame();
 
-    /* ==== التحكم في حركة الشريط السفلي (Filter Sheet) مع حركة Bounce ==== */
-const filterSheet = document.getElementById("filterSheet");
-const filterHandle = document.getElementById("filterHandle");
-let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
-
-function setFilterState(open) {
-  sheetOpen = open;
-  filterSheet.classList.toggle("open", open);
-  if (open) {
-    // حركة Bounce لطيفة عند الفتح
-    filterSheet.animate(
-      [
-        { transform: "translateY(10%)" },
-        { transform: "translateY(-2%)" },
-        { transform: "translateY(0)" }
-      ],
-      { duration: 500, easing: "cubic-bezier(.25,1.25,.5,1)" }
-    );
-  }
-}
-
-filterHandle.addEventListener("mousedown", e => { draggingFilter = true; dragStartY = e.clientY; filterSheet.style.transition = "none"; });
-filterHandle.addEventListener("touchstart", e => { draggingFilter = true; dragStartY = e.touches[0].clientY; filterSheet.style.transition = "none"; });
-window.addEventListener("mousemove", e => { if(!draggingFilter)return; dragY=e.clientY; const dy=Math.max(0,dragY-dragStartY); const sheetHeight=filterSheet.offsetHeight; const translate=Math.max(0,Math.min(sheetHeight*0.8,sheetOpen?dy:sheetHeight*0.8-dy)); filterSheet.style.transform=`translateY(${translate}px)`; });
-window.addEventListener("touchmove", e => { if(!draggingFilter)return; dragY=e.touches[0].clientY; const dy=Math.max(0,dragY-dragStartY); const sheetHeight=filterSheet.offsetHeight; const translate=Math.max(0,Math.min(sheetHeight*0.8,sheetOpen?dy:sheetHeight*0.8-dy)); filterSheet.style.transform=`translateY(${translate}px)`; });
-window.addEventListener("mouseup", ()=>{ if(!draggingFilter)return; draggingFilter=false; const matrix=window.getComputedStyle(filterSheet).transform; let current=0; if(matrix&&matrix!=="none"){const values=matrix.split("(")[1].split(")")[0].split(","); current=parseFloat(values[5]||0);} const threshold=filterSheet.offsetHeight*0.4; if(current>threshold){setFilterState(false);filterSheet.style.transform=`translateY(80%)`;}else{setFilterState(true);filterSheet.style.transform=`translateY(0)`;} filterSheet.style.transition="transform 0.4s cubic-bezier(0.25,1.25,0.5,1)"; });
-window.addEventListener("touchend", ()=>{ if(!draggingFilter)return; draggingFilter=false; const matrix=window.getComputedStyle(filterSheet).transform; let current=0; if(matrix&&matrix!=="none"){const values=matrix.split("(")[1].split(")")[0].split(","); current=parseFloat(values[5]||0);} const threshold=filterSheet.offsetHeight*0.4; if(current>threshold){setFilterState(false);filterSheet.style.transform=`translateY(80%)`;}else{setFilterState(true);filterSheet.style.transform=`translateY(0)`;} filterSheet.style.transition="transform 0.4s cubic-bezier(0.25,1.25,0.5,1)"; });
-document.querySelector(".filter-head").addEventListener("click", ()=>setFilterState(!sheetOpen));
-
-    
     startLive();
     drawMe();
     lucide.createIcons();
   </script>
-
-
-    
 </body>
 </html>
