@@ -1014,50 +1014,6 @@ document.getElementById('countGreen').textContent = greens;
       }catch(e){}
     }
 
-    const filterSheet = document.getElementById('filterSheet');
-    const filterHandle = document.getElementById('filterHandle');
-    let dragStartY = 0, dragY = 0, draggingFilter = false, sheetOpen = false;
-
-    function setFilterState(open){
-      sheetOpen = open;
-      filterSheet.classList.toggle('open', open);
-    }
-    function onFilterStart(e){
-      draggingFilter = true;
-      dragStartY = (e.touches?e.touches[0].clientY:e.clientY);
-      filterSheet.style.transition = 'none';
-    }
-    function onFilterMove(e){
-      if(!draggingFilter) return;
-      dragY = (e.touches?e.touches[0].clientY:e.clientY);
-      const dy = Math.max(0, dragY - dragStartY);
-      const base = sheetOpen ? 0 : (filterSheet.offsetHeight - 60);
-      let translate = sheetOpen ? dy : (filterSheet.offsetHeight - 60 - dy);
-      translate = Math.max(0, Math.min(filterSheet.offsetHeight - 60, translate));
-      filterSheet.style.transform = `translateY(${translate}px)`;
-    }
-    function onFilterEnd(){
-      if(!draggingFilter) return;
-      draggingFilter = false;
-      filterSheet.style.transition = '';
-      const matrix = window.getComputedStyle(filterSheet).transform;
-      let current = 0;
-      if (matrix && matrix !== 'none'){
-        const values = matrix.split('(')[1].split(')')[0].split(',');
-        current = parseFloat(values[5] || 0);
-      }
-      const threshold = (filterSheet.offsetHeight - 60)/2;
-      if (current > threshold){ setFilterState(false); filterSheet.style.transform = `translateY(${filterSheet.offsetHeight - 60}px)`; }
-      else { setFilterState(true); filterSheet.style.transform = `translateY(0)`; }
-    }
-
-    filterHandle.addEventListener('mousedown', onFilterStart);
-    filterHandle.addEventListener('touchstart', onFilterStart);
-    window.addEventListener('mousemove', onFilterMove);
-    window.addEventListener('touchmove', onFilterMove);
-    window.addEventListener('mouseup', onFilterEnd);
-    window.addEventListener('touchend', onFilterEnd);
-    document.querySelector('.filter-head').addEventListener('click', ()=> setFilterState(!sheetOpen));
 
     function toast(text){
       const t=document.getElementById('toast'); t.textContent=text; t.classList.add('show');
