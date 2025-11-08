@@ -848,6 +848,22 @@ document.head.appendChild(style);
     window.closeModal = (id)=>{ document.getElementById(id).style.display='none'; };
   </script>
 
+<!-- مقارنة الصور قبل وبعد -->
+<div id="imageComparisonWrapper" class="comparison-wrapper hidden mt-6">
+  <img id="beforeImage" class="before-image w-full h-auto" alt="صورة قبل الإصلاح">
+  <div id="afterImageContainer" class="after-image">
+    <img id="afterImage" class="w-full h-auto" alt="صورة بعد الإصلاح">
+  </div>
+  <div id="comparisonDivider" class="comparison-divider no-print">
+    <div class="comparison-divider-handle">
+      <i data-lucide="arrow-left-right" class="w-4 h-4 text-teal-600"></i>
+    </div>
+  </div>
+  <span class="comparison-label label-before no-print">قبل</span>
+  <span class="comparison-label label-after no-print">بعد</span>
+</div>
+
+  
   <!-- Toast -->
   <div id="toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 bg-teal-600 text-white px-4 py-2 rounded-full shadow-xl z-50 transition-opacity duration-500"></div>
 
