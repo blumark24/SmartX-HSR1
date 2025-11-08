@@ -319,28 +319,23 @@ body { padding-top: 68px; }
 </style>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
   authDomain: "gen-lang-client-0349944917.firebaseapp.com",
   projectId: "gen-lang-client-0349944917",
-  storageBucket: "gen-lang-client-0349944917.firebasestorage.app",
+  storageBucket: "smart-hsr-manager.firebasestorage.app",
   messagingSenderId: "883065484771",
   appId: "1:883065484771:web:c907bb5a51f68caad75cd6",
   measurementId: "G-V8WG5M8V5B"
 };
 
-// ✅ تهيئة Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
-
 
 const logoutBtn = document.getElementById('logoutBtn');
 const userName = document.getElementById('userName');
@@ -369,66 +364,33 @@ onAuthStateChanged(auth, async (user) => {
       console.warn("خطأ أثناء جلب البيانات:", err);
     }
 
-// تحويل الدور إلى عربي + تنسيق اللون
-const rawRole = (stored.role || "manager").toLowerCase().trim();
-let arabicRole = "";
-let roleClass = "";
+    // تحويل الدور إلى عربي + تنسيق اللون
+    const rawRole = (stored.role || "manager").toLowerCase().trim();
+    let arabicRole = "";
+    let roleClass = "";
 
-if (rawRole.includes("manager") || rawRole.includes("مدير")) {
-  arabicRole = "مدير";
-  roleClass = "user-role-manager";
-} else if (rawRole.includes("inspector") || rawRole.includes("مراقب")) {
-  arabicRole = "مراقب";
-  roleClass = "user-role-inspector";
-} else if (rawRole.includes("contractor") || rawRole.includes("مقاول")) {
-  arabicRole = "مقاول";
-  roleClass = "user-role-contractor";
-} else {
-  arabicRole = "مستخدم";
-}
+    if (rawRole.includes("manager") || rawRole.includes("مدير")) {
+      arabicRole = "مدير";
+      roleClass = "user-role-manager";
+    } else if (rawRole.includes("inspector") || rawRole.includes("مراقب")) {
+      arabicRole = "مراقب";
+      roleClass = "user-role-inspector";
+    } else if (rawRole.includes("contractor") || rawRole.includes("مقاول")) {
+      arabicRole = "مقاول";
+      roleClass = "user-role-contractor";
+    } else {
+      arabicRole = "مستخدم";
+    }
 
-// ✅ هذا السطر هو الجديد
-window.currentUserRole = arabicRole; // حفظ الدور لاستخدامه لاحقًا
+    // عرض الاسم والدور في سطر واحد أنيق
+    userName.textContent = stored.name || user.displayName || "مستخدم";
+    userRole.className = roleClass;
+    userRole.textContent = arabicRole;
 
-// عرض الاسم والدور في سطر واحد أنيق
-userName.textContent = stored.name || user.displayName || "مستخدم";
-userRole.className = roleClass;
-userRole.textContent = arabicRole;
-
-    // === صلاحيات الواجهة حسب الدور ===
-function applyRolePermissions() {
-  if (!window.currentUserRole) return;
-
-  // 🔹 مدير النظام (يشاهد كل شيء)
-  if (currentUserRole === "مدير") {
-    document.querySelectorAll(".role-inspector, .role-contractor, .role-manager")
-      .forEach(el => el.classList.remove("hidden"));
+  } else {
+    redirectToLogin();
   }
-
-  // 🔹 المراقب (يدخل البلاغات ويحدثها)
-  else if (currentUserRole === "مراقب") {
-    document.querySelectorAll(".role-inspector")
-      .forEach(el => el.classList.remove("hidden"));
-    document.querySelectorAll(".role-contractor, .role-manager")
-      .forEach(el => el.classList.add("hidden"));
-  }
-
-  // 🔹 المقاول (يرفع الصور بعد التنفيذ فقط)
-  else if (currentUserRole === "مقاول") {
-    document.querySelectorAll(".role-contractor")
-      .forEach(el => el.classList.remove("hidden"));
-    document.querySelectorAll(".role-inspector, .role-manager")
-      .forEach(el => el.classList.add("hidden"));
-  }
-}
-applyRolePermissions();
-
-
-} else {
-  redirectToLogin();
-}
 });
-
 
 // ===== تسجيل الخروج =====
 logoutBtn.addEventListener('click', async () => {
@@ -492,9 +454,9 @@ document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
       <div class="text-center mb-12 no-print">
         <h3 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-3" style="color:var(--color-navy);">سجل الملاحظات التفاعلي: دقة الصورة والنص</h3>
         <p class="mt-3 text-lg text-gray-600">عرض تفصيلي للملاحظات الميدانية مع أدوات التحليل الآلي.</p>
-        <button id="add-observation-btn" class="ai-button-primary rounded-full px-6 py-2 text-md font-bold mt-4 flex items-center justify-center mx-auto role-inspector hidden" onclick="openModal('smartInputModal')">
-  <i data-lucide="plus-circle" class="w-5 h-5 ml-2"></i> إضافة ملاحظة جديدة (الإدخال الذكي)
-</button>
+        <button id="add-observation-btn" class="ai-button-primary rounded-full px-6 py-2 text-md font-bold mt-4 flex items-center justify-center mx-auto" onclick="openModal('smartInputModal')">
+          <i data-lucide="plus-circle" class="w-5 h-5 ml-2"></i> إضافة ملاحظة جديدة (الإدخال الذكي)
+        </button>
       </div>
 
       <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl grid grid-cols-1 lg:grid-cols-3 gap-8 border border-gray-200">
@@ -589,31 +551,18 @@ document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
               </div>
             </div>
 
-        <div id="actionButtons" class="mt-6 pt-4 border-t border-gray-300 flex justify-end gap-3 no-print">
-
-  <!-- 🔸 زر تحديث الملاحظة يظهر فقط للمقاول -->
-  <button id="contractorUpdateBtn"
-          class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150 hidden role-contractor"
-          onclick="openModal('closeoutModal')">
-    <i data-lucide='upload' class='w-4 h-4 ml-2'></i> تحديث الملاحظة (صورة بعد التنفيذ)
-  </button>
-
-  <!-- 🔹 زر الإغلاق النهائي يظهر فقط للمدير -->
-  <button id="managerCloseBtn"
-          class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150 hidden role-manager"
-          onclick="closeObservationByManager()">
-    <i data-lucide='lock' class='w-4 h-4 ml-2'></i> الإغلاق الإداري النهائي
-  </button>
-
-  <!-- ✅ حالة الإغلاق -->
-  <button id="alreadyCompletedBtn"
-          class="bg-green-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150 hidden"
-          disabled>
-    <i data-lucide='check' class='w-4 h-4 ml-2'></i> الملاحظة مغلقة وموثقة
-  </button>
-
-</div>
-
+            <div id="actionButtons" class="mt-6 pt-4 border-t border-gray-300 flex justify-end gap-3 no-print">
+              <button id="updateStatusBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150" onclick="alert('تم تحويل الحالة إلى قيد التنفيذ (تجريبي)')">
+                تحديث الحالة إلى "قيد التنفيذ"
+              </button>
+              <button id="completeObservationBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150" onclick="openModal('closeoutModal')">
+                <i data-lucide="lock" class="w-4 h-4 ml-2"></i> الإغلاق التنفيذي (صورة بعد)
+              </button>
+              <button id="alreadyCompletedBtn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-150 hidden" disabled>
+                <i data-lucide="check" class="w-4 h-4 ml-2"></i> الملاحظة مغلقة وموثقة
+              </button>
+            </div>
+          </div>
 
           <div id="detailPlaceholder" class="text-center space-y-4">
             <p class="text-gray-500 mt-16 text-lg">الرجاء اختيار ملاحظة من القائمة لعرض الصورة والمذكرة التفصيلية.</p>
@@ -813,28 +762,16 @@ const firebaseConfig = {
 };
 
 // تهيئة التطبيق وقاعدة البيانات
-let app, db, storage, FIREBASE_READY = false;
-
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+let app, db, FIREBASE_READY = false;
 
 try {
-  // ✅ أولاً: تهيئة التطبيق
   app = initializeApp(firebaseConfig);
-
-  // ✅ ثانياً: Firestore
   db = getFirestore(app);
-
-  // ✅ ثالثاً: Storage (بعد تهيئة التطبيق)
-  storage = getStorage(app);
-
   FIREBASE_READY = !!db;
-  document.getElementById('userInfo').textContent =
-    '✅ تم الاتصال بنجاح بـ Firebase / Firestore.';
+  document.getElementById('userInfo').textContent = '✅ تم الاتصال بنجاح بـ Firebase / Firestore.';
 } catch (e) {
   console.warn('Firebase init failed, fallback to local demo mode.', e);
-  document.getElementById('userInfo').textContent =
-    '⚠️ وضع تجريبي محلي (لم يتم ضبط Firebase).';
+  document.getElementById('userInfo').textContent = '⚠️ وضع تجريبي محلي (لم يتم ضبط Firebase).';
 }
 
     // =============================
@@ -1074,17 +1011,12 @@ async function uploadImageBase64(file) {
       hide('modalStep1'); unhide('modalResult');
       setHTML('modalResultContent', loaderHTML('جاري معالجة البيانات...'));
 
-try {
-  let uploadedUrl = null;
+      try {
+        let uploadedUrl = null;
+        if (currentFile) {
+  uploadedUrl = await uploadImageBase64(currentFile);
 
-  // ✅ رفع الصورة إلى Firebase Storage بدل Base64
-  if (currentFile) {
-    const fileRef = ref(storage, `beforeImages/${Date.now()}_${currentFile.name}`);
-    await uploadBytes(fileRef, currentFile);
-    uploadedUrl = await getDownloadURL(fileRef);
-    console.log("📸 تم رفع الصورة إلى Storage:", uploadedUrl);
-  }
-
+        }
 
         // نحسب displayId بسيط: أكبر قيمة + 1
         const nextDisplayId = (observationsData.reduce((m,o)=>Math.max(m,o.id||0),0) + 1) || 1;
@@ -1193,16 +1125,10 @@ try {
         || `تم الإغلاق التنفيذي في ${new Date().toLocaleString('ar-SA')} وتوثيقه بالصورة المرفقة.`;
 
       try {
+        // ارفع صورة AFTER لـ ImgBB
+        setButtonBusy('finalCloseoutBtn', true);
+        const afterUrl = await uploadImageBase64(currentAfterFile);
 
-// ✅ رفع صورة AFTER إلى Firebase Storage
-setButtonBusy('finalCloseoutBtn', true);
-const afterRef = ref(storage, `afterImages/${Date.now()}_${currentAfterFile.name}`);
-await uploadBytes(afterRef, currentAfterFile);
-const afterUrl = await getDownloadURL(afterRef);
-console.log("✅ تم رفع صورة الإغلاق إلى Firebase Storage:", afterUrl);
-
-
-        
         // حدّث Firestore إن كان متاح
         if (FIREBASE_READY) {
           await updateObservationInFirestore(currentSelectedObservation.docId, {
@@ -1388,60 +1314,8 @@ function setButtonBusy(buttonId, busy) {
 }
 
   </script>
-
-    <!-- ضع الكود هنا 👇 قبل </script> مباشرة -->
-  <script>
-    
-  // =============================
-  // دالة الإغلاق الإداري النهائي (للمدير فقط)
-  // =============================
-  window.closeObservationByManager = async function() {
-    if (!currentSelectedObservation) {
-      alert("الرجاء اختيار ملاحظة أولاً.");
-      return;
-    }
-
-    const confirmClose = confirm(
-      `هل أنت متأكد من إغلاق الملاحظة رقم ${currentSelectedObservation.id} نهائيًا؟`
-    );
-    if (!confirmClose) return;
-
-    try {
-      // 🔸 معلومات إضافية لتوثيق الإغلاق
-      const managerName =
-        (JSON.parse(localStorage.getItem("hsrUserData") || "{}").name) || "مدير النظام";
-      const closureNote = `تم الإغلاق الإداري بواسطة ${managerName} في ${new Date().toLocaleString(
-        "ar-SA"
-      )}.`;
-
-      // 🔹 تحديث Firestore إن متاح
-      if (FIREBASE_READY) {
-        await updateObservationInFirestore(currentSelectedObservation.docId, {
-          status: "COMPLETED",
-          resolutionNote: closureNote,
-          adminClosedBy: managerName,
-          adminClosedAt: new Date().toISOString(),
-        });
-      }
-
-      // 🔹 تحديث محلي للواجهة
-      currentSelectedObservation.status = "COMPLETED";
-      currentSelectedObservation.resolutionNote = closureNote;
-
-      alert(`✅ تم الإغلاق الإداري النهائي للملاحظة رقم ${currentSelectedObservation.id}`);
-      handleFilterChange(); // لإعادة تحميل القائمة
-      showObservationDetail(currentSelectedObservation.docId);
-      renderKPIs();
-    } catch (err) {
-      console.error(err);
-      alert("حدث خطأ أثناء الإغلاق الإداري. تحقق من الاتصال بـ Firebase.");
-    }
-  };
-  </script>
-
-  <script src="modal-script.js"></script>
   
+  <script src="modal-script.js"></script>
+
 </body>
 </html>
-
-  
