@@ -1,1 +1,120 @@
+/* ===============================
+   زر الإدخال الذكي بتأثير iOS التفاعلي
+   =============================== */
 
+#add-observation-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 0.55rem 1.3rem !important;
+  font-size: 0.9rem !important;
+  font-weight: 700;
+  color: #fff;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #1bb3b0, #0fa29f);
+  box-shadow: 0 4px 10px rgba(24,165,162,0.35);
+  border: none;
+  cursor: pointer;
+
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  animation: btnFadeIn 0.8s ease-out forwards;
+  animation-delay: 0.2s;
+  transition: all 0.25s ease-in-out;
+}
+
+/* لمعة Apple */
+#add-observation-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 90%);
+  transform: skewX(-25deg);
+  transition: 0.7s;
+}
+#add-observation-btn:hover::after {
+  left: 130%;
+}
+
+/* تأثير النبض الذكي عند اللمس أو hover */
+#add-observation-btn:hover,
+#add-observation-btn:active {
+  animation: btnGlow 2.5s ease-in-out 1;
+}
+
+@keyframes btnGlow {
+  0% {
+    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(24,165,162,0.7);
+  }
+  100% {
+    box-shadow: 0 4px 10px rgba(24,165,162,0.35);
+  }
+}
+
+/* عند اللمس */
+#add-observation-btn:active {
+  transform: translateY(2px) scale(0.92);
+}
+
+/* حركة الظهور */
+@keyframes btnFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(25px) scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* حركة النص والأيقونة */
+#add-observation-btn span,
+#add-observation-btn i,
+#add-observation-btn svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: textMotion 1s ease-out forwards;
+  animation-delay: 0.7s;
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+@keyframes textMotion {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* للجوال */
+@media (max-width: 480px) {
+  #add-observation-btn {
+    width: 90%;
+    max-width: 250px;
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 12px;
+    margin: 0 auto;
+    display: flex;
+  }
+}
