@@ -28,7 +28,20 @@
     .table th,.table td{padding:.75rem;border-bottom:1px solid #e5e7eb}
     .pill{border-radius:999px;padding:.25rem .65rem;font-weight:800}
     .tab-active{background:#fff;border-top:5px solid var(--color-teal);border-radius:1rem 1rem 0 0}
-    #map{height:580px;border-radius:1rem;box-shadow:0 10px 30px rgba(0,0,0,.08);border:1px solid #e5e7eb}
+
+    #map {
+  height: 580px;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #ACE2E1 0%, #18A5A2 50%, #0A1931 100%) border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+    
     .legend{position:absolute;bottom:12px;left:12px;background:#fff;border-radius:.75rem;border:1px solid #e5e7eb;padding:.6rem 1rem;font-size:.85rem;line-height:1.6;box-shadow:0 8px 20px rgba(0,0,0,.08)}
     .legend .dot{display:inline-block;width:.8rem;height:.8rem;border-radius:50%;margin-left:.45rem;vertical-align:middle}
     .badge{display:inline-flex;align-items:center;gap:.4rem;background:#F1F5F9;border:1px solid #E2E8F0;padding:.25rem .6rem;border-radius:999px;font-size:.75rem;font-weight:800}
@@ -579,14 +592,24 @@ const firebaseConfig = {
       list.forEach(o=>{
         const icon = ICONS[o.status] || ICONS.PENDING;
         const m = L.marker([o.lat,o.lng], {icon})
-          .bindPopup(`
-            <div style="min-width:180px">
-              <div class="font-extrabold mb-1">${(o.title||'—')}</div>
-              <div class="text-xs text-gray-600 mb-1">المعرف: ${(o.displayId||o.id)||'—'}</div>
-              <div class="text-xs"><span class="badge"><span class="dot" style="background:${statusColor(o.status)}"></span>${statusLabels[o.status]||o.status}</span></div>
-              ${o.inspector && o.inspector!=='—' ? `<div class="text-xs mt-1">المراقب: ${o.inspector}</div>`:''}
-              ${o.contractor && o.contractor!=='—' ? `<div class="text-xs">المقاول: ${o.contractor}</div>`:''}
-            </div>`);
+
+         .bindPopup(`
+  <div style="min-width:200px; font-family:Tajawal;">
+    <div class="font-extrabold mb-1 text-[15px]">${o.title || '—'}</div>
+    <div class="text-xs text-gray-600 mb-2">المعرف: ${(o.displayId || o.id) || '—'}</div>
+    <div class="text-xs mb-2"><span class="badge"><span class="dot" style="background:${statusColor(o.status)}"></span>${statusLabels[o.status] || o.status}</span></div>
+    ${o.inspector && o.inspector !== '—' ? `<div class="text-xs mb-1">👷‍♂️ المراقب: ${o.inspector}</div>` : ''}
+    ${o.contractor && o.contractor !== '—' ? `<div class="text-xs mb-2">🏗️ المقاول: ${o.contractor}</div>` : ''}
+    <div class="flex flex-col gap-2">
+      <button onclick="showObservationImages('${o.docId || o.id}')" class="px-2 py-1 bg-indigo-600 text-white rounded text-xs w-full">📸 عرض الصور</button>
+      <button onclick="closeTicket('${o.docId || o.id}')" class="px-2 py-1 bg-green-600 text-white rounded text-xs w-full">✅ إغلاق البلاغ</button>
+      <button onclick="deleteObservation('${o.docId || o.id}')" class="px-2 py-1 bg-red-600 text-white rounded text-xs w-full">🗑️ حذف البلاغ</button>
+    </div>
+  </div>
+`);
+ 
+
+        
         m.addTo(markersLayer);
       });
     }
