@@ -1320,5 +1320,48 @@ function setButtonBusy(buttonId, busy) {
   
   <script src="modal-script.js"></script>
 
+
+  <script>
+// ===== تحديث حالة GPS في الهيدر =====
+function updateGpsStatus() {
+  const gpsCircle = document.querySelector("#gpsIndicator .circle");
+  const gpsText = document.getElementById("gpsText");
+
+  if (!navigator.geolocation) {
+    gpsText.textContent = "غير مدعوم";
+    gpsCircle.classList.add("off");
+    gpsCircle.classList.remove("on");
+    return;
+  }
+
+  gpsText.textContent = "جاري التحديد...";
+  gpsCircle.classList.add("off");
+  gpsCircle.classList.remove("on");
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      gpsText.textContent = "نشط";
+      gpsCircle.classList.add("on");
+      gpsCircle.classList.remove("off");
+    },
+    (err) => {
+      gpsText.textContent = "غير متاح";
+      gpsCircle.classList.add("off");
+      gpsCircle.classList.remove("on");
+    },
+    { enableHighAccuracy: true, timeout: 5000 }
+  );
+}
+
+// تشغيل الفحص مباشرة عند تحميل الصفحة
+document.addEventListener("DOMContentLoaded", () => {
+  updateGpsStatus();
+});
+
+// إعادة فحص GPS كل دقيقة (اختياري)
+setInterval(updateGpsStatus, 60000);
+</script>
+
+  
 </body>
 </html>
